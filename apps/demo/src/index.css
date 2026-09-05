@@ -1,0 +1,16 @@
+/* demo 应用全局样式：页面级设置由宿主应用负责（组件库样式见 @eflink-tech/draw/styles.css） */
+@import "tailwindcss";
+
+/* 组件库内部布局用到 Tailwind 工具类，必须显式扫描其源码，否则类不会生成 */
+@source "../../../packages/draw/src";
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}

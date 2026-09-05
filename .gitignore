@@ -1,0 +1,22 @@
+node_modules
+dist
+.DS_Store
+*.local
+.vite
+tsconfig.tsbuildinfo
+
+# Playwright 产物
+test-results
+playwright-report
+blob-report
+playwright/.cache
+
+# 本地历史资料与设计草稿（不随开源仓库发布）
+/processon_files
+/index.old.html
+/images
+/docs
+/.superpowers
+/.playwright-mcp
+/gui-test-screenshots
+/.idea
