@@ -4,6 +4,12 @@
 
 A diagram & flowchart editor for the web. Run it standalone, or embed `<DrawEditor />` into your React app.
 
+## 截图预览
+
+| 流程图编辑 | 属性面板 | AI 助手 |
+| --- | --- | --- |
+| ![流程图编辑](docs/screenshots/flowchart.png) | ![属性面板](docs/screenshots/property-panel.png) | ![AI 助手](docs/screenshots/ai-assistant.png) |
+
 ## 功能特性
 
 - 画布引擎：Konva + react-konva，无限画布、缩放平移、网格与分页参考
