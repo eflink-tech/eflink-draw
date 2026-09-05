@@ -5,6 +5,8 @@ import './styles.css'
 
 // 组件
 export { DrawEditor } from './DrawEditor'
+export { setDrawRemoteStore } from './core/editor/persistence'
+export type { DrawRemoteStore } from './core/editor/persistence'
 
 // 状态
 export { useEditorStore } from './store/editorStore'

@@ -10,13 +10,16 @@ import { Canvas } from '@/components/canvas/Canvas'
 import { AIAssistantRoot } from '@/components/ai/AIAssistantRoot'
 import { AIChatPanel } from '@/components/ai/AIChatPanel'
 import { useEditorStore } from '@/store/editorStore'
-import { loadDocumentFromStorage } from '@/core/editor/persistence'
+import { loadDocumentFromStorage, loadFromRemote } from '@/core/editor/persistence'
 
 export function DrawEditor() {
-  // 启动自动恢复：读到合法持久化文档则载入（StrictMode 下 effect 重跑两次，loadDocument 幂等）
+  // 启动自动恢复：先载入本地缓存（即时），再异步拉取远端覆盖（远端为权威数据源）
   useEffect(() => {
     const saved = loadDocumentFromStorage()
     if (saved) useEditorStore.getState().loadDocument(saved)
+    void loadFromRemote().then((doc) => {
+      if (doc) useEditorStore.getState().loadDocument(doc)
+    })
   }, [])
 
   return (

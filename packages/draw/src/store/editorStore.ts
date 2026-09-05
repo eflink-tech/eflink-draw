@@ -10,7 +10,7 @@ import {
 import { LINKER_FONT_DEFAULTS } from '@/core/editor/linker'
 import { resetManualRoute } from '@/core/editor/manualRoute'
 import { expandGroupIds, newGroupId, remapGroupIdsForCopy } from '@/core/editor/groupOps'
-import { saveDocumentToStorage } from '@/core/editor/persistence'
+import { saveDocumentToStorage, mirrorToRemote } from '@/core/editor/persistence'
 import { HistoryManager, applyCommand, reverseCommand, getPageFromCommand } from '@/core/editor/history'
 import { alignShapes, applyShapeTransform, distributeShapes, matchSize } from '@/core/editor/alignmentOps'
 
@@ -170,7 +170,10 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   // ⌘S 保存：写 localStorage，成功后清除脏标记；失败保留 isDirty 提示未保存
   saveDocument: () => {
     const ok = saveDocumentToStorage(get().document)
-    if (ok) set({ isDirty: false })
+    if (ok) {
+      set({ isDirty: false })
+      mirrorToRemote(get().document)
+    }
     return ok
   },
 
@@ -197,6 +200,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const doc = createEmptyDocument()
     historyManager.clear()
     saveDocumentToStorage(doc)
+    mirrorToRemote(doc)
     set({
       document: doc,
       selectedIds: new Set(),

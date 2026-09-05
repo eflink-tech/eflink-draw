@@ -58,3 +58,35 @@ export function loadDocumentFromStorage(): DocumentData | null {
     return null
   }
 }
+
+/**
+ * 远端存储钩子：宿主注入后，文档保存会异步镜像到远端（后端 API），
+ * localStorage 仍同步写入作为即时缓存与离线兜底。
+ */
+export interface DrawRemoteStore {
+  /** 启动时拉取远端文档；无文档返回 null */
+  load(): Promise<DocumentData | null>
+  /** 文档保存时整体覆盖远端 */
+  save(doc: DocumentData): Promise<void>
+}
+
+let remoteStore: DrawRemoteStore | null = null
+
+/** 注册远端存储（宿主在挂载编辑器前调用；传 null 注销） */
+export function setDrawRemoteStore(store: DrawRemoteStore | null): void {
+  remoteStore = store
+}
+
+/** 内部使用：异步镜像到远端（静默失败，不打断编辑流程） */
+export function mirrorToRemote(doc: DocumentData): void {
+  if (!remoteStore) return
+  void remoteStore.save(doc).catch(() => {
+    /* 远端不可用时保留本地副本 */
+  })
+}
+
+/** 内部使用：从远端拉取文档 */
+export function loadFromRemote(): Promise<DocumentData | null> {
+  if (!remoteStore) return Promise.resolve(null)
+  return remoteStore.load().catch(() => null)
+}
