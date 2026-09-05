@@ -21,3 +21,8 @@ playwright/.cache
 /.playwright-mcp
 /gui-test-screenshots
 /.idea
+
+# 环境变量文件（可能含密钥，不入库）
+.env
+.env.*
+!.env.example
