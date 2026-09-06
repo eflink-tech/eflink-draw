@@ -9,6 +9,10 @@ export { setDrawRemoteStore } from './core/editor/persistence'
 export { setEditorBackHref } from './core/editor/chrome'
 export type { DrawRemoteStore } from './core/editor/persistence'
 
+// 分享桥接：宿主注入分享实现（编辑器分享按钮调用）
+export { setDrawShareHandler } from './core/share/shareBridge'
+export type { DrawShareHandler, DrawShareResult } from './core/share/shareBridge'
+
 // 状态
 export { useEditorStore } from './store/editorStore'
 export { useUIStore } from './store/uiStore'

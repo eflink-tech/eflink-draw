@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from 'react'
 import {
   Undo2, Redo2, Bold, Italic, Underline,
-  Paintbrush as FormatBrush, Lock, Unlock, Link2, ArrowLeft,
+  Paintbrush as FormatBrush, Lock, Unlock, Link2, ArrowLeft, Share2,
 } from 'lucide-react'
 import { IconButton } from '@/components/common/IconButton'
 import { Tooltip } from '@/components/common/Tooltip'
@@ -23,6 +23,9 @@ import { getLinkerPoints } from '@/core/editor/linker'
 import { makeStoreRectGetter } from '@/core/editor/interaction'
 import logoUrl from '@/assets/draw-eflink-logo.png'
 import { getEditorBackHref } from '@/core/editor/chrome'
+import { ShareDialog } from './ShareDialog'
+import { getDrawShareHandler } from '@/core/share/shareBridge'
+import type { DocumentData } from '@/types'
 
 /** Mac 平台判定（快捷键显示用；行为层兼容见 Canvas.tsx 的 metaKey） */
 const IS_MAC =
@@ -349,6 +352,17 @@ export function TopBar() {
   const brushData = useEditorStore((s) => s.brushData)
   const currentTool = useEditorStore((s) => s.currentTool)
   const page = useEditorStore((s) => s.document.page)
+
+  // 分享弹窗（doc 为点击"分享"时刻的画板快照，弹窗期间编辑不影响本次分享内容）
+  const [shareOpen, setShareOpen] = useState(false)
+  const [shareDoc, setShareDoc] = useState<DocumentData | null>(null)
+  const closeShare = useRef(() => setShareOpen(false)).current
+  const openShare = () => {
+    const doc = useEditorStore.getState().document
+    if (!doc) return
+    setShareDoc(doc)
+    setShareOpen(true)
+  }
 
   // 获取第一个选中图形（不含连线，用于填充/字体等图形专属属性）
   const firstSelected: ElementInstance | null = (() => {
@@ -760,6 +774,19 @@ export function TopBar() {
             openOnHover
           />
         ))}
+
+        {/* 行尾分享入口（菜单栏右侧留白处；仅宿主注入分享实现后出现） */}
+        {getDrawShareHandler() !== null && (
+          <button
+            type="button"
+            onClick={openShare}
+            title="生成分享链接"
+            className="ml-auto flex h-6 items-center gap-1 rounded-md px-2 text-xs text-[#666] transition-colors hover:bg-[#ececec] hover:text-[#333]"
+          >
+            <Share2 size={13} />
+            分享
+          </button>
+        )}
       </div>
 
       {/* 工具栏 */}
@@ -1001,6 +1028,7 @@ export function TopBar() {
       {/* 离屏导出（监听 efdraw:export） */}
       <ExportImage />
       {hotkeyOpen && <HotkeyDialog onClose={() => setHotkeyOpen(false)} />}
+      <ShareDialog open={shareOpen} doc={shareDoc} onClose={closeShare} />
     </div>
   )
 }
