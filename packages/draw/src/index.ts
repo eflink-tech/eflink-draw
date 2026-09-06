@@ -6,6 +6,7 @@ import './styles.css'
 // 组件
 export { DrawEditor } from './DrawEditor'
 export { setDrawRemoteStore } from './core/editor/persistence'
+export { setEditorBackHref } from './core/editor/chrome'
 export type { DrawRemoteStore } from './core/editor/persistence'
 
 // 状态

@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from 'react'
 import {
   Undo2, Redo2, Bold, Italic, Underline,
-  Paintbrush as FormatBrush, Lock, Unlock, Link2,
+  Paintbrush as FormatBrush, Lock, Unlock, Link2, ArrowLeft,
 } from 'lucide-react'
 import { IconButton } from '@/components/common/IconButton'
 import { Tooltip } from '@/components/common/Tooltip'
@@ -22,6 +22,7 @@ import { applyLayerAction } from '@/core/editor/layerAction'
 import { getLinkerPoints } from '@/core/editor/linker'
 import { makeStoreRectGetter } from '@/core/editor/interaction'
 import logoUrl from '@/assets/draw-eflink-logo.png'
+import { getEditorBackHref } from '@/core/editor/chrome'
 
 /** Mac 平台判定（快捷键显示用；行为层兼容见 Canvas.tsx 的 metaKey） */
 const IS_MAC =
@@ -736,6 +737,15 @@ export function TopBar() {
     <div className="flex flex-col border-b border-[#e0e0e0] bg-[#f8f8f8] select-none">
       {/* 菜单栏 */}
       <div className="flex items-center h-8 px-4">
+        {getEditorBackHref() && (
+          <a
+            href={getEditorBackHref()!}
+            title="返回"
+            className="mr-3 flex size-6 shrink-0 items-center justify-center rounded-md text-[#666] transition-colors hover:bg-[#ececec] hover:text-[#333]"
+          >
+            <ArrowLeft size={16} />
+          </a>
+        )}
         <span className="flex items-center font-semibold text-sm text-[#333] mr-4">
           <img src={logoUrl} alt="易飞绘图 Logo" className="w-[18px] h-[18px] mr-1.5" draggable={false} />
           易飞绘图
