@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from 'react'
 import {
   Undo2, Redo2, Bold, Italic, Underline,
-  Paintbrush as FormatBrush, Lock, Unlock, Link2, ArrowLeft, Share2,
+  Paintbrush as FormatBrush, Lock, Unlock, Link2, ArrowLeft, Share2, MessageCircle,
 } from 'lucide-react'
 import { IconButton } from '@/components/common/IconButton'
 import { Tooltip } from '@/components/common/Tooltip'
@@ -777,6 +777,7 @@ export function TopBar() {
 
         {/* 行尾分享入口（菜单栏右侧留白处；仅宿主注入分享实现后出现） */}
         {getDrawShareHandler() !== null && (
+          <>
           <button
             type="button"
             onClick={openShare}
@@ -786,6 +787,16 @@ export function TopBar() {
             <Share2 size={13} />
             分享
           </button>
+          <button
+            type="button"
+            onClick={() => window.open('/contact', '_blank')}
+            title="问题反馈"
+            className="ml-1 flex h-6 items-center gap-1 rounded-md px-2 text-xs text-[#666] transition-colors hover:bg-[#ececec] hover:text-[#333]"
+          >
+            <MessageCircle size={13} />
+            反馈
+          </button>
+          </>
         )}
       </div>
 
