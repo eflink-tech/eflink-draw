@@ -160,7 +160,9 @@ export function Canvas() {
         }
       } else if (name === 'element' || name === 'linker') {
         // 文本块命中区等辅助节点不带 Konva id，元素 id 从自定义 attr 兜底读取
-        const id = target.id() || target.getAttr('elementId')
+        // （经 target.attrs 读取：konva 10 的 getAttr 泛型签名在 Node 联合类型上不可调用）
+        // konva 10 起 id() 返回 string | undefined，命中元素必有 id，此处兜底为空串
+        const id = target.id() ?? (target.attrs.elementId as string | undefined) ?? ''
         const st = useEditorStore.getState()
         // 格式刷模式：点击图形应用样式（从 getState 实时读取，避免 useCallback 闭包过期）
         if (st.brushData) {
