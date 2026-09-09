@@ -122,7 +122,7 @@ git push          # 推送后机器人自动开 Version PR
 使用微信或企业微信扫码添加（二维码长期有效）：
 
 <p align="center">
-  <img src="./docs/wecom-contact-qr.png" width="220" alt="企业微信二维码" />
+  <img src="./docs/screenshots/wecom-contact-qr.png" width="220" alt="企业微信二维码" />
 </p>
 
 ## License
