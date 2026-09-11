@@ -20,6 +20,24 @@ export function DrawEditor() {
     void loadFromRemote().then((doc) => {
       if (doc) useEditorStore.getState().loadDocument(doc)
     })
+
+    // 离页拦截 bridge：宿主（EditorLeaveGuard）通过它读取脏状态、触发保存、清理本地草稿
+    ;(window as unknown as Record<string, unknown>).__eflinkEditorBridge = {
+      isDirty: () => useEditorStore.getState().isDirty,
+      save: () => {
+        useEditorStore.getState().saveDocument()
+      },
+      discard: () => {
+        try {
+          localStorage.removeItem('efdraw:document:v1')
+        } catch {
+          /* ignore */
+        }
+      },
+    }
+    return () => {
+      delete (window as unknown as Record<string, unknown>).__eflinkEditorBridge
+    }
   }, [])
 
   return (
