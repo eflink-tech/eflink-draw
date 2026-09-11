@@ -3,6 +3,7 @@ import {
   visibleWorldRect,
   clippedSnapLinePoints,
   createFrameScheduler,
+  createPointerPanSession,
 } from '../dragPerf'
 
 describe('visibleWorldRect', () => {
@@ -78,5 +79,75 @@ describe('createFrameScheduler', () => {
     scheduler.flush()
     expect(cancel).toHaveBeenCalledWith(1)
     expect(fn).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('createPointerPanSession', () => {
+  it('同一帧多次 move 只 apply 最后一次坐标', () => {
+    const queued: FrameRequestCallback[] = []
+    const scheduler = createFrameScheduler({
+      schedule: (cb) => {
+        queued.push(cb)
+        return queued.length
+      },
+      cancel: () => undefined,
+    })
+    const apply = vi.fn()
+    const session = createPointerPanSession({ apply, scheduler })
+    session.move(10, 20)
+    session.move(30, 40)
+    expect(apply).not.toHaveBeenCalled()
+    queued[0]!(0)
+    expect(apply).toHaveBeenCalledTimes(1)
+    expect(apply).toHaveBeenCalledWith({ x: 30, y: 40 })
+  })
+
+  it('clamp 在合帧前生效，apply 收到裁剪后的坐标', () => {
+    const queued: FrameRequestCallback[] = []
+    const scheduler = createFrameScheduler({
+      schedule: (cb) => {
+        queued.push(cb)
+        return queued.length
+      },
+      cancel: () => undefined,
+    })
+    const apply = vi.fn()
+    const session = createPointerPanSession({
+      apply,
+      scheduler,
+      clamp: (x, y) => ({ x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) }),
+    })
+    session.move(-20, 250)
+    queued[0]!(0)
+    expect(apply).toHaveBeenCalledWith({ x: 0, y: 100 })
+  })
+
+  it('end 在 rAF 尚未触发时 flush 最后一次 apply', () => {
+    let id = 0
+    const cancel = vi.fn()
+    const scheduler = createFrameScheduler({
+      schedule: () => ++id,
+      cancel,
+    })
+    const apply = vi.fn()
+    const session = createPointerPanSession({ apply, scheduler })
+    session.move(5, 6)
+    session.end()
+    expect(cancel).toHaveBeenCalledWith(1)
+    expect(apply).toHaveBeenCalledTimes(1)
+    expect(apply).toHaveBeenCalledWith({ x: 5, y: 6 })
+  })
+
+  it('cancel 丢弃未执行的 apply', () => {
+    const scheduler = createFrameScheduler({
+      schedule: () => 1,
+      cancel: () => undefined,
+    })
+    const apply = vi.fn()
+    const session = createPointerPanSession({ apply, scheduler })
+    session.move(1, 2)
+    session.cancel()
+    session.end()
+    expect(apply).not.toHaveBeenCalled()
   })
 })

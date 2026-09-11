@@ -9,7 +9,7 @@ import { registerCanvasContainer } from '@/core/editor/panelDrag'
 import { getContentWorldBounds, getScrollBounds, thumbPosFromVp, vpFromThumbPos } from '@/core/editor/viewportBounds'
 import { getDarkerColor, effectivePageSize } from '@/core/editor/grid'
 import { absToWorld, getShapesByRange, hitElementId } from '@/core/editor/interaction'
-import { createFrameScheduler } from '@/core/editor/dragPerf'
+import { createFrameScheduler, createPointerPanSession } from '@/core/editor/dragPerf'
 import {
   beginFreeLinker,
   moveFreeLinker,
@@ -56,7 +56,6 @@ export function Canvas() {
   } | null>(null)
 
   const viewport = useEditorStore((s) => s.viewport)
-  const updateViewport = useEditorStore((s) => s.updateViewport)
   const doc = useEditorStore((s) => s.document)
   const page = doc.page
   const currentTool = useEditorStore((s) => s.currentTool)
@@ -215,11 +214,9 @@ export function Canvas() {
       }
       // 平移模式
       if (isPanning.current) {
-        if (!stage) return
         const newX = e.evt.clientX - panStart.current.x
         const newY = e.evt.clientY - panStart.current.y
-        stage.position({ x: newX, y: newY })
-        stage.batchDraw()
+        pointerPan.current.move(newX, newY)
         return
       }
       // 框选模式：起点已记录且当前在空白区域
@@ -254,7 +251,7 @@ export function Canvas() {
       // 平移结束
       if (isPanning.current) {
         isPanning.current = false
-        if (stage) updateViewport({ x: stage.x(), y: stage.y() })
+        pointerPan.current.end()
       }
       // 框选结束
       if (marqueeStart.current && marqueeCurrent.current && stage) {
@@ -301,7 +298,7 @@ export function Canvas() {
         }
       }
     },
-    [updateViewport, viewport.scale, doc.elements, currentTool],
+    [viewport.scale, doc.elements, currentTool],
   )
 
   // 全局键盘快捷键（缩放/剪贴板/层级/删除/空格平移 + ⌘A/⌘D/⌘B/I/U/方向键等，见 hook）
@@ -488,6 +485,13 @@ export function Canvas() {
   const clampViewportRef = useRef(clampViewport)
   clampViewportRef.current = clampViewport
 
+  const pointerPan = useRef(
+    createPointerPanSession({
+      apply: ({ x, y }) => useEditorStore.getState().updateViewport({ x, y }),
+      clamp: (x, y) => clampViewportRef.current(x, y),
+    }),
+  )
+
   const wheelAcc = useRef({ x: 0, y: 0 })
   const wheelFrame = useRef(createFrameScheduler())
 
@@ -535,6 +539,8 @@ export function Canvas() {
       wheelAcc.current.y = 0
     }
   }, [])
+
+  useEffect(() => () => pointerPan.current.cancel(), [])
 
   // 容器光标：空格按下时显示 grab，拖拽中显示 grabbing
   const containerCursor = scrollDrag

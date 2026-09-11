@@ -91,3 +91,35 @@ export function createFrameScheduler(hooks?: FrameSchedulerHooks): {
     },
   }
 }
+
+export interface PointerPanApply {
+  (pos: { x: number; y: number }): void
+}
+
+export interface PointerPanSession {
+  move: (x: number, y: number) => void
+  end: () => void
+  cancel: () => void
+}
+
+/** 指针平移：同帧多次 move 合并为一次 apply；end flush，cancel 丢弃 */
+export function createPointerPanSession(opts: {
+  apply: PointerPanApply
+  clamp?: (x: number, y: number) => { x: number; y: number }
+  scheduler?: ReturnType<typeof createFrameScheduler>
+}): PointerPanSession {
+  const scheduler = opts.scheduler ?? createFrameScheduler()
+  let latest = { x: 0, y: 0 }
+  return {
+    move(x, y) {
+      latest = opts.clamp ? opts.clamp(x, y) : { x, y }
+      scheduler.schedule(() => opts.apply(latest))
+    },
+    end() {
+      scheduler.flush()
+    },
+    cancel() {
+      scheduler.cancel()
+    },
+  }
+}
