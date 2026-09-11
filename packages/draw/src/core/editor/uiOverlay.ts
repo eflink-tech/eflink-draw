@@ -2,10 +2,16 @@
 // 拖拽期间每帧更新这些节点，绕过 React 重渲染。
 import type Konva from 'konva'
 import type { SnapResult } from './alignment'
+import { clippedSnapLinePoints, visibleWorldRect } from './dragPerf'
+
+/** 吸附线相对视口外扩（世界单位），避免贴边被裁切 */
+const SNAP_PAD = 64
 
 let snapV: Konva.Line | null = null
 let snapH: Konva.Line | null = null
 let tipEl: HTMLDivElement | null = null
+/** 上次吸附线几何签名；相同则跳过 batchDraw */
+let snapDrawKey = ''
 
 export function registerSnapLines(v: Konva.Line | null, h: Konva.Line | null): void {
   snapV = v
@@ -16,13 +22,29 @@ export function registerTip(el: HTMLDivElement | null): void {
   tipEl = el
 }
 
-/** 显示吸附线（横贯画布虚线；线宽/虚线间距按视口缩放折算为恒定屏幕像素） */
+/** 显示吸附线（只画可见视口，线宽/虚线间距按视口缩放折算为恒定屏幕像素） */
 export function showSnapLines(snap: SnapResult, scale: number): void {
-  // 虚线间距 4-3（世界单位随缩放折算，屏幕上恒定）
+  const stage = snapV?.getStage() ?? snapH?.getStage()
+  if (!stage) return
+  const world = visibleWorldRect(
+    {
+      x: stage.x(),
+      y: stage.y(),
+      width: stage.width(),
+      height: stage.height(),
+      scaleX: stage.scaleX() || 1,
+      scaleY: stage.scaleY() || 1,
+    },
+    SNAP_PAD,
+  )
+  const key = `${snap.v?.x ?? ''}:${snap.h?.y ?? ''}:${world.x}:${world.y}:${world.w}:${world.h}:${scale}`
+  if (key === snapDrawKey) return
+  snapDrawKey = key
+
   const dash = [4 / scale, 3 / scale]
   if (snapV) {
     if (snap.v) {
-      snapV.points([snap.v.x, -1e5, snap.v.x, 1e5])
+      snapV.points(clippedSnapLinePoints('v', snap.v.x, world))
       snapV.strokeWidth(1 / scale)
       snapV.dash(dash)
       snapV.visible(true)
@@ -32,7 +54,7 @@ export function showSnapLines(snap: SnapResult, scale: number): void {
   }
   if (snapH) {
     if (snap.h) {
-      snapH.points([-1e5, snap.h.y, 1e5, snap.h.y])
+      snapH.points(clippedSnapLinePoints('h', snap.h.y, world))
       snapH.strokeWidth(1 / scale)
       snapH.dash(dash)
       snapH.visible(true)
@@ -44,6 +66,7 @@ export function showSnapLines(snap: SnapResult, scale: number): void {
 }
 
 export function clearSnapLines(): void {
+  snapDrawKey = ''
   snapV?.visible(false)
   snapH?.visible(false)
   snapV?.getLayer()?.batchDraw()

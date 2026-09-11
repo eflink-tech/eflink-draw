@@ -19,10 +19,16 @@ export function pointerWorld(stage: Konva.Stage | null): { x: number; y: number 
   return absToWorld(stage, p)
 }
 
+/** 世界坐标 → 缩放后的屏幕像素（不含视口平移，供 HTML 层用 CSS translate 跟手） */
+export function worldToScaled(x: number, y: number, scale: number): { x: number; y: number } {
+  return { x: x * scale, y: y * scale }
+}
+
 /** 世界坐标 → 画布容器像素坐标 */
 export function worldToScreen(x: number, y: number): { x: number; y: number } {
   const vp = useEditorStore.getState().viewport
-  return { x: x * vp.scale + vp.x, y: y * vp.scale + vp.y }
+  const s = worldToScaled(x, y, vp.scale)
+  return { x: s.x + vp.x, y: s.y + vp.y }
 }
 
 /** 从 store 读取图形矩形（连线 points 计算用） */

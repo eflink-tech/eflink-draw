@@ -941,3 +941,9 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
   cancelBrush: () => set({ brushData: null }),
 }))
+
+// 自动化钩子：暴露 store 供宿主脚本驱动视口（如缩略图回填时"适应整页"后再截图）。
+// 生产环境同样存在但无副作用（仅多一个 window 属性）。
+if (typeof window !== 'undefined') {
+  ;(window as unknown as Record<string, unknown>).__eflinkDrawStore = useEditorStore
+}

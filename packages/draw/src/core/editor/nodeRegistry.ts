@@ -38,6 +38,14 @@ export function getLinkerLabelNode(id: string): Konva.Group | undefined {
   return linkerLabelNodes.get(id)
 }
 
+export function forEachElementNode(fn: (id: string, node: Konva.Group) => void): void {
+  for (const [id, node] of elementNodes) fn(id, node)
+}
+
+export function forEachLinkerNode(fn: (id: string, node: Konva.Shape) => void): void {
+  for (const [id, node] of linkerNodes) fn(id, node)
+}
+
 /**
  * 读取图形实时矩形（交互期间的直操位置，而非 store 里的旧值）
  * Group 的 position 即世界坐标（Layer 无变换）

@@ -3,6 +3,7 @@
 // - 页面为固定大小矩形（默认 1600×1200，portrait 互换），白区 padding 内缩
 // - 网格线只画在白区内，线 1px、屏幕空间 0.5 偏移，每 4 条世界线一条主线
 // - showGrid 只控制网格线，白色页面始终绘制
+import { memo } from 'react'
 import { Rect, Line } from 'react-konva'
 import {
   computePageRect,
@@ -18,11 +19,11 @@ interface GridLayerProps {
   scale: number
 }
 
-export function GridLayer({ page, scale }: GridLayerProps) {
-  const lightColor = rgbToCSS(getDarkerColor(page.backgroundColor))
-  const darkColor = rgbToCSS(getDarkestColor(page.backgroundColor))
+export const GridLayer = memo(function GridLayer({ page, scale }: GridLayerProps) {
+  const bg = page.backgroundColor === 'transparent' ? '255,255,255' : page.backgroundColor
+  const lightColor = rgbToCSS(getDarkerColor(bg))
+  const darkColor = rgbToCSS(getDarkestColor(bg))
   const { inner } = computePageRect(page)
-  // 线集合与平移无关（全页生成），拖拽中不重渲染也不缺线
   const { vertical, horizontal } = computePageGridLines(page, { scale })
   const strokeWidth = 1 / scale
 
@@ -33,7 +34,7 @@ export function GridLayer({ page, scale }: GridLayerProps) {
         y={inner.y}
         width={inner.width}
         height={inner.height}
-        fill={rgbToCSS(page.backgroundColor)}
+        fill={rgbToCSS(bg)}
         // 淡阴影：柔和扩散、低透明度（对齐参考截图）
         shadowColor="black"
         shadowBlur={12 / scale}
@@ -63,4 +64,4 @@ export function GridLayer({ page, scale }: GridLayerProps) {
       )}
     </>
   )
-}
+})

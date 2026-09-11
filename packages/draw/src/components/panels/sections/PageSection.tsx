@@ -1,5 +1,6 @@
 // 页面设置（无选中时显示；写 document.page）
 import { useEditorStore } from '@/store/editorStore'
+import { effectivePageSize } from '@/core/editor/grid'
 import { ColorButton } from '@/components/common/ColorPicker'
 import { NumField, Row, Section } from '../fields'
 
@@ -7,13 +8,23 @@ export function PageSection() {
   const page = useEditorStore((s) => s.document.page)
   const updatePage = useEditorStore((s) => s.updatePage)
 
+  // portrait 约定：存储值渲染时横竖交换，面板按生效尺寸显示与写回
+  const size = effectivePageSize(page)
+  const commitSize = (field: 'width' | 'height', value: number) => {
+    if (page.orientation === 'portrait') {
+      updatePage(field === 'width' ? { height: value } : { width: value })
+    } else {
+      updatePage(field === 'width' ? { width: value } : { height: value })
+    }
+  }
+
   return (
     <Section title="页面设置">
       <Row label="宽度">
-        <NumField value={page.width} min={100} live onCommit={(v) => updatePage({ width: v })} />
+        <NumField value={size.width} min={100} live onCommit={(v) => commitSize('width', v)} />
       </Row>
       <Row label="高度">
-        <NumField value={page.height} min={100} live onCommit={(v) => updatePage({ height: v })} />
+        <NumField value={size.height} min={100} live onCommit={(v) => commitSize('height', v)} />
       </Row>
       <Row label="背景色">
         <ColorButton

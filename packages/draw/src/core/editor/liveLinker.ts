@@ -8,7 +8,11 @@ import { getLinkerMidpoint } from './linkerDraw'
  * 写入/清除连线拖拽期间的实时数据，并同步标签位置与层重绘。
  * live 为 null（拖拽结束）时标签位置不回写——store 提交后 React 重渲染按 props 定位。
  */
-export function applyLiveLinker(id: string, live: LinkerInstance | null): void {
+export function applyLiveLinker(
+  id: string,
+  live: LinkerInstance | null,
+  opts?: { draw?: boolean },
+): void {
   const node = getLinkerNode(id)
   node?.setAttr('liveLinker', live)
   if (live) {
@@ -18,5 +22,5 @@ export function applyLiveLinker(id: string, live: LinkerInstance | null): void {
       label.position(mid)
     }
   }
-  node?.getLayer()?.batchDraw()
+  if (opts?.draw !== false) node?.getLayer()?.batchDraw()
 }

@@ -81,12 +81,23 @@ export interface PageRect {
 }
 
 /**
+ * 页面生效尺寸：portrait 约定下 width/height 存的是竖版基准值，渲染时横竖交换
+ * （旧数据兼容）；属性面板/底栏等一切展示与编辑都应使用本函数的生效尺寸
+ */
+export function effectivePageSize(page: Pick<PageGeometry, 'width' | 'height' | 'orientation'>): {
+  width: number
+  height: number
+} {
+  return page.orientation === 'portrait'
+    ? { width: page.height, height: page.width }
+    : { width: page.width, height: page.height }
+}
+
+/**
  * 计算页面矩形。
  */
 export function computePageRect(page: PageGeometry): PageRect {
-  const swap = page.orientation === 'portrait'
-  const width = swap ? page.height : page.width
-  const height = swap ? page.width : page.height
+  const { width, height } = effectivePageSize(page)
   const p = Math.max(0, Math.min(page.padding, width / 2, height / 2))
   return {
     width,

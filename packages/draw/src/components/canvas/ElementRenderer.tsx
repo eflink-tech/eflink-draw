@@ -1,7 +1,7 @@
 // 元素渲染器（直操模式）
 //   mouseup 时一次性提交 store（等价 Model.updateMulti）。
 // 吸附线 / 坐标 tip / 关联连线跟随 同样走直操通道，避免 React 逐帧重渲染。
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Shape, Text, Rect, Circle, Group } from 'react-konva'
 import type Konva from 'konva'
 import type { ElementInstance } from '@/types'
@@ -22,8 +22,10 @@ import {
   routeAttachedLinkers,
   type LiveShapeState,
 } from '@/core/editor/documentOps'
-import { getElementNode, registerElementNode } from '@/core/editor/nodeRegistry'
+import { getElementNode, getLinkerNode, registerElementNode } from '@/core/editor/nodeRegistry'
 import { applyLiveLinker } from '@/core/editor/liveLinker'
+import { createFrameScheduler } from '@/core/editor/dragPerf'
+import { freezeStaticScene, unfreezeStaticScene } from '@/core/editor/sceneFreeze'
 import {
   clearSnapLines,
   hideEndpointPreview,
@@ -56,21 +58,43 @@ interface ElementRendererProps {
 
 type HandleDir = 'tl' | 'tr' | 'br' | 'bl' | 'tm' | 'bm' | 'ml' | 'mr'
 
+/** 直操合帧：同一手势多次 pointermove 只在下一帧落地一次 */
+const directManipFrame = createFrameScheduler()
+
+function freezeMovingShapes(shapeIds: Iterable<string>): void {
+  const ids = [...shapeIds]
+  freezeStaticScene({
+    movingShapeIds: ids,
+    liveLinkerIds: attachedLinkerIds(useEditorStore.getState().document.elements, ids),
+  })
+}
+
+function batchDrawLinkerLayer(linkerId: string | undefined): void {
+  if (!linkerId) return
+  getLinkerNode(linkerId)?.getLayer()?.batchDraw()
+}
+
 /** 清除连线的 live 直操数据并重绘（统一通道，含标签回位由 React 重渲染接管） */
 function clearLiveLinkers(shapeIds: Iterable<string>): void {
   const st = useEditorStore.getState()
+  let lastId: string | undefined
   for (const lid of attachedLinkerIds(st.document.elements, shapeIds)) {
-    applyLiveLinker(lid, null)
+    applyLiveLinker(lid, null, { draw: false })
+    lastId = lid
   }
+  batchDrawLinkerLayer(lastId)
 }
 
 /** 直操更新附着连线（livePos 为世界坐标目标状态，可携带 live w/h；标签位置同步跟随） */
 function updateLiveLinkers(livePos: Map<string, LiveShapeState>): void {
   const st = useEditorStore.getState()
   const updated = routeAttachedLinkers(st.document.elements, livePos)
+  let lastId: string | undefined
   for (const [lid, nl] of updated) {
-    applyLiveLinker(lid, nl)
+    applyLiveLinker(lid, nl, { draw: false })
+    lastId = lid
   }
+  batchDrawLinkerLayer(lastId)
 }
 
 // resizeDir 默认仅四角（四边中点是连线锚点，非 resize 手柄）
@@ -135,7 +159,7 @@ function paintRotateIcon(
   ctx.restore()
 }
 
-export function ElementRenderer({ element, textEngine = 'konva' }: ElementRendererProps) {
+export const ElementRenderer = memo(function ElementRenderer({ element, textEngine = 'konva' }: ElementRendererProps) {
   const { props, path, fontStyle, textBlock, shapeStyle } = element
   const selected = useEditorStore((s) => s.selectedIds.has(element.id))
   const hovered = useEditorStore((s) => s.hoveredId === element.id)
@@ -225,14 +249,15 @@ export function ElementRenderer({ element, textEngine = 'konva' }: ElementRender
       const node = groupRef.current
       if (!node) return
       const st = useEditorStore.getState()
+      const movingIds = [...st.selectedIds].filter((id) => {
+        const el = st.document.elements[id]
+        return el != null && !isLinker(el)
+      })
+      freezeMovingShapes(movingIds.length > 0 ? movingIds : [element.id])
 
-      // 被拖节点实时位移（Konva 已把该节点移到新位置，store 尚未提交）
       const dx = groupLeft(node) - element.props.x
       const dy = groupTop(node) - element.props.y
 
-      // 收集选中元素实时状态：目标位置 = store 初始值 + 位移。
-      // 所有选中图形每帧同步直操跟随（此前仅吸附修正时才移其他节点，
-      // 无吸附时多选拖拽要等 mouseup 提交才整体移动）
       const live = new Map<
         string,
         { node: Konva.Group | undefined; el: ElementInstance; x: number; y: number }
@@ -251,7 +276,6 @@ export function ElementRenderer({ element, textEngine = 'konva' }: ElementRender
         live.set(element.id, { node, el: element, x: element.props.x + dx, y: element.props.y + dy })
       }
 
-      // 包围盒 → 吸附检测（snapLine 原地修正 t）
       let minX = Infinity
       let minY = Infinity
       let maxX = -Infinity
@@ -270,12 +294,10 @@ export function ElementRenderer({ element, textEngine = 'konva' }: ElementRender
       const shiftX = t.x - minX
       const shiftY = t.y - minY
 
-      // 实时直操：全部选中图形节点同步到目标位置（含吸附修正，绝对定位无累积误差）
       for (const L of live.values()) {
         if (L.node) setGroupTopLeft(L.node, L.x + shiftX, L.y + shiftY)
       }
 
-      // 吸附线 + 坐标 tip
       showSnapLines(snap, st.viewport.scale)
       const stage = node.getStage()
       const pp = stage?.getPointerPosition()
@@ -283,13 +305,14 @@ export function ElementRenderer({ element, textEngine = 'konva' }: ElementRender
         showTip(pp.x, pp.y, `${Math.round(t.x)}, ${Math.round(t.y)}`)
       }
 
-      // 关联连线 live 更新
       const livePos = new Map<string, LiveShapeState>()
       for (const [sid, L] of live) {
         livePos.set(sid, { x: L.x + shiftX, y: L.y + shiftY })
       }
-      updateLiveLinkers(livePos)
-      node.getLayer()?.batchDraw()
+      // 连线重路由较贵：合到下一帧；吸附/位移必须同步，否则会先画出未吸附位置
+      directManipFrame.schedule(() => {
+        updateLiveLinkers(livePos)
+      })
     },
     [element],
   )
@@ -297,28 +320,34 @@ export function ElementRenderer({ element, textEngine = 'konva' }: ElementRender
   const handleDragEnd = useCallback(
     (e: Konva.KonvaEventObject<DragEvent>) => {
       e.cancelBubble = true
-      const node = groupRef.current
-      if (!node) return
-      const st = useEditorStore.getState()
-      clearSnapLines()
-      hideTip()
-      const dx = groupLeft(node) - element.props.x
-      const dy = groupTop(node) - element.props.y
-      if (dx !== 0 || dy !== 0) {
-        const ids = [...st.selectedIds].filter((id) => {
-          const el = st.document.elements[id]
-          return el != null && !isLinker(el)
-        })
-        st.moveElements(ids.length > 0 ? ids : [element.id], dx, dy)
-      }
-      clearLiveLinkers([...st.selectedIds, element.id])
-      if (textEngine === 'html') {
-        const ids = [...st.selectedIds].filter((id) => {
-          const el = st.document.elements[id]
-          return el != null && !isLinker(el)
-        })
-        if (!ids.includes(element.id)) ids.push(element.id)
-        setTextDisplayDrag(ids, false)
+      try {
+        directManipFrame.flush()
+        unfreezeStaticScene()
+        const node = groupRef.current
+        if (!node) return
+        const st = useEditorStore.getState()
+        clearSnapLines()
+        hideTip()
+        const dx = groupLeft(node) - element.props.x
+        const dy = groupTop(node) - element.props.y
+        if (dx !== 0 || dy !== 0) {
+          const ids = [...st.selectedIds].filter((id) => {
+            const el = st.document.elements[id]
+            return el != null && !isLinker(el)
+          })
+          st.moveElements(ids.length > 0 ? ids : [element.id], dx, dy)
+        }
+        clearLiveLinkers([...st.selectedIds, element.id])
+        if (textEngine === 'html') {
+          const ids = [...st.selectedIds].filter((id) => {
+            const el = st.document.elements[id]
+            return el != null && !isLinker(el)
+          })
+          if (!ids.includes(element.id)) ids.push(element.id)
+          setTextDisplayDrag(ids, false)
+        }
+      } finally {
+        unfreezeStaticScene()
       }
     },
     [element, textEngine],
@@ -403,6 +432,7 @@ export function ElementRenderer({ element, textEngine = 'konva' }: ElementRender
       const stage = e.target.getStage()
       const pp = stage?.getPointerPosition()
       if (!pp) return
+      freezeMovingShapes([element.id])
       const st = useEditorStore.getState()
       const s0 = resizeState.current
       const dx = (pp.x - s0.px) / st.viewport.scale
@@ -415,7 +445,6 @@ export function ElementRenderer({ element, textEngine = 'konva' }: ElementRender
         e.evt.shiftKey,
       )
 
-      // 直操：Group 位置（offset 跟随新尺寸）+ Shape/Text 尺寸 + 选择 UI
       const node = groupRef.current
       node?.offset({ x: ew / 2, y: eh / 2 })
       if (node) setGroupTopLeft(node, ex, ey)
@@ -424,12 +453,12 @@ export function ElementRenderer({ element, textEngine = 'konva' }: ElementRender
       syncSelectionLayout(ew, eh, 8 / st.viewport.scale)
       syncAnchorLayout(ew, eh)
 
-      // 关联连线 live 更新（携带 live 尺寸，端点按初始相对比例映射保持锚点身份）
-      updateLiveLinkers(new Map([[element.id, { x: ex, y: ey, w: ew, h: eh }]]))
-      node?.getLayer()?.batchDraw()
-
       const screen = worldToScreen(ex, ey)
       showTip(screen.x, screen.y, `${Math.round(ex)}, ${Math.round(ey)}; ${Math.round(ew)} × ${Math.round(eh)}`)
+
+      directManipFrame.schedule(() => {
+        updateLiveLinkers(new Map([[element.id, { x: ex, y: ey, w: ew, h: eh }]]))
+      })
     },
     [element.id, props.x, props.y, syncSelectionLayout, syncAnchorLayout],
   )
@@ -437,17 +466,23 @@ export function ElementRenderer({ element, textEngine = 'konva' }: ElementRender
   const handleResizeEnd = useCallback(
     (e: Konva.KonvaEventObject<DragEvent>) => {
       e.cancelBubble = true
-      hideTip()
-      const st = useEditorStore.getState()
-      const node = groupRef.current
-      const shape = shapeRef.current
-      const x = node ? groupLeft(node) : props.x
-      const y = node ? groupTop(node) : props.y
-      const w = shape?.width() ?? props.w
-      const h = shape?.height() ?? props.h
-      st.resizeElement(element.id, x, y, w, h)
-      clearLiveLinkers([element.id])
-      if (textEngine === 'html') setTextDisplayDrag([element.id], false)
+      try {
+        directManipFrame.flush()
+        unfreezeStaticScene()
+        hideTip()
+        const st = useEditorStore.getState()
+        const node = groupRef.current
+        const shape = shapeRef.current
+        const x = node ? groupLeft(node) : props.x
+        const y = node ? groupTop(node) : props.y
+        const w = shape?.width() ?? props.w
+        const h = shape?.height() ?? props.h
+        st.resizeElement(element.id, x, y, w, h)
+        clearLiveLinkers([element.id])
+        if (textEngine === 'html') setTextDisplayDrag([element.id], false)
+      } finally {
+        unfreezeStaticScene()
+      }
     },
     [element.id, props.x, props.y, props.w, props.h, textEngine],
   )
@@ -474,6 +509,7 @@ export function ElementRenderer({ element, textEngine = 'konva' }: ElementRender
   const handleRotateMove = useCallback(
     (e: Konva.KonvaEventObject<DragEvent>) => {
       e.cancelBubble = true
+      freezeMovingShapes([element.id])
       const stage = e.target.getStage()
       const pw = pointerWorld(stage)
       if (!pw) return
@@ -493,7 +529,6 @@ export function ElementRenderer({ element, textEngine = 'konva' }: ElementRender
       while (delta > Math.PI) delta -= Math.PI * 2
       while (delta < -Math.PI) delta += Math.PI * 2
       let angle = rotateState.current.startAngle + delta
-      // 默认 1° 步进；按住 Shift 可无级微调
       if (!e.evt.shiftKey) {
         const step = Math.PI / 180
         angle = Math.round(angle / step) * step
@@ -502,24 +537,28 @@ export function ElementRenderer({ element, textEngine = 'konva' }: ElementRender
       const deg = Math.round(((((angle * 180) / Math.PI) % 360) + 360) % 360)
       const screen = worldToScreen(groupLeft(node), groupTop(node))
       showTip(screen.x, screen.y, `${deg}°`)
-      node.getLayer()?.batchDraw()
     },
-    [props.w, props.h],
+    [element.id, props.w, props.h],
   )
 
   const handleRotateEnd = useCallback(
     (e: Konva.KonvaEventObject<DragEvent>) => {
       e.cancelBubble = true
-      hideTip()
-      const node = groupRef.current
-      if (!node) return
-      const rad = (node.rotation() * Math.PI) / 180
-      if (Math.abs(rad - props.angle) > 0.001) {
-        useEditorStore.getState().updateElement(element.id, {
-          props: { ...props, angle: rad },
-        })
+      try {
+        hideTip()
+        unfreezeStaticScene()
+        const node = groupRef.current
+        if (!node) return
+        const rad = (node.rotation() * Math.PI) / 180
+        if (Math.abs(rad - props.angle) > 0.001) {
+          useEditorStore.getState().updateElement(element.id, {
+            props: { ...props, angle: rad },
+          })
+        }
+        if (textEngine === 'html') setTextDisplayDrag([element.id], false)
+      } finally {
+        unfreezeStaticScene()
       }
-      if (textEngine === 'html') setTextDisplayDrag([element.id], false)
     },
     [element.id, props, textEngine],
   )
@@ -703,6 +742,7 @@ export function ElementRenderer({ element, textEngine = 'konva' }: ElementRender
         sceneFunc={sceneFunc}
         hitFunc={hitFunc}
         fill="#000"
+        perfectDrawEnabled={false}
         id={element.id}
         name="element"
       />
@@ -984,7 +1024,7 @@ export function ElementRenderer({ element, textEngine = 'konva' }: ElementRender
         ))}
     </Group>
   )
-}
+})
 
 /** 手柄初始位置（局部坐标） */
 function handleHome(dir: HandleDir, w: number, h: number, hs: number): { x: number; y: number } {

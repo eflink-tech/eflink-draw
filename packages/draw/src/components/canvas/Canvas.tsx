@@ -7,8 +7,9 @@ import { isLinker, type ElementInstance, type LinkerInstance } from '@/types'
 import { registerSnapLines, registerTip } from '@/core/editor/uiOverlay'
 import { registerCanvasContainer } from '@/core/editor/panelDrag'
 import { getContentWorldBounds, getScrollBounds, thumbPosFromVp, vpFromThumbPos } from '@/core/editor/viewportBounds'
-import { getDarkerColor } from '@/core/editor/grid'
+import { getDarkerColor, effectivePageSize } from '@/core/editor/grid'
 import { absToWorld, getShapesByRange, hitElementId } from '@/core/editor/interaction'
+import { createFrameScheduler } from '@/core/editor/dragPerf'
 import {
   beginFreeLinker,
   moveFreeLinker,
@@ -79,11 +80,11 @@ export function Canvas() {
         // 首次测量容器尺寸时，将页面居中
         if (!hasCenteredRef.current) {
           hasCenteredRef.current = true
-          const page = useEditorStore.getState().document.page
+          const pageSize = effectivePageSize(useEditorStore.getState().document.page)
           const vp = useEditorStore.getState().viewport
           if (vp.x === 0 && vp.y === 0 && vp.scale === 1) {
-            const scaledPageW = page.width * vp.scale
-            const scaledPageH = page.height * vp.scale
+            const scaledPageW = pageSize.width * vp.scale
+            const scaledPageH = pageSize.height * vp.scale
             useEditorStore.getState().updateViewport({
               x: Math.round((width - scaledPageW) / 2),
               y: Math.round((height - scaledPageH) / 2),
@@ -350,11 +351,12 @@ export function Canvas() {
 
   // 可视内容世界范围（页面矩形 ∪ 页面外元素/连线端点；无内容时退化为页面本身）
   const contentBounds = useMemo(() => getContentWorldBounds(doc.elements), [doc.elements])
+  const pageRect = effectivePageSize(doc.page)
   const world = {
     minX: Math.min(0, contentBounds.minX),
     minY: Math.min(0, contentBounds.minY),
-    maxX: Math.max(page.width, contentBounds.maxX),
-    maxY: Math.max(page.height, contentBounds.maxY),
+    maxX: Math.max(pageRect.width, contentBounds.maxX),
+    maxY: Math.max(pageRect.height, contentBounds.maxY),
   }
 
   // 视口偏移边界与滚动条行程（计算见 viewportBounds；内容画到页面外时行程随之扩展）
@@ -486,40 +488,52 @@ export function Canvas() {
   const clampViewportRef = useRef(clampViewport)
   clampViewportRef.current = clampViewport
 
-  // 鼠标滚轮平移（步长根据 deltaMode 调整，降低滚动速度）
+  const wheelAcc = useRef({ x: 0, y: 0 })
+  const wheelFrame = useRef(createFrameScheduler())
+
+  // 鼠标滚轮 / 触控板平移：同帧多次 wheel 合并成一次 updateViewport，
+  // 避免 React 按事件频率 reconcile 网格与全部 HTML 文字。
   useEffect(() => {
     const el = containerRef.current
     if (!el) return
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault()
-      const vp = useEditorStore.getState().viewport
       const { w, h } = visibleRef.current
 
-      // 根据 deltaMode 调整滚动步长
-      // deltaMode: 0 = DOM_DELTA_PIXEL, 1 = DOM_DELTA_LINE, 2 = DOM_DELTA_PAGE
       let stepX = 0
       let stepY = 0
 
       if (e.deltaMode === 1) {
-        // 行模式（鼠标滚轮）：每行滚动 15 像素
         stepX = e.deltaX * 15
         stepY = e.deltaY * 15
       } else if (e.deltaMode === 2) {
-        // 页面模式：滚动可见区域的 80%
         stepX = e.deltaX * w * 0.8
         stepY = e.deltaY * h * 0.8
       } else {
-        // 像素模式（触控板）：直接使用浏览器提供的精确像素 delta
         stepX = e.deltaX
         stepY = e.deltaY
       }
 
-      useEditorStore.getState().updateViewport(
-        clampViewportRef.current(vp.x - stepX, vp.y - stepY),
-      )
+      wheelAcc.current.x += stepX
+      wheelAcc.current.y += stepY
+      wheelFrame.current.schedule(() => {
+        const dx = wheelAcc.current.x
+        const dy = wheelAcc.current.y
+        wheelAcc.current.x = 0
+        wheelAcc.current.y = 0
+        const vp = useEditorStore.getState().viewport
+        useEditorStore.getState().updateViewport(
+          clampViewportRef.current(vp.x - dx, vp.y - dy),
+        )
+      })
     }
     el.addEventListener('wheel', handleWheel, { passive: false })
-    return () => el.removeEventListener('wheel', handleWheel)
+    return () => {
+      el.removeEventListener('wheel', handleWheel)
+      wheelFrame.current.cancel()
+      wheelAcc.current.x = 0
+      wheelAcc.current.y = 0
+    }
   }, [])
 
   // 容器光标：空格按下时显示 grab，拖拽中显示 grabbing
@@ -561,18 +575,7 @@ export function Canvas() {
       >
         {/* Layer 1: 固定页面矩形 + 网格（页面始终绘制，showGrid 只控线） */}
         <Layer listening={false}>
-          <GridLayer
-            page={{
-              width: page.width,
-              height: page.height,
-              orientation: page.orientation,
-              padding: page.padding,
-              gridSize: page.gridSize,
-              showGrid: page.showGrid,
-              backgroundColor: bgColor,
-            }}
-            scale={viewport.scale}
-          />
+          <GridLayer page={doc.page} scale={viewport.scale} />
         </Layer>
 
         {/* Layer 2: 连线（图形下方）+ 选中图形的流动光标 */}

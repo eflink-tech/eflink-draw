@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import type { ElementInstance } from '@/types'
-import { worldToLocalPoint, hitElementAtPoint } from '../interaction'
+import { worldToLocalPoint, hitElementAtPoint, worldToScaled } from '../interaction'
 
 /** 构造测试用图形实例（仅填命中检测需要的字段） */
 function makeEl(
@@ -93,5 +93,16 @@ describe('hitElementAtPoint（container 命中兜底）', () => {
       path: [[{ action: 'move', x: 0, y: 0 }]],
     })
     expect(hitElementAtPoint([el], 150, 30)).toBeNull()
+  })
+})
+
+describe('worldToScaled', () => {
+  it('只乘缩放、不含视口平移，供 HTML 文字层用 CSS translate 跟手', () => {
+    expect(worldToScaled(100, 50, 2)).toEqual({ x: 200, y: 100 })
+  })
+
+  it('加上视口平移后等于屏幕坐标', () => {
+    const s = worldToScaled(100, 50, 2)
+    expect({ x: s.x + 30, y: s.y + 40 }).toEqual({ x: 230, y: 140 })
   })
 })

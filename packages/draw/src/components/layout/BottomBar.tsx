@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Minus, Plus, LocateFixed, Expand, ChevronDown, Pencil } from 'lucide-react'
 import { useEditorStore } from '@/store/editorStore'
 import { useUIStore } from '@/store/uiStore'
+import { effectivePageSize } from '@/core/editor/grid'
 import { MenuDropdown } from '@/components/common/MenuDropdown'
 import { PromptDialog } from '@/components/common/PromptDialog'
 
@@ -64,7 +65,7 @@ export function BottomBar() {
           <span className="truncate">{fileTitle}</span>
         </button>
         <span>图形: {elementCount}</span>
-        <span>页面: {document.page.width}×{document.page.height}</span>
+        <span>页面: {effectivePageSize(document.page).width}×{effectivePageSize(document.page).height}</span>
         <span className={isDirty ? 'text-orange-500' : ''}>
           {isDirty ? '● 未保存' : '✓ 已保存'}
         </span>

@@ -3,7 +3,7 @@
 // - Group 化后追加文字标签（中点居中、白底 Rect + 居中 Text，可命中/选中/双击编辑）
 // - sceneFunc 从节点属性 liveLinker 读取拖拽期间的实时数据（直操模式），否则用 props
 // - hitFunc 用 12px 粗描边做命中区域
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Group, Rect, Shape, Text } from 'react-konva'
 import type Konva from 'konva'
 import type { LinkerInstance } from '@/types'
@@ -25,7 +25,7 @@ const HIT_WIDTH = 12
 /** 文字标签内边距（世界坐标） */
 const LABEL_PAD = 2
 
-export function LinkerRenderer({ linker }: LinkerRendererProps) {
+export const LinkerRenderer = memo(function LinkerRenderer({ linker }: LinkerRendererProps) {
   const selected = useEditorStore((s) => s.selectedIds.has(linker.id))
   const scale = useEditorStore((s) => s.viewport.scale)
   const editingText = useEditorStore((s) => s.textEdit?.id === linker.id)
@@ -77,6 +77,7 @@ export function LinkerRenderer({ linker }: LinkerRendererProps) {
         stroke="#000"
         strokeWidth={linker.lineStyle.lineWidth ?? 2}
         hitStrokeWidth={HIT_WIDTH}
+        perfectDrawEnabled={false}
         id={linker.id}
         name="linker"
         onMouseDown={(e) => {
@@ -128,7 +129,7 @@ export function LinkerRenderer({ linker }: LinkerRendererProps) {
       {!editingText && linker.text && <LinkerLabel linker={linker} />}
     </Group>
   )
-}
+})
 
 /** 连线文字标签（getLinkerMidpoint 中点居中，白底） */
 function LinkerLabel({ linker }: { linker: LinkerInstance }) {
