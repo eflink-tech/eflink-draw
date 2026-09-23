@@ -1,4 +1,5 @@
-import type { PathDefinition, ShapeDefinition } from '@/types'
+import type { FillStyle, PathDefinition, ShapeDefinition } from '@/types'
+import { DEFAULT_LINE_WIDTH } from '@/types'
 
 // 尺寸、锚点、textBlock、路径均取自旧 Schema；样式（边线 2px / 50,50,50、
 
@@ -783,17 +784,198 @@ const leftBrace: ShapeDefinition = {
 // 导出列表
 // ═══════════════════════════════════════════
 
+/** 备注便签（黄色便笺，右上折角） */
+const note: ShapeDefinition = {
+  name: 'note',
+  title: '备注',
+  category: 'basic',
+  props: { w: 120, h: 120 },
+  fillStyle: { type: 'solid', color: '255,242,164' },
+  fontStyle: { textAlign: 'left', vAlign: 'top' },
+  textBlock: [{ position: { x: 8, y: 8, w: 'w-16', h: 'h-16' }, text: '' }],
+  anchors: [],
+  path: [
+    [
+      { action: 'move', x: 0, y: 0 },
+      { action: 'line', x: 'w*0.62', y: 0 },
+      { action: 'line', x: 'w', y: 'h*0.2' },
+      { action: 'line', x: 'w', y: 'h' },
+      { action: 'line', x: 0, y: 'h' },
+      { action: 'close' },
+    ],
+    [
+      { action: 'move', x: 'w*0.62', y: 0 },
+      { action: 'line', x: 'w*0.62', y: 'h*0.2' },
+      { action: 'line', x: 'w', y: 'h*0.2' },
+    ],
+  ],
+}
+
+/** 直线（斜线段，左下 → 右上） */
+const line: ShapeDefinition = {
+  name: 'line',
+  title: '直线',
+  category: 'basic',
+  props: { w: 100, h: 60 },
+  attribute: { container: false, rotatable: true, linkable: false },
+  fillStyle: { type: 'none' },
+  textBlock: [],
+  anchors: [],
+  path: [[
+    { action: 'move', x: 0, y: 'h' },
+    { action: 'line', x: 'w', y: 0 },
+  ]],
+}
+
+/** 箭头线（斜线段 + 末端箭头，左下 → 右上） */
+const arrowLine: ShapeDefinition = {
+  name: 'arrowLine',
+  title: '箭头线',
+  category: 'basic',
+  props: { w: 100, h: 60 },
+  attribute: { container: false, rotatable: true, linkable: false },
+  fillStyle: { type: 'none' },
+  textBlock: [],
+  anchors: [],
+  path: [
+    [
+      { action: 'move', x: 0, y: 'h' },
+      { action: 'line', x: 'w', y: 0 },
+    ],
+    [
+      { action: 'move', x: 'w-Math.min(w*0.2,14)', y: 0 },
+      { action: 'line', x: 'w', y: 0 },
+      { action: 'line', x: 'w', y: 'Math.min(h*0.35,14)' },
+    ],
+  ],
+}
+
+/** 直角三角形（直角在左下） */
+const rightTriangle: ShapeDefinition = {
+  name: 'rightTriangle',
+  title: '直角三角形',
+  category: 'basic',
+  props: { w: 80, h: 70 },
+  path: [[
+    { action: 'move', x: 0, y: 0 },
+    { action: 'line', x: 0, y: 'h' },
+    { action: 'line', x: 'w', y: 'h' },
+    { action: 'close' },
+  ]],
+}
+
+/**
+ * 代码块面板图标：外框 + 深色顶栏 + `</>` 字形。
+ * schema 的 lineStyle.lineWidth=0（画布无边框）会被缩略图继承为 0 描边，
+ * 故每个子路径显式指定填充与描边宽度。
+ */
+function codeBlockDrawIcon(w: number, h: number): PathDefinition[] {
+  const band = Math.round(h * 0.26)
+  const none: Partial<FillStyle> = { type: 'none' }
+  const dark: Partial<FillStyle> = { type: 'solid', color: '50,50,50' }
+  const stroke = { lineWidth: DEFAULT_LINE_WIDTH }
+  return [
+    // 外框（开放闭合，仅描边）
+    {
+      actions: [
+        { action: 'move', x: 0, y: 0 },
+        { action: 'line', x: w, y: 0 },
+        { action: 'line', x: w, y: h },
+        { action: 'line', x: 0, y: h },
+        { action: 'line', x: 0, y: 0 },
+      ],
+      fillStyle: none,
+      lineStyle: stroke,
+    },
+    // 顶栏（深色实心）
+    {
+      actions: [
+        { action: 'move', x: 0, y: 0 },
+        { action: 'line', x: w, y: 0 },
+        { action: 'line', x: w, y: band },
+        { action: 'line', x: 0, y: band },
+        { action: 'close' },
+      ],
+      fillStyle: dark,
+      lineStyle: stroke,
+    },
+    // '<'
+    {
+      actions: [
+        { action: 'move', x: w * 0.36, y: band + (h - band) * 0.22 },
+        { action: 'line', x: w * 0.2, y: band + (h - band) * 0.5 },
+        { action: 'line', x: w * 0.36, y: band + (h - band) * 0.78 },
+      ],
+      fillStyle: none,
+      lineStyle: stroke,
+    },
+    // '/'
+    {
+      actions: [
+        { action: 'move', x: w * 0.46, y: band + (h - band) * 0.78 },
+        { action: 'line', x: w * 0.54, y: band + (h - band) * 0.22 },
+      ],
+      fillStyle: none,
+      lineStyle: stroke,
+    },
+    // '>'
+    {
+      actions: [
+        { action: 'move', x: w * 0.64, y: band + (h - band) * 0.22 },
+        { action: 'line', x: w * 0.8, y: band + (h - band) * 0.5 },
+        { action: 'line', x: w * 0.64, y: band + (h - band) * 0.78 },
+      ],
+      fillStyle: none,
+      lineStyle: stroke,
+    },
+  ]
+}
+
+/** 代码块：灰底无边框、等宽字体左上对齐、文本区给行号槽留白 */
+const codeBlock: ShapeDefinition = {
+  name: 'codeBlock',
+  title: '代码块',
+  category: 'basic',
+  attribute: { container: false, rotatable: false, linkable: false },
+  props: { w: 400, h: 320 },
+  fillStyle: { type: 'solid', color: '246,247,250' },
+  lineStyle: { lineWidth: 0 },
+  fontStyle: {
+    size: 13,
+    fontFamily: 'courier',
+    color: '51,51,51',
+    textAlign: 'left',
+    vAlign: 'top',
+  },
+  textBlock: [{ position: { x: 44, y: 14, w: 'w-56', h: 'h-28' }, text: '' }],
+  anchors: [],
+  drawIcon: codeBlockDrawIcon,
+  path: [[
+    { action: 'move', x: 0, y: 0 },
+    { action: 'line', x: 'w', y: 0 },
+    { action: 'line', x: 'w', y: 'h' },
+    { action: 'line', x: 0, y: 'h' },
+    { action: 'close' },
+  ]],
+}
+
 export const basicShapes: ShapeDefinition[] = [
+  // 文本与便签
+  note,
   // 基础几何
   rectangle,
   roundRectangle,
   round,
   triangle,
+  rightTriangle,
   diamond,
   polygon,
   hexagon,
   octagon,
   pentagon,
+  // 线段
+  line,
+  arrowLine,
   // 曲线图形
   sector,
   sector2,
@@ -818,4 +1000,6 @@ export const basicShapes: ShapeDefinition[] = [
   parentheses,
   rightBrace,
   leftBrace,
+  // 代码块
+  codeBlock,
 ]

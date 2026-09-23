@@ -15,6 +15,7 @@ import { expandGroupIds, newGroupId, remapGroupIdsForCopy } from '@/core/editor/
 import { saveDocumentToStorage, mirrorToRemote } from '@/core/editor/persistence'
 import { HistoryManager, applyCommand, reverseCommand, getPageFromCommand } from '@/core/editor/history'
 import { alignShapes, applyShapeTransform, distributeShapes, matchSize } from '@/core/editor/alignmentOps'
+import type { ActiveSwimlaneTarget } from '@/core/editor/swimlane'
 
 /** 剪贴板数据（复制时深拷贝的选中元素，含端点引用映射） */
 export interface ClipboardData {
@@ -66,6 +67,8 @@ interface EditorState {
   linkerDraft: LinkerDraft | null
   /** 文字编辑状态：block 为图形 textBlock 下标；连线为 -1；fresh 标记刚创建未输入的自由文本 */
   textEdit: { id: string; block: number; fresh?: boolean } | null
+  /** 泳道图中当前填色目标（画布点击标题带/泳道设定；工具栏的颜色按钮直接作用于它） */
+  activeTarget: ActiveSwimlaneTarget | null
   /** 面板拖拽创建中的图形预览（creating_from_panel；位置由 panelDrag 直操） */
   creatingShape: ElementInstance | null
   /** 剪贴板（复制时存入，粘贴时读取） */
@@ -88,6 +91,7 @@ interface EditorState {
   selectElement: (id: string, multi?: boolean) => void
   clearSelection: () => void
   setHoveredId: (id: string | null) => void
+  setActiveTarget: (target: ActiveSwimlaneTarget | null) => void
   setTool: (tool: EditorState['currentTool']) => void
   updateElement: (id: string, updates: Partial<ElementInstance>) => void
   resizeElement: (id: string, x: number, y: number, w: number, h: number) => void
@@ -158,6 +162,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   hoveredId: null,
   linkerDraft: null,
   textEdit: null,
+  activeTarget: null,
   creatingShape: null,
   clipboard: null,
   currentTool: 'select',
@@ -190,6 +195,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       hoveredId: null,
       linkerDraft: null,
       textEdit: null,
+      activeTarget: null,
       creatingShape: null,
       clipboard: null,
       currentTool: 'select',
@@ -209,6 +215,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       hoveredId: null,
       linkerDraft: null,
       textEdit: null,
+      activeTarget: null,
       creatingShape: null,
       clipboard: null,
       currentTool: 'select',
@@ -241,6 +248,15 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   clearSelection: () => set({ selectedIds: new Set() }),
 
   setHoveredId: (id) => set((s) => (s.hoveredId === id ? s : { hoveredId: id })),
+
+  setActiveTarget: (target) =>
+    set((s) => {
+      const cur = s.activeTarget
+      const same =
+        (cur === null && target === null) ||
+        (!!cur && !!target && cur.id === target.id && cur.kind === target.kind && cur.index === target.index)
+      return same ? s : { activeTarget: target }
+    }),
 
   setTool: (tool) => set({ currentTool: tool }),
 

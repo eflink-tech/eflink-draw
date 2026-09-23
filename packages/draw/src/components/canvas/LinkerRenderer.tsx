@@ -127,7 +127,14 @@ export const LinkerRenderer = memo(function LinkerRenderer({ linker }: LinkerRen
         }}
         onDblClick={(e) => {
           e.cancelBubble = true
-          useEditorStore.getState().setTextEdit({ id: linker.id, block: -1 })
+          const st = useEditorStore.getState()
+          // 文字锚点落到双击处（一条连线仅一个文字点；再次双击其他位置即移动该点）
+          const stage = e.target.getStage()
+          const pw = stage ? pointerWorld(stage) : null
+          if (pw && (linker.textPos == null || linker.textPos.x !== pw.x || linker.textPos.y !== pw.y)) {
+            st.updateLinker(linker.id, { textPos: { x: pw.x, y: pw.y } })
+          }
+          st.setTextEdit({ id: linker.id, block: -1 })
         }}
       />
       {!editingText && linker.text && <LinkerLabel linker={linker} />}
@@ -135,7 +142,7 @@ export const LinkerRenderer = memo(function LinkerRenderer({ linker }: LinkerRen
   )
 })
 
-/** 连线文字标签（getLinkerMidpoint 中点居中，白底） */
+/** 连线文字标签（textPos 锚点优先，缺省线中点；白底居中） */
 function LinkerLabel({ linker }: { linker: LinkerInstance }) {
   const font = { ...LINKER_FONT_DEFAULTS, ...linker.fontStyle }
   // 背景尺寸：Text 挂载后测量回填（首次渲染 0×0，layout effect 后立即修正，无闪烁）
@@ -157,7 +164,7 @@ function LinkerLabel({ linker }: { linker: LinkerInstance }) {
     setBox((prev) => (prev.w === w && prev.h === h ? prev : { w, h }))
   }, [linker.text, font.size, font.bold, font.italic, font.fontFamily])
 
-  const mid = getLinkerMidpoint(linker)
+  const mid = linker.textPos ?? getLinkerMidpoint(linker)
   return (
     <Group
       ref={groupRef}

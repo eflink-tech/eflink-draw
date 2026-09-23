@@ -73,8 +73,8 @@ describe('基础图形默认样式', () => {
     }
   })
 
-  it('registry 注册了全部 29 个基础图形', () => {
-    expect(basicShapes).toHaveLength(29)
+  it('registry 注册了全部 34 个基础图形', () => {
+    expect(basicShapes).toHaveLength(34)
     const names = basicShapes.map((s) => s.name)
     // 基础几何
     expect(names).toContain('rectangle')

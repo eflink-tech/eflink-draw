@@ -69,7 +69,8 @@ export function drawShapeThumb(canvas: HTMLCanvasElement, name: string, size: nu
       : schema.fillStyle
     // 面板图标填充策略：
     // 1. drawIcon + fillStyle='none'（泳道等）→ 用深色填充头部
-    // 2. schema 有明确的 solid 填充（开始/同步等深色图形）→ 用 schema 的填充色
+    // 2. schema 有明确的 solid 填充（开始/同步等深色图形）→ 用 schema 的填充色；
+    //    子路径显式指定 solid 色（如代码块顶栏）时优先用子路径色
     // 3. 其余（有描边的普通图形）→ 填充白色，让描边可见
     const schemaFill = schema.fillStyle
     const hasSchemaSolidFill = schemaFill?.type === 'solid'
@@ -83,7 +84,7 @@ export function drawShapeThumb(canvas: HTMLCanvasElement, name: string, size: nu
       ctx.fillStyle = strokeStyle
       ctx.fill()
     } else if (hasSchemaSolidFill && subFillStyle?.type !== 'none') {
-      ctx.fillStyle = `rgb(${schemaFill.color})`
+      ctx.fillStyle = `rgb(${subFillStyle?.type === 'solid' && subFillStyle.color ? subFillStyle.color : schemaFill.color})`
       ctx.fill()
     } else if (!iconFill && !hasSchemaSolidFill && subFillStyle?.type !== 'none') {
       ctx.fillStyle = 'rgb(255,255,255)'

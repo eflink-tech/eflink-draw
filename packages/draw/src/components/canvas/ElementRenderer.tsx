@@ -41,6 +41,7 @@ import {
   hitElementId,
   makeStoreRectGetter,
   pointerWorld,
+  worldToLocalPoint,
   worldToScreen,
 } from '@/core/editor/interaction'
 import { LINKER_DEFAULTS } from '@/core/editor/linker'
@@ -51,6 +52,7 @@ import { rotateCursor } from '@/core/editor/rotateCursor'
 import { computeResizeRect } from '@/core/editor/resizeOps'
 import { setTextDisplayDrag, useIsTextDisplayDrag } from '@/core/editor/textDisplayDrag'
 import { KONVA_TEXT_PROPS, snapTextCoord } from '@/core/editor/textRender'
+import { isSwimlane, swimlaneLayoutOf, buildSwimlanePath, buildSwimlaneTextBlocks, clampRatio, MIN_LANE_PX, resolveTarget, targetAtLocal, targetRectOf } from '@/core/editor/swimlane'
 
 interface ElementRendererProps {
   element: ElementInstance
@@ -171,6 +173,7 @@ function paintRotateIcon(
 
 export const ElementRenderer = memo(function ElementRenderer({ element, textEngine = 'konva' }: ElementRendererProps) {
   const { props, path, fontStyle, textBlock, shapeStyle } = element
+  const isCodeBlockElement = element.name === 'codeBlock'
   const selected = useEditorStore((s) => s.selectedIds.has(element.id))
   const hovered = useEditorStore((s) => s.hoveredId === element.id)
   const scale = useEditorStore((s) => s.viewport.scale)
@@ -573,6 +576,133 @@ export const ElementRenderer = memo(function ElementRenderer({ element, textEngi
     [element.id, props, textEngine],
   )
 
+  // ===== 泳道分界线拖拽调整宽度 =====
+  const swimlaneEl = isSwimlane(element) ? element : null
+  const swimlaneLayout = swimlaneEl ? swimlaneLayoutOf(swimlaneEl) : null
+  const laneDragState = useRef<{
+    dividerIndex: number
+    startRatios: number[]
+    currentRatios: number[]
+  } | null>(null)
+  const [hoveredDivider, setHoveredDivider] = useState<number | null>(null)
+
+  const handleLaneDividerDragStart = useCallback(
+    (e: Konva.KonvaEventObject<DragEvent>, divIdx: number) => {
+      e.cancelBubble = true
+      if (!swimlaneLayout) return
+      const n = swimlaneLayout.laneCount
+      const ratios = swimlaneLayout.laneRatios ?? Array.from({ length: n - 1 }, (_, i) => (i + 1) / n)
+      laneDragState.current = {
+        dividerIndex: divIdx,
+        startRatios: [...ratios],
+        currentRatios: [...ratios],
+      }
+    },
+    [swimlaneLayout],
+  )
+
+  const handleLaneDividerDragMove = useCallback(
+    (e: Konva.KonvaEventObject<DragEvent>) => {
+      e.cancelBubble = true
+      const state = laneDragState.current
+      if (!state || !swimlaneLayout) return
+      const isV = swimlaneLayout.orientation === 'v'
+      const totalSize = isV ? props.w : props.h
+      const pos = isV ? e.target.x() : e.target.y()
+      const newRatio = Math.max(0.01, Math.min(0.99, pos / totalSize))
+      state.currentRatios[state.dividerIndex] = newRatio
+      const finalRatios = clampRatio(state.currentRatios, state.dividerIndex, MIN_LANE_PX / totalSize)
+      state.currentRatios = finalRatios
+
+      // 重建 path 并重绘（直操，不走 React）
+      const livePath = buildSwimlanePath({ ...swimlaneLayout, laneRatios: finalRatios })
+      const tempEl = { ...element, path: livePath }
+      const tempSceneFunc = makeShapeSceneFunc(tempEl)
+      shapeRef.current?.sceneFunc(tempSceneFunc)
+      shapeRef.current?.getLayer()?.batchDraw()
+    },
+    [element, swimlaneLayout, props.w, props.h],
+  )
+
+  const handleLaneDividerDragEnd = useCallback(
+    (e: Konva.KonvaEventObject<DragEvent>) => {
+      e.cancelBubble = true
+      const state = laneDragState.current
+      if (!state || !swimlaneLayout) return
+      laneDragState.current = null
+
+      const finalRatios = state.currentRatios
+      const nextLayout = { ...swimlaneLayout, laneRatios: finalRatios }
+      useEditorStore.getState().updateElement(element.id, {
+        laneRatios: finalRatios,
+        path: buildSwimlanePath(nextLayout),
+        textBlock: buildSwimlaneTextBlocks(nextLayout, element.textBlock),
+      })
+      // 重置 hit zone 位置（React 重渲染后会恢复，但先手动重置避免闪烁）
+      e.target.position({ x: 0, y: 0 })
+    },
+    [element, swimlaneLayout],
+  )
+
+  // 计算 divider hit zones 的位置
+  const laneDividerHitZones = useMemo(() => {
+    if (!swimlaneLayout || !selected) return []
+    const n = swimlaneLayout.laneCount
+    if (n < 2) return []
+    const isV = swimlaneLayout.orientation === 'v'
+    const titleSize = swimlaneLayout.titleSize ?? 40
+    const ratios = swimlaneLayout.laneRatios ?? Array.from({ length: n - 1 }, (_, i) => (i + 1) / n)
+    const totalSize = isV ? props.w : props.h
+    const hitWidth = 10 / scale
+
+    return ratios.map((r, i) => {
+      const pos = r * totalSize
+      if (isV) {
+        return {
+          key: `lane-div-${i}`,
+          x: pos - hitWidth / 2,
+          y: titleSize,
+          width: hitWidth,
+          height: props.h - titleSize,
+          cursor: 'col-resize',
+          index: i,
+        }
+      }
+      return {
+        key: `lane-div-${i}`,
+        x: titleSize,
+        y: pos - hitWidth / 2,
+        width: props.w - titleSize,
+        height: hitWidth,
+        cursor: 'row-resize',
+        index: i,
+      }
+    })
+  }, [swimlaneLayout, selected, props.w, props.h, scale])
+
+  // 单击泳道图区域 → 设为当前填色目标（标题带或某条泳道；工具栏颜色按钮直接作用于它）
+  const handleLaneClick = useCallback(
+    (e: Konva.KonvaEventObject<MouseEvent>) => {
+      if (!swimlaneEl || swimlaneEl.locked) return
+      const st = useEditorStore.getState()
+      if (st.currentTool !== 'select') return
+      const pw = pointerWorld(e.target.getStage())
+      if (!pw) return
+      const local = worldToLocalPoint(swimlaneEl, pw.x, pw.y)
+      if (!local) return
+      const target = targetAtLocal(swimlaneEl, local.x, local.y)
+      if (target) st.setActiveTarget({ id: swimlaneEl.id, ...target })
+    },
+    [swimlaneEl],
+  )
+
+  // 当前填色目标的高亮框（与工具栏同一口径，未点击时回落第 1 条泳道）
+  const activeTarget = useEditorStore((s) => s.activeTarget)
+  const activeTargetRect = useMemo(() => {
+    if (!swimlaneEl || !selected || currentTool !== 'select') return null
+    return targetRectOf(swimlaneEl, resolveTarget(swimlaneEl, activeTarget))
+  }, [swimlaneEl, selected, currentTool, activeTarget])
+
   // ===== 锚点 → 连线创建 =====
   const anchorStart = useRef<{ x: number; y: number } | null>(null)
 
@@ -735,6 +865,7 @@ export const ElementRenderer = memo(function ElementRenderer({ element, textEngi
         const container = e.target.getStage()?.container()
         if (container) container.style.cursor = 'default'
       }}
+      onClick={handleLaneClick}
       onDblClick={(e) => {
         e.cancelBubble = true
         const stage = e.target.getStage()
@@ -784,6 +915,21 @@ export const ElementRenderer = memo(function ElementRenderer({ element, textEngi
             )
           })}
         </Group>
+      )}
+
+      {/* 当前填色目标的高亮框（置于文字层之下，避免淡色底压住泳道标题） */}
+      {activeTargetRect && (
+        <Rect
+          x={activeTargetRect.x}
+          y={activeTargetRect.y}
+          width={activeTargetRect.w}
+          height={activeTargetRect.h}
+          fill="rgba(24,144,255,0.06)"
+          stroke="#1890ff"
+          strokeWidth={1.5 / scale}
+          dash={[6 / scale, 4 / scale]}
+          listening={false}
+        />
       )}
 
       {/* 文本层（多块时仅隐藏正在编辑的块，其余块保持显示） */}
@@ -898,6 +1044,28 @@ export const ElementRenderer = memo(function ElementRenderer({ element, textEngi
         )
       )}
 
+      {/* 代码块行号槽（视图态；编辑态由 TextEditorOverlay 内的行号槽接管） */}
+      {isCodeBlockElement && textBlock?.[0] && editingBlock !== 0 && (() => {
+        const r = evalTextBlockRect(textBlock[0], w, h)
+        const code = textBlock[0].text || ''
+        const lineCount = Math.max(code.split('\n').length, 1)
+        const dark = element.codeTheme === 'dark'
+        return (
+          <Text
+            x={snap(12)}
+            y={snap(r.y)}
+            width={24}
+            align="right"
+            text={Array.from({ length: lineCount }, (_, i) => i + 1).join('\n')}
+            fontSize={fontSize}
+            fontFamily={fontFamilyCSS('courier')}
+            fill={dark ? '#7d8590' : '#a5abb3'}
+            lineHeight={TEXT_LINE_HEIGHT}
+            {...KONVA_TEXT_PROPS}
+          />
+        )
+      })()}
+
       {/* 选中控件：包围盒 + 四角缩放手柄 + 右上角弧形旋转图标 */}
       {selected && (
         <>
@@ -986,6 +1154,41 @@ export const ElementRenderer = memo(function ElementRenderer({ element, textEngi
           )}
         </>
       )}
+
+      {/* 泳道分界线拖拽 hit zones（选中时显示） */}
+      {selected && laneDividerHitZones.map((zone) => (
+        <Rect
+          key={zone.key}
+          x={zone.x}
+          y={zone.y}
+          width={zone.width}
+          height={zone.height}
+          fill={hoveredDivider === zone.index ? 'rgba(24,144,255,0.15)' : 'transparent'}
+          draggable={currentTool !== 'linker'}
+          dragBoundFunc={(pos) => {
+            const titleSize = swimlaneLayout!.titleSize ?? 40
+            const isV = swimlaneLayout!.orientation === 'v'
+            return isV
+              ? { x: pos.x, y: titleSize + (props.h - titleSize) / 2 }
+              : { x: titleSize + (props.w - titleSize) / 2, y: pos.y }
+          }}
+          onMouseEnter={(e) => {
+            e.cancelBubble = true
+            setHoveredDivider(zone.index)
+            const container = e.target.getStage()?.container()
+            if (container) container.style.cursor = zone.cursor
+          }}
+          onMouseLeave={(e) => {
+            e.cancelBubble = true
+            setHoveredDivider(null)
+            const container = e.target.getStage()?.container()
+            if (container) container.style.cursor = 'default'
+          }}
+          onDragStart={(e) => handleLaneDividerDragStart(e, zone.index)}
+          onDragMove={handleLaneDividerDragMove}
+          onDragEnd={handleLaneDividerDragEnd}
+        />
+      ))}
 
       {/* 锚点命中区：始终渲染 7px 数学检测——不管是否选中/悬停都能从锚点拖出连线 */}
       {!element.locked &&

@@ -2,7 +2,17 @@ import type { PathDefinition, ShapeDefinition } from '@/types'
 import {
   buildSwimlanePath,
   buildSwimlaneTextBlocks,
+  type SwimlaneLayout,
 } from '@/core/editor/swimlane'
+
+/** 泳池族（无二级标题行）布局；具体尺寸/方向/标题带厚见各形状定义 */
+const poolLayout = (orientation: 'v' | 'h', laneCount: number, titleSize: number): SwimlaneLayout => ({
+  orientation,
+  laneCount,
+  stageCount: 0,
+  titleSize,
+  hasHeadRow: false,
+})
 
 // 文字 orientation（与旧 lane.js 对齐）：
 //   顶部标题带（verticalPool 等）→ horizontal（横排，从左到右）
@@ -13,16 +23,16 @@ import {
 // 池/道（4 个）：透明容器 + 外框 + 头部分隔线
 // ═══════════════════════════════════════════
 
-// 面板图标（drawIcon）：真实 Schema 里池/道只有「头部分隔线厚度（40/30）」之别，
-// 缩略图下几乎无法区分，故面板用 drawIcon 单独表达语义差异：
-//   泳池 = 闭合外框 + 深色标题带（带标签的完整容器）
-//   泳道 = 闭合外框 + 细分隔线（池内子分区）
-// 注：ShapePreview 对「drawIcon + fillStyle:'none'」的子路径，含 close 者会填深色（iconFill），
-//     故标题带子路径用 close 触发填色；外框子路径显式闭合（不写 close）以保持仅描边。
+// 面板图标（drawIcon）：参考样式为纯描边——外框 + 标题带/头部分隔用「单线」表达，
+// 不用 close 闭合子路径（shapeThumb 对 drawIcon + fillStyle:'none' 的含 close 子路径
+// 会填深色 iconFill），保证面板图标与拖到画布上的线性观感一致。
+//   泳池 = 外框 + 标题带分隔线（带标签的完整容器）
+//   泳道 = 外框 + 细分隔线（池内子分区）
+//   双向泳池 = 外框 + 标题带分隔线 + 泳道中线
 
-/** 泳池(垂直) 图标：闭合外框 + 顶部深色标题带 */
+/** 泳池(垂直) 图标：外框 + 顶部标题带分隔线 */
 function verticalPoolDrawIcon(w: number, h: number): PathDefinition[] {
-  const band = Math.round(h * 0.2)
+  const band = Math.round(h * 0.18)
   return [
     [
       { action: 'move', x: 0, y: 0 },
@@ -32,16 +42,13 @@ function verticalPoolDrawIcon(w: number, h: number): PathDefinition[] {
       { action: 'line', x: 0, y: 0 },
     ],
     [
-      { action: 'move', x: 0, y: 0 },
-      { action: 'line', x: w, y: 0 },
+      { action: 'move', x: 0, y: band },
       { action: 'line', x: w, y: band },
-      { action: 'line', x: 0, y: band },
-      { action: 'close' },
     ],
   ]
 }
 
-/** 泳道(垂直) 图标：闭合外框 + 头部分隔线 */
+/** 泳道(垂直) 图标：外框 + 头部分隔线 */
 function verticalLaneDrawIcon(w: number, h: number): PathDefinition[] {
   const band = Math.round(h * 0.14)
   return [
@@ -59,9 +66,9 @@ function verticalLaneDrawIcon(w: number, h: number): PathDefinition[] {
   ]
 }
 
-/** 泳池(水平) 图标：闭合外框 + 左侧深色标题带 */
+/** 泳池(水平) 图标：外框 + 左侧标题列分隔线 */
 function horizontalPoolDrawIcon(w: number, h: number): PathDefinition[] {
-  const band = Math.round(w * 0.2)
+  const band = Math.round(w * 0.15)
   return [
     [
       { action: 'move', x: 0, y: 0 },
@@ -71,16 +78,13 @@ function horizontalPoolDrawIcon(w: number, h: number): PathDefinition[] {
       { action: 'line', x: 0, y: 0 },
     ],
     [
-      { action: 'move', x: 0, y: 0 },
-      { action: 'line', x: band, y: 0 },
+      { action: 'move', x: band, y: 0 },
       { action: 'line', x: band, y: h },
-      { action: 'line', x: 0, y: h },
-      { action: 'close' },
     ],
   ]
 }
 
-/** 泳道(水平) 图标：闭合外框 + 头部分隔线 */
+/** 泳道(水平) 图标：外框 + 头部分隔线 */
 function horizontalLaneDrawIcon(w: number, h: number): PathDefinition[] {
   const band = Math.round(w * 0.14)
   return [
@@ -98,7 +102,7 @@ function horizontalLaneDrawIcon(w: number, h: number): PathDefinition[] {
   ]
 }
 
-/** 泳池(垂直) 250×540 */
+/** 泳池(垂直) 250×540 — 标题带 40 + 1 泳道 */
 const verticalPool: ShapeDefinition = {
   name: 'verticalPool',
   title: '泳池(垂直)',
@@ -107,27 +111,15 @@ const verticalPool: ShapeDefinition = {
   attribute: { container: true, rotatable: false, linkable: false },
   fillStyle: { type: 'none' },
   fontStyle: { size: 16, orientation: 'horizontal' },
-  textBlock: [{ position: { x: 10, y: 0, w: 'w-20', h: 40 }, text: '' }],
+  laneCount: 1,
+  stageCount: 0,
   anchors: [],
   drawIcon: verticalPoolDrawIcon,
-  path: [
-    // 外框矩形
-    [
-      { action: 'move', x: 0, y: 0 },
-      { action: 'line', x: 'w', y: 0 },
-      { action: 'line', x: 'w', y: 'h' },
-      { action: 'line', x: 0, y: 'h' },
-      { action: 'close' },
-    ],
-    // 头部分隔线 y=40
-    [
-      { action: 'move', x: 0, y: 40 },
-      { action: 'line', x: 'w', y: 40 },
-    ],
-  ],
+  path: buildSwimlanePath(poolLayout('v', 1, 40)),
+  textBlock: buildSwimlaneTextBlocks(poolLayout('v', 1, 40)),
 }
 
-/** 泳道(垂直) 250×500 */
+/** 泳道(垂直) 250×500 — 标题带 30 + 1 泳道 */
 const verticalLane: ShapeDefinition = {
   name: 'verticalLane',
   title: '泳道(垂直)',
@@ -136,26 +128,15 @@ const verticalLane: ShapeDefinition = {
   attribute: { container: true, rotatable: false, linkable: false },
   fillStyle: { type: 'none' },
   fontStyle: { orientation: 'horizontal' },
-  textBlock: [{ position: { x: 10, y: 0, w: 'w-20', h: 30 }, text: '' }],
+  laneCount: 1,
+  stageCount: 0,
   anchors: [],
   drawIcon: verticalLaneDrawIcon,
-  path: [
-    [
-      { action: 'move', x: 0, y: 0 },
-      { action: 'line', x: 'w', y: 0 },
-      { action: 'line', x: 'w', y: 'h' },
-      { action: 'line', x: 0, y: 'h' },
-      { action: 'close' },
-    ],
-    // 头部分隔线 y=30
-    [
-      { action: 'move', x: 0, y: 30 },
-      { action: 'line', x: 'w', y: 30 },
-    ],
-  ],
+  path: buildSwimlanePath(poolLayout('v', 1, 30)),
+  textBlock: buildSwimlaneTextBlocks(poolLayout('v', 1, 30)),
 }
 
-/** 泳池(水平) 640×200 */
+/** 泳池(水平) 640×200 — 标题列 40 + 1 泳道 */
 const horizontalPool: ShapeDefinition = {
   name: 'horizontalPool',
   title: '泳池(水平)',
@@ -164,26 +145,15 @@ const horizontalPool: ShapeDefinition = {
   attribute: { container: true, rotatable: false, linkable: false },
   fillStyle: { type: 'none' },
   fontStyle: { size: 16, orientation: 'vertical' },
-  textBlock: [{ position: { x: 0, y: 10, w: 40, h: 'h-20' }, text: '' }],
+  laneCount: 1,
+  stageCount: 0,
   anchors: [],
   drawIcon: horizontalPoolDrawIcon,
-  path: [
-    [
-      { action: 'move', x: 0, y: 0 },
-      { action: 'line', x: 'w', y: 0 },
-      { action: 'line', x: 'w', y: 'h' },
-      { action: 'line', x: 0, y: 'h' },
-      { action: 'close' },
-    ],
-    // 头部分隔线 x=40
-    [
-      { action: 'move', x: 40, y: 0 },
-      { action: 'line', x: 40, y: 'h' },
-    ],
-  ],
+  path: buildSwimlanePath(poolLayout('h', 1, 40)),
+  textBlock: buildSwimlaneTextBlocks(poolLayout('h', 1, 40)),
 }
 
-/** 泳道(水平) 600×200 */
+/** 泳道(水平) 600×200 — 标题列 30 + 1 泳道 */
 const horizontalLane: ShapeDefinition = {
   name: 'horizontalLane',
   title: '泳道(水平)',
@@ -192,23 +162,12 @@ const horizontalLane: ShapeDefinition = {
   attribute: { container: true, rotatable: false, linkable: false },
   fillStyle: { type: 'none' },
   fontStyle: { orientation: 'vertical' },
-  textBlock: [{ position: { x: 0, y: 10, w: 30, h: 'h-20' }, text: '' }],
+  laneCount: 1,
+  stageCount: 0,
   anchors: [],
   drawIcon: horizontalLaneDrawIcon,
-  path: [
-    [
-      { action: 'move', x: 0, y: 0 },
-      { action: 'line', x: 'w', y: 0 },
-      { action: 'line', x: 'w', y: 'h' },
-      { action: 'line', x: 0, y: 'h' },
-      { action: 'close' },
-    ],
-    // 头部分隔线 x=30
-    [
-      { action: 'move', x: 30, y: 0 },
-      { action: 'line', x: 30, y: 'h' },
-    ],
-  ],
+  path: buildSwimlanePath(poolLayout('h', 1, 30)),
+  textBlock: buildSwimlaneTextBlocks(poolLayout('h', 1, 30)),
 }
 
 // ═══════════════════════════════════════════
@@ -216,9 +175,9 @@ const horizontalLane: ShapeDefinition = {
 //   水平 = 两个 horizontalPool 上下叠放（左侧标题列 + 水平中线 y=h/2）
 //   垂直 = 两个 verticalPool 左右并排（顶部标题行 + 垂直中线 x=w/2）
 
-/** 双向泳池(水平) 图标：外框 + 左侧竖带 + 水平中线（上下两个水平泳池） */
+/** 双向泳池(水平) 图标：外框 + 左侧标题列分隔线 + 水平中线（上下两个水平泳池） */
 function bidirectionalPoolHDrawIcon(w: number, h: number): PathDefinition[] {
-  const leftBand = Math.round(w * 0.12)
+  const leftBand = Math.round(w * 0.15)
   return [
     [
       { action: 'move', x: 0, y: 0 },
@@ -228,11 +187,8 @@ function bidirectionalPoolHDrawIcon(w: number, h: number): PathDefinition[] {
       { action: 'line', x: 0, y: 0 },
     ],
     [
-      { action: 'move', x: 0, y: 0 },
-      { action: 'line', x: leftBand, y: 0 },
+      { action: 'move', x: leftBand, y: 0 },
       { action: 'line', x: leftBand, y: h },
-      { action: 'line', x: 0, y: h },
-      { action: 'close' },
     ],
     [
       { action: 'move', x: leftBand, y: Math.round(h / 2) },
@@ -241,9 +197,9 @@ function bidirectionalPoolHDrawIcon(w: number, h: number): PathDefinition[] {
   ]
 }
 
-/** 双向泳池(垂直) 图标：外框 + 顶部横带 + 垂直中线（左右两个垂直泳池） */
+/** 双向泳池(垂直) 图标：外框 + 顶部标题带分隔线 + 垂直中线（左右两个垂直泳池） */
 function bidirectionalPoolVDrawIcon(w: number, h: number): PathDefinition[] {
-  const topBand = Math.round(h * 0.12)
+  const topBand = Math.round(h * 0.18)
   return [
     [
       { action: 'move', x: 0, y: 0 },
@@ -253,11 +209,8 @@ function bidirectionalPoolVDrawIcon(w: number, h: number): PathDefinition[] {
       { action: 'line', x: 0, y: 0 },
     ],
     [
-      { action: 'move', x: 0, y: 0 },
-      { action: 'line', x: w, y: 0 },
+      { action: 'move', x: 0, y: topBand },
       { action: 'line', x: w, y: topBand },
-      { action: 'line', x: 0, y: topBand },
-      { action: 'close' },
     ],
     [
       { action: 'move', x: Math.round(w / 2), y: topBand },
@@ -266,7 +219,7 @@ function bidirectionalPoolVDrawIcon(w: number, h: number): PathDefinition[] {
   ]
 }
 
-/** 双向泳池(水平) 640×400 — 两个 horizontalPool(640×200) 上下叠放 */
+/** 双向泳池(水平) 640×400 — 标题列 40 + 2 泳道 */
 const bidirectionalPoolH: ShapeDefinition = {
   name: 'bidirectionalPoolH',
   title: '双向泳池(水平)',
@@ -275,29 +228,15 @@ const bidirectionalPoolH: ShapeDefinition = {
   attribute: { container: true, rotatable: false, linkable: false },
   fillStyle: { type: 'none' },
   fontStyle: { size: 16, orientation: 'vertical' },
-  textBlock: [{ position: { x: 0, y: 10, w: 40, h: 'h-20' }, text: '' }],
+  laneCount: 2,
+  stageCount: 0,
   anchors: [],
   drawIcon: bidirectionalPoolHDrawIcon,
-  path: [
-    [
-      { action: 'move', x: 0, y: 0 },
-      { action: 'line', x: 'w', y: 0 },
-      { action: 'line', x: 'w', y: 'h' },
-      { action: 'line', x: 0, y: 'h' },
-      { action: 'close' },
-    ],
-    [
-      { action: 'move', x: 40, y: 0 },
-      { action: 'line', x: 40, y: 'h' },
-    ],
-    [
-      { action: 'move', x: 40, y: 'h/2' },
-      { action: 'line', x: 'w', y: 'h/2' },
-    ],
-  ],
+  path: buildSwimlanePath(poolLayout('h', 2, 40)),
+  textBlock: buildSwimlaneTextBlocks(poolLayout('h', 2, 40)),
 }
 
-/** 双向泳池(垂直) 500×540 — 两个 verticalPool(250×540) 左右并排 */
+/** 双向泳池(垂直) 500×540 — 标题带 40 + 2 泳道 */
 const bidirectionalPoolV: ShapeDefinition = {
   name: 'bidirectionalPoolV',
   title: '双向泳池(垂直)',
@@ -306,26 +245,12 @@ const bidirectionalPoolV: ShapeDefinition = {
   attribute: { container: true, rotatable: false, linkable: false },
   fillStyle: { type: 'none' },
   fontStyle: { size: 16, orientation: 'horizontal' },
-  textBlock: [{ position: { x: 10, y: 0, w: 'w-20', h: 40 }, text: '' }],
+  laneCount: 2,
+  stageCount: 0,
   anchors: [],
   drawIcon: bidirectionalPoolVDrawIcon,
-  path: [
-    [
-      { action: 'move', x: 0, y: 0 },
-      { action: 'line', x: 'w', y: 0 },
-      { action: 'line', x: 'w', y: 'h' },
-      { action: 'line', x: 0, y: 'h' },
-      { action: 'close' },
-    ],
-    [
-      { action: 'move', x: 0, y: 40 },
-      { action: 'line', x: 'w', y: 40 },
-    ],
-    [
-      { action: 'move', x: 'w/2', y: 40 },
-      { action: 'line', x: 'w/2', y: 'h' },
-    ],
-  ],
+  path: buildSwimlanePath(poolLayout('v', 2, 40)),
+  textBlock: buildSwimlaneTextBlocks(poolLayout('v', 2, 40)),
 }
 
 // 分隔条（2 个）：窄带 20px + 中线 + 「阶段」标签
@@ -439,7 +364,7 @@ function swimlaneHDrawIcon(w: number, h: number): PathDefinition[] {
   ]
 }
 
-/** 泳道图(垂直) 720×480，默认 4 泳道 */
+/** 泳道图(垂直) 720×480，默认 2 泳道 */
 const swimlaneV: ShapeDefinition = {
   name: 'swimlaneV',
   title: '泳道图(垂直)',
@@ -448,15 +373,15 @@ const swimlaneV: ShapeDefinition = {
   attribute: { container: true, rotatable: false, linkable: false },
   fillStyle: { type: 'none' },
   fontStyle: { orientation: 'horizontal' },
-  laneCount: 4,
+  laneCount: 2,
   stageCount: 0,
   anchors: [],
   drawIcon: swimlaneVDrawIcon,
-  path: buildSwimlanePath('v', 4, 0),
-  textBlock: buildSwimlaneTextBlocks('v', 4),
+  path: buildSwimlanePath({ orientation: 'v', laneCount: 2, stageCount: 0, titleSize: 40, hasHeadRow: true }),
+  textBlock: buildSwimlaneTextBlocks({ orientation: 'v', laneCount: 2, stageCount: 0, titleSize: 40, hasHeadRow: true }),
 }
 
-/** 泳道图(水平) 720×480，默认 4 泳道 */
+/** 泳道图(水平) 720×480，默认 2 泳道 */
 const swimlaneH: ShapeDefinition = {
   name: 'swimlaneH',
   title: '泳道图(水平)',
@@ -465,12 +390,12 @@ const swimlaneH: ShapeDefinition = {
   attribute: { container: true, rotatable: false, linkable: false },
   fillStyle: { type: 'none' },
   fontStyle: { orientation: 'horizontal' },
-  laneCount: 4,
+  laneCount: 2,
   stageCount: 0,
   anchors: [],
   drawIcon: swimlaneHDrawIcon,
-  path: buildSwimlanePath('h', 4, 0),
-  textBlock: buildSwimlaneTextBlocks('h', 4),
+  path: buildSwimlanePath({ orientation: 'h', laneCount: 2, stageCount: 0, titleSize: 40, hasHeadRow: true }),
+  textBlock: buildSwimlaneTextBlocks({ orientation: 'h', laneCount: 2, stageCount: 0, titleSize: 40, hasHeadRow: true }),
 }
 
 // ═══════════════════════════════════════════

@@ -118,15 +118,39 @@ describe('泳池/泳道形状默认样式', () => {
     }
   })
 
-  it('泳道图实例携带 laneCount/stageCount 默认值', () => {
+  it('泳道图实例携带 laneCount/stageCount 默认值（默认 2 泳道）', () => {
     for (const name of ['swimlaneV', 'swimlaneH']) {
       const el = shapeRegistry.createElement(name, 0, 0)!
-      expect(el.laneCount, `${name}.laneCount`).toBe(4)
+      expect(el.laneCount, `${name}.laneCount`).toBe(2)
       expect(el.stageCount, `${name}.stageCount`).toBe(0)
-      // 1 标题块 + 4 泳道头块
-      expect(el.textBlock, `${name}.textBlock`).toHaveLength(5)
-      // 外框 + 标题带线 + 泳道头线 + 3 泳道分隔线
-      expect(el.path, `${name}.path`).toHaveLength(6)
+      // 1 标题块 + 2 泳道头块
+      expect(el.textBlock, `${name}.textBlock`).toHaveLength(3)
+      // 外框 + 标题带线 + 泳道头线 + 1 泳道分隔线
+      expect(el.path, `${name}.path`).toHaveLength(4)
+    }
+  })
+
+  it('泳池/泳道/双向泳池实例由 builder 生成并携带 laneCount', () => {
+    const expected: Record<string, { lanes: number; titleSize: number }> = {
+      verticalPool:       { lanes: 1, titleSize: 40 },
+      verticalLane:       { lanes: 1, titleSize: 30 },
+      horizontalPool:     { lanes: 1, titleSize: 40 },
+      horizontalLane:     { lanes: 1, titleSize: 30 },
+      bidirectionalPoolH: { lanes: 2, titleSize: 40 },
+      bidirectionalPoolV: { lanes: 2, titleSize: 40 },
+    }
+    for (const [name, { lanes, titleSize }] of Object.entries(expected)) {
+      const el = shapeRegistry.createElement(name, 0, 0)!
+      expect(el.laneCount, `${name}.laneCount`).toBe(lanes)
+      expect(el.textBlock, `${name}.textBlock 仅标题块`).toHaveLength(1)
+      // 外框 + 标题带线 + (lanes-1) 泳道分隔线；无二级标题线
+      expect(el.path, `${name}.path`).toHaveLength(2 + lanes - 1)
+      const titleLine = el.path[1]!
+      const isHorizontal = ['horizontalPool', 'horizontalLane', 'bidirectionalPoolH'].includes(name)
+      expect(titleLine[0], `${name}.标题带线起点`).toEqual({
+        action: 'move',
+        ...(isHorizontal ? { x: titleSize, y: 0 } : { x: 0, y: titleSize }),
+      })
     }
   })
 })

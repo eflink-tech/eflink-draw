@@ -10,6 +10,7 @@ test-results
 playwright-report
 blob-report
 playwright/.cache
+.playwright-mcp
 
 # 本地历史资料与设计草稿（不随开源仓库发布）；仅放行 README 引用的截图
 /processon_files

@@ -18,7 +18,7 @@ export function applyLiveLinker(
   if (live) {
     const label = getLinkerLabelNode(id)
     if (label) {
-      const mid = getLinkerMidpoint(live)
+      const mid = live.textPos ?? getLinkerMidpoint(live)
       label.position(mid)
     }
   }

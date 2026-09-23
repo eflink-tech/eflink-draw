@@ -4,8 +4,8 @@ import { flowShapes } from '../shapes/flow'
 import '@/core/schema/shapes'
 
 describe('流程图形状默认样式', () => {
-  it('flowShapes 共 21 个', () => {
-    expect(flowShapes).toHaveLength(21)
+  it('flowShapes 共 28 个', () => {
+    expect(flowShapes).toHaveLength(28)
   })
 
   it('registry 已注册全部流程图形状', () => {

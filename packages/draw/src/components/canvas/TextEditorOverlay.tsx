@@ -85,6 +85,9 @@ function Editor({ id, block }: { id: string; block: number }) {
 
   if (!el) return null
 
+  // 代码块：wrapper 外侧（文本区左侧 44px 边距内）渲染行号槽，随输入实时刷新
+  const isCode = !isLinker(el) && el.name === 'codeBlock'
+
   // —— 几何：wrapper 锚点（世界坐标）与宽度 ——
   // 图形：Konva Text 以整个图形矩形布局（width=w height=h verticalAlign），
   // 编辑器锚点对齐图形中心，wrapper 使用固定 shape 高度（而非动态 contentH），
@@ -97,7 +100,8 @@ function Editor({ id, block }: { id: string; block: number }) {
   let taPadTop = 0 // textarea 内部垂直对齐偏移（px），模拟 Konva verticalAlign
   let taBg = 'transparent' // 图形有自身填充色 → 透明；连线无填充 → 白底，编辑态可见
   if (isLinker(el)) {
-    const mid = getLinkerMidpoint(el)
+    // 文字锚点优先（线身双击处），缺省回落线中点
+    const mid = el.textPos ?? getLinkerMidpoint(el)
     anchorX = mid.x
     anchorY = mid.y
     worldW = Math.max(LINKER_MIN_W, textW + LINKER_PAD_W)
@@ -227,9 +231,29 @@ function Editor({ id, block }: { id: string; block: number }) {
         background: 'transparent',
         zIndex: 20,
         boxSizing: 'border-box',
-        overflow: 'hidden',
+        overflow: isCode ? 'visible' : 'hidden',
       }}
     >
+      {isCode && (
+        <div
+          style={{
+            position: 'absolute',
+            left: -32,
+            top: 0,
+            width: 24,
+            whiteSpace: 'pre',
+            pointerEvents: 'none',
+            ...fontStyleCSS,
+            // 行号槽固定右对齐：放在 fontStyleCSS 之后，避免被图形的 textAlign:left 覆盖
+            // （覆盖后编辑态靠左、视图态靠右，进出编辑行号会横向跳变）
+            textAlign: 'right',
+            color: el.codeTheme === 'dark' ? '#7d8590' : '#a5abb3',
+            lineHeight: `${fontSize * TEXT_LINE_HEIGHT}px`,
+          }}
+        >
+          {Array.from({ length: Math.max(value.split('\n').length, 1) }, (_, i) => i + 1).join('\n')}
+        </div>
+      )}
       <textarea
         ref={taRef}
         value={value}

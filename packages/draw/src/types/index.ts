@@ -204,6 +204,22 @@ export interface ElementInstance {
   laneCount?: number
   /** 泳道图：阶段分隔数量 */
   stageCount?: number
+  /** 泳道图：各泳道背景色（索引 i 对应第 i 个泳道；空洞/undefined = 该泳道无填充） */
+  laneColors?: (RGBColor | undefined)[]
+  /** 泳道图：各二级标题格（泳道头格）背景色，索引与 laneColors 对齐 */
+  laneHeadColors?: (RGBColor | undefined)[]
+  /** 泳道图：标题栏背景色（缺省 = 无填充） */
+  titleColor?: RGBColor
+  /**
+   * 泳道图：泳道分隔线位置累积比率（N 泳道 = N-1 个值，范围 (0,1) 严格递增）。
+   * 垂直泳道 = x 轴比率；水平泳道 = y 轴比率。
+   * undefined / 空数组 = 等分（兼容旧数据）。
+   */
+  laneRatios?: number[]
+  /** 代码块：代码语言标注（plaintext/js/ts/python/java/sql/json/html/css/markdown），仅标注不做语法高亮 */
+  codeLanguage?: string
+  /** 代码块：主题（light/dark），决定背景色与文字色 */
+  codeTheme?: 'light' | 'dark'
 }
 
 /**
@@ -226,6 +242,8 @@ export interface LinkerInstance {
   from: { id: string | null; x: number; y: number; angle: number; junction?: LinkerJunction }
   to: { id: string | null; x: number; y: number; angle: number; junction?: LinkerJunction }
   text: string
+  /** 连线文字锚点（世界坐标）：线身双击处；缺省回落到线中点。一条连线仅此一个文字点 */
+  textPos?: { x: number; y: number }
   fontStyle?: FontStyle
   linkerType: 'curve' | 'broken' | 'line'
   lineStyle: LineStyle & {

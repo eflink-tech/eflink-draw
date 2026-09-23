@@ -408,6 +408,163 @@ const annotation: ShapeDefinition = {
 // 导出列表（顺序与 flow.js 一致）
 // ═══════════════════════════════════════════
 
+/** 磁鼓（立式圆柱，存储介质符号） */
+const magneticDrum: ShapeDefinition = {
+  name: 'magneticDrum',
+  title: '磁鼓',
+  category: 'flow',
+  props: { w: 70, h: 90 },
+  anchors: [],
+  path: [
+    [
+      { action: 'move', x: 0, y: 'Math.min(h*0.16,w*0.3)' },
+      { action: 'quadraticCurve', x1: 'w/2', y1: '-Math.min(h*0.16,w*0.3)', x: 'w', y: 'Math.min(h*0.16,w*0.3)' },
+      { action: 'line', x: 'w', y: 'h-Math.min(h*0.16,w*0.3)' },
+      { action: 'quadraticCurve', x1: 'w/2', y1: 'h+Math.min(h*0.16,w*0.3)', x: 0, y: 'h-Math.min(h*0.16,w*0.3)' },
+      { action: 'close' },
+    ],
+    [
+      { action: 'move', x: 0, y: 'Math.min(h*0.16,w*0.3)' },
+      { action: 'quadraticCurve', x1: 'w/2', y1: 'Math.min(h*0.16,w*0.3)*3', x: 'w', y: 'Math.min(h*0.16,w*0.3)' },
+    ],
+  ],
+}
+
+/** 或连接（圆 + 十字） */
+const orJunction: ShapeDefinition = {
+  name: 'orJunction',
+  title: '或连接',
+  category: 'flow',
+  props: { w: 54, h: 54 },
+  anchors: [],
+  path: [
+    ...round.path,
+    [
+      { action: 'move', x: 'w/2', y: 0 },
+      { action: 'line', x: 'w/2', y: 'h' },
+    ],
+    [
+      { action: 'move', x: 0, y: 'h/2' },
+      { action: 'line', x: 'w', y: 'h/2' },
+    ],
+  ],
+}
+
+/** 汇总连接（圆 + 交叉对角线） */
+const summingJunction: ShapeDefinition = {
+  name: 'summingJunction',
+  title: '汇总连接',
+  category: 'flow',
+  props: { w: 54, h: 54 },
+  anchors: [],
+  path: [
+    ...round.path,
+    [
+      { action: 'move', x: 0, y: 0 },
+      { action: 'line', x: 'w', y: 'h' },
+    ],
+    [
+      { action: 'move', x: 'w', y: 0 },
+      { action: 'line', x: 0, y: 'h' },
+    ],
+  ],
+}
+
+/** 排序（菱形 + 水平中线） */
+const sort: ShapeDefinition = {
+  name: 'sort',
+  title: '排序',
+  category: 'flow',
+  props: { w: 69, h: 54 },
+  anchors: [],
+  path: [
+    ...decision.path,
+    [
+      { action: 'move', x: 0, y: 'h/2' },
+      { action: 'line', x: 'w', y: 'h/2' },
+    ],
+  ],
+}
+
+/** 合并（倒三角） */
+const merge: ShapeDefinition = {
+  name: 'merge',
+  title: '合并',
+  category: 'flow',
+  props: { w: 69, h: 54 },
+  anchors: [],
+  path: [[
+    { action: 'move', x: 0, y: 0 },
+    { action: 'line', x: 'w', y: 0 },
+    { action: 'line', x: 'w/2', y: 'h' },
+    { action: 'close' },
+  ]],
+}
+
+/** 注释（右）—— 文本行 + 右侧方括号 */
+const annotationRight: ShapeDefinition = {
+  name: 'annotationRight',
+  title: '注释(右)',
+  category: 'flow',
+  attribute: { container: false, rotatable: false, linkable: false },
+  props: { w: 100, h: 70 },
+  fillStyle: { type: 'none' },
+  textBlock: [],
+  anchors: [],
+  path: [
+    [
+      { action: 'move', x: 0, y: 'h*0.22' },
+      { action: 'line', x: 'w*0.55', y: 'h*0.22' },
+    ],
+    [
+      { action: 'move', x: 0, y: 'h*0.48' },
+      { action: 'line', x: 'w*0.62', y: 'h*0.48' },
+    ],
+    [
+      { action: 'move', x: 0, y: 'h*0.74' },
+      { action: 'line', x: 'w*0.5', y: 'h*0.74' },
+    ],
+    [
+      { action: 'move', x: 'w*0.85', y: 0 },
+      { action: 'line', x: 'w', y: 0 },
+      { action: 'line', x: 'w', y: 'h' },
+      { action: 'line', x: 'w*0.85', y: 'h' },
+    ],
+  ],
+}
+
+/** 注释（左）—— 左侧方括号 + 文本行 */
+const annotationLeft: ShapeDefinition = {
+  name: 'annotationLeft',
+  title: '注释(左)',
+  category: 'flow',
+  attribute: { container: false, rotatable: false, linkable: false },
+  props: { w: 100, h: 70 },
+  fillStyle: { type: 'none' },
+  textBlock: [],
+  anchors: [],
+  path: [
+    [
+      { action: 'move', x: 'w', y: 'h*0.22' },
+      { action: 'line', x: 'w*0.45', y: 'h*0.22' },
+    ],
+    [
+      { action: 'move', x: 'w', y: 'h*0.48' },
+      { action: 'line', x: 'w*0.38', y: 'h*0.48' },
+    ],
+    [
+      { action: 'move', x: 'w', y: 'h*0.74' },
+      { action: 'line', x: 'w*0.5', y: 'h*0.74' },
+    ],
+    [
+      { action: 'move', x: 'w*0.15', y: 0 },
+      { action: 'line', x: 0, y: 0 },
+      { action: 'line', x: 0, y: 'h' },
+      { action: 'line', x: 'w*0.15', y: 'h' },
+    ],
+  ],
+}
+
 export const flowShapes: ShapeDefinition[] = [
   process,
   decision,
@@ -419,6 +576,7 @@ export const flowShapes: ShapeDefinition[] = [
   internalStorage,
   sequentialData,
   directData,
+  magneticDrum,
   manualInput,
   card,
   paperTape,
@@ -428,6 +586,12 @@ export const flowShapes: ShapeDefinition[] = [
   parallelMode,
   loopLimit,
   onPageReference,
+  orJunction,
+  summingJunction,
   offPageReference,
+  sort,
+  merge,
   annotation,
+  annotationRight,
+  annotationLeft,
 ]
