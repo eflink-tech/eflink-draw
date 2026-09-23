@@ -15,7 +15,15 @@ function ViewportPan({ children }: { children: ReactNode }) {
   const x = useEditorStore((s) => s.viewport.x)
   const y = useEditorStore((s) => s.viewport.y)
   return (
-    <div className="absolute inset-0" style={{ transform: `translate(${x}px, ${y}px)` }}>
+    <div
+      className="absolute inset-0"
+      style={{
+        // translate3d + willChange：把文字层提升为合成层，平移时整层 GPU 位移，
+        // 不逐帧重排/重采样文字（否则文字相对画布形状晃动）
+        transform: `translate3d(${x}px, ${y}px, 0)`,
+        willChange: 'transform',
+      }}
+    >
       {children}
     </div>
   )

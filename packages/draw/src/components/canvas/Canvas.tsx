@@ -1,5 +1,5 @@
 // src/components/canvas/Canvas.tsx
-import { useRef, useState, useCallback, useMemo, useEffect } from 'react'
+import { useRef, useState, useCallback, useMemo, useEffect, useLayoutEffect } from 'react'
 import { Stage, Layer, Line } from 'react-konva'
 import type Konva from 'konva'
 import { useEditorStore } from '@/store/editorStore'
@@ -58,6 +58,10 @@ export function Canvas() {
   } | null>(null)
 
   const viewport = useEditorStore((s) => s.viewport)
+
+  // 平移/缩放同步：Konva 的重绘走 rAF（batchDraw），比 DOM 文字覆盖层晚一帧，
+  // 平移时文字会先于形状移动（视觉晃动）。viewport 变化后在 layout effect 里
+  // 同步强制重绘各层，保证画布与文字同帧。
   const doc = useEditorStore((s) => s.document)
   const page = doc.page
   const currentTool = useEditorStore((s) => s.currentTool)
@@ -489,10 +493,18 @@ export function Canvas() {
 
   const pointerPan = useRef(
     createPointerPanSession({
-      apply: ({ x, y }) => useEditorStore.getState().updateViewport({ x, y }),
+      // 平移量取整：Konva 位图与 DOM 文字层在整数像素上移动方式一致，
+      // 小数偏移会让两层渲染相位不同 → 文字相对形状晃动
+      apply: ({ x, y }) => useEditorStore.getState().updateViewport({ x: Math.round(x), y: Math.round(y) }),
       clamp: (x, y) => clampViewportRef.current(x, y),
     }),
   )
+
+  // 平移/缩放帧同步：Konva batchDraw 走 rAF 比 DOM 文字层晚一帧（文字先动、画布后动），
+  // viewport 变化后同步强制重绘各层，两层同帧渲染
+  useLayoutEffect(() => {
+    stageRef.current?.getLayers().forEach((l) => l.draw())
+  }, [viewport.x, viewport.y, viewport.scale])
 
   const wheelAcc = useRef({ x: 0, y: 0 })
   const wheelFrame = useRef(createFrameScheduler())
@@ -528,9 +540,9 @@ export function Canvas() {
         wheelAcc.current.x = 0
         wheelAcc.current.y = 0
         const vp = useEditorStore.getState().viewport
-        useEditorStore.getState().updateViewport(
-          clampViewportRef.current(vp.x - dx, vp.y - dy),
-        )
+        const clamped = clampViewportRef.current(vp.x - dx, vp.y - dy)
+        // 同指针平移：取整避免位图/DOM 文字渲染相位差引起的晃动
+        useEditorStore.getState().updateViewport({ x: Math.round(clamped.x), y: Math.round(clamped.y) })
       })
     }
     el.addEventListener('wheel', handleWheel, { passive: false })
