@@ -274,6 +274,8 @@ function Editor({ id, block }: { id: string; block: number }) {
           width: '100%',
           height: '100%',
           ...fontStyleCSS,
+          // 连线文字与 Konva 标签同源基线校正，保证编辑态与显示态一致
+          ...(isLinker(el) && { position: 'relative', top: '-0.08em' }),
           background: taBg,
           paddingTop: `${taPadTop}px`,
           resize: 'none',

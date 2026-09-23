@@ -142,6 +142,39 @@ export const LinkerRenderer = memo(function LinkerRenderer({ linker }: LinkerRen
   )
 })
 
+/**
+ * 连线文字垂直居中：Konva10 按 alphabetic 基线对齐行盒，中文字形墨迹在行盒内偏下，
+ * 无法用固定常量校准（随字体而变）。这里用 canvas measureText 实测墨迹中心
+ * （actualBoundingBox），算出文字节点顶部应放的 y，使墨迹中心精确落在标签锚点（线上）。
+ */
+const inkOffsetCache = new Map<string, number>()
+function labelInkTopOffset(text: string, fontCSS: string, fontSize: number): number {
+  const sample = text.split('\n').reduce((a, b) => (b.length > a.length ? b : a), '') || '否'
+  const key = `${fontCSS}@${fontSize}:${sample}`
+  const cached = inkOffsetCache.get(key)
+  if (cached !== undefined) return cached
+  let v = -(fontSize * TEXT_LINE_HEIGHT) / 2 // 量测失败时退回「行盒居中」
+  try {
+    const ctx = document.createElement('canvas').getContext('2d')
+    if (ctx) {
+      ctx.font = `${fontSize}px ${fontCSS}`
+      const m = ctx.measureText(sample)
+      // Konva10：基线在行盒内的位置 = (ascent-descent)/2 + lineHeight/2
+      const baselineInBox =
+        ((m.fontBoundingBoxAscent ?? m.actualBoundingBoxAscent ?? 0) -
+          (m.fontBoundingBoxDescent ?? m.actualBoundingBoxDescent ?? 0)) / 2 +
+        (fontSize * TEXT_LINE_HEIGHT) / 2
+      const inkCenterFromBaseline = ((m.actualBoundingBoxAscent ?? fontSize * 0.8) -
+        (m.actualBoundingBoxDescent ?? 0)) / 2
+      v = inkCenterFromBaseline - baselineInBox // 文字节点顶部 y（相对标签锚点）
+    }
+  } catch {
+    // 非 DOM 环境：退回行盒居中
+  }
+  inkOffsetCache.set(key, v)
+  return v
+}
+
 /** 连线文字标签（textPos 锚点优先，缺省线中点；白底居中） */
 function LinkerLabel({ linker }: { linker: LinkerInstance }) {
   const font = { ...LINKER_FONT_DEFAULTS, ...linker.fontStyle }
@@ -191,7 +224,7 @@ function LinkerLabel({ linker }: { linker: LinkerInstance }) {
       <Text
         ref={textRef}
         x={-box.w / 2}
-        y={-box.h / 2}
+        y={labelInkTopOffset(linker.text, fontFamilyCSS(font.fontFamily), font.size ?? 13)}
         text={linker.text}
         fontSize={font.size}
         fontFamily={fontFamilyCSS(font.fontFamily)}
