@@ -13,6 +13,7 @@ import { ArrowStyleDropdown } from '@/components/common/ArrowStyleDropdown'
 import { MenuDropdown } from '@/components/common/MenuDropdown'
 import { useUIStore } from '@/store/uiStore'
 import { useEditorStore } from '@/store/editorStore'
+import { applyFontPatch } from '@/core/editor/styleOps'
 import { isLinker, type ArrowStyle, type ElementInstance, type LinkerInstance } from '@/types'
 import { PromptDialog } from '@/components/common/PromptDialog'
 import { ExportImage, EXPORT_EVENT } from '@/components/export/ExportImage'
@@ -438,9 +439,8 @@ export function TopBar() {
           fontStyle: { ...el.fontStyle, color: rgb },
         })
       } else {
-        st.updateElement(id, {
-          fontStyle: { ...el.fontStyle, color: rgb },
-        })
+        // 泳道族当前文字目标 → 块级样式；其余 → 图形级
+        st.updateElement(id, applyFontPatch(el, { color: rgb }))
       }
     }
   }

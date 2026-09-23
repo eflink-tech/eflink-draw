@@ -95,7 +95,7 @@ const diamond: ShapeDefinition = {
   name: 'diamond',
   title: '菱形',
   category: 'basic',
-  props: { w: 81, h: 54 },
+  props: { w: 96, h: 54 },
   textBlock: [{ position: { x: 10, y: 'h*0.13', w: 'w-20', h: 'h*0.75' }, text: '' }],
   anchors: [
     { x: 0, y: 'h/2' },

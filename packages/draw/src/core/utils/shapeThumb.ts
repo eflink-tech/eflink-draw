@@ -29,16 +29,13 @@ export function drawShapeThumb(canvas: HTMLCanvasElement, name: string, size: nu
     const box = size - Math.max(lineWidth * 2, 3)
     w = box
     h = box
-  } else if (w >= size || h >= size) {
-    if (w >= h) {
-      const nw = size - lineWidth * 2
-      h = Math.round((h / w) * nw)
-      w = nw
-    } else {
-      const nh = size - lineWidth * 2
-      w = Math.round((w / h) * nh)
-      h = nh
-    }
+  } else {
+    // 高度优先归一：所有图标统一到可用高度，仅过宽图形按宽度兜底
+    const avail = size - lineWidth * 2
+    let s = avail / h
+    if (w * s > avail) s = avail / w
+    w = Math.max(1, Math.round(w * s))
+    h = Math.max(1, Math.round(h * s))
   }
 
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0)

@@ -142,9 +142,10 @@ describe('泳池/泳道形状默认样式', () => {
     for (const [name, { lanes, titleSize }] of Object.entries(expected)) {
       const el = shapeRegistry.createElement(name, 0, 0)!
       expect(el.laneCount, `${name}.laneCount`).toBe(lanes)
-      expect(el.textBlock, `${name}.textBlock 仅标题块`).toHaveLength(1)
-      // 外框 + 标题带线 + (lanes-1) 泳道分隔线；无二级标题线
-      expect(el.path, `${name}.path`).toHaveLength(2 + lanes - 1)
+      const hasHeadRow = name.startsWith('bidirectional')
+      expect(el.textBlock, `${name}.textBlock`).toHaveLength(hasHeadRow ? 1 + lanes : 1)
+      // 外框 + 标题带线 + 二级标题线（仅双向）+ (lanes-1) 泳道分隔线
+      expect(el.path, `${name}.path`).toHaveLength((hasHeadRow ? 3 : 2) + lanes - 1)
       const titleLine = el.path[1]!
       const isHorizontal = ['horizontalPool', 'horizontalLane', 'bidirectionalPoolH'].includes(name)
       expect(titleLine[0], `${name}.标题带线起点`).toEqual({

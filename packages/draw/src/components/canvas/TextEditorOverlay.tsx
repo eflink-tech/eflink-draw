@@ -179,6 +179,14 @@ function Editor({ id, block }: { id: string; block: number }) {
     if (isLinker(cur)) {
       const base: FontStyle = { ...LINKER_FONT_DEFAULTS, ...cur.fontStyle }
       st.updateLinker(cur.id, { fontStyle: { ...base, [key]: !base[key] } })
+    } else if (block >= 0 && cur.textBlock[block]) {
+      // 多块图形（泳道等）：加粗/斜体/下划线只作用于正在编辑的块（块级样式覆盖）
+      const merged = { ...cur.fontStyle, ...cur.textBlock[block]?.fontStyle }
+      st.updateElement(cur.id, {
+        textBlock: cur.textBlock.map((tb, i) =>
+          i === block ? { ...tb, fontStyle: { ...tb.fontStyle, [key]: !merged[key] } } : tb,
+        ),
+      })
     } else {
       st.updateElement(cur.id, {
         fontStyle: { ...cur.fontStyle, [key]: !cur.fontStyle[key] },

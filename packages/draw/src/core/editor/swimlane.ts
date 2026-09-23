@@ -1,6 +1,6 @@
 // 泳道族（复合形状）布局构建：泳道图 swimlaneV/H + 泳池/泳道/双向泳池 6 形状
 //   泳道图 = 外框 + 标题带 + 二级标题行 + N 泳道（grid 变体，hasHeadRow=true）
-//   泳池/泳道/双向泳池 = 外框 + 标题带 + N 泳道（简化变体，无二级标题行）
+//   泳池/泳道/双向泳池 = 同样带二级标题行（与泳道图仅默认泳道数/标题带厚不同）
 //   分隔线坐标用 w/h 表达式表达，resize 时按比例缩放，无需重建 path；
 //   仅泳道数/阶段数/方向/颜色变化时由 buildSwimlaneUpdate 重建实例 path 与 textBlock。
 //   变体差异（标题带厚 / 是否带二级标题行 / 换向名称映射）由图形名静态决定，不落实例存储，
@@ -26,7 +26,7 @@ export interface SwimlaneLayout {
   stageCount: number
   /** 标题带厚（垂直=顶部横带高 / 水平=左侧标题列宽），缺省 40 */
   titleSize?: number
-  /** 是否带二级标题行（泳道图 true；泳池/泳道/双向泳池 false），缺省 true */
+  /** 是否带二级标题行（泳道图/双向泳池 true；泳池/泳道 false），缺省 true */
   hasHeadRow?: boolean
   laneColors?: (RGBColor | undefined)[]
   /** 二级标题（泳道头格）逐格背景色，索引与 laneColors 对齐 */
@@ -74,7 +74,7 @@ const FAMILY_META = {
     titles: { v: '双向泳池(垂直)', h: '双向泳池(水平)' },
     defaultLanes: 2,
     titleSize: 40,
-    hasHeadRow: false,
+    hasHeadRow: true,
   },
 } as const satisfies Record<string, Omit<SwimlaneShapeMeta, 'orientation'>>
 
@@ -452,16 +452,17 @@ export function buildSwimlaneTextBlocks(
   const hasHeadRow = layout.hasHeadRow ?? true
   const n = clamp(layout.laneCount, MIN_LANES, MAX_LANES)
   const titleText = prev?.[0]?.text ?? ''
+  // 重建时保留各块的块级样式（fontStyle）与文字：主标题默认 16 号，块级可覆盖
   const blocks: TextBlock[] = orientation === 'v'
     ? [{
         position: { x: 10, y: 0, w: 'w-20', h: titleSize },
         text: titleText,
-        fontStyle: { size: 16 },
+        fontStyle: { size: 16, ...prev?.[0]?.fontStyle },
       }]
     : [{
         position: { x: 0, y: 10, w: titleSize, h: 'h-20' },
         text: titleText,
-        fontStyle: { size: 16, orientation: 'vertical' },
+        fontStyle: { size: 16, orientation: 'vertical', ...prev?.[0]?.fontStyle },
       }]
   if (!hasHeadRow) return blocks
   for (let i = 0; i < n; i++) {
@@ -478,6 +479,7 @@ export function buildSwimlaneTextBlocks(
             h: SWIMLANE_HEADER,
           },
           text,
+          fontStyle: prev?.[i + 1]?.fontStyle,
         })
       } else {
         const start = i === 0 ? 0 : `w*${laneRatios[i - 1]}`
@@ -487,6 +489,7 @@ export function buildSwimlaneTextBlocks(
         blocks.push({
           position: { x: xExpr, y: titleSize, w: wExpr, h: SWIMLANE_HEADER },
           text,
+          fontStyle: prev?.[i + 1]?.fontStyle,
         })
       }
     } else {
@@ -499,6 +502,7 @@ export function buildSwimlaneTextBlocks(
             h: `h/${n}-8`,
           },
           text,
+          fontStyle: prev?.[i + 1]?.fontStyle,
         })
       } else {
         const start = i === 0 ? 0 : `h*${laneRatios[i - 1]}`
@@ -508,6 +512,7 @@ export function buildSwimlaneTextBlocks(
         blocks.push({
           position: { x: titleSize + 4, y: yExpr, w: SWIMLANE_HEADER - 8, h: hExpr },
           text,
+          fontStyle: prev?.[i + 1]?.fontStyle,
         })
       }
     }

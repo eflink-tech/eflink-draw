@@ -2,7 +2,7 @@
 import type { ElementInstance, FontStyle, LinkerInstance } from '@/types'
 import { DEFAULT_FONT_SIZE, isLinker } from '@/types'
 import { ColorButton } from '@/components/common/ColorPicker'
-import { applyLinkerPatch, applyShapePatch, linkerFont } from '@/core/editor/styleOps'
+import { applyFontPatch, applyLinkerPatch, applyShapePatch, effectiveFont, linkerFont } from '@/core/editor/styleOps'
 import { FONT_OPTIONS, DEFAULT_FONT_VALUE } from '@/core/editor/fontMap'
 import { NumField, Row, Section, ToggleButton } from '../fields'
 
@@ -13,11 +13,13 @@ const V_ALIGN_LABEL = ['顶', '中', '底'] as const
 
 export function TextSection({ first }: { first: ElementInstance | LinkerInstance }) {
   const linkerMode = isLinker(first)
-  // 连线无对齐概念（恒居中）→ 隐藏对齐两行
-  const font: FontStyle = linkerMode ? linkerFont(first) : first.fontStyle
+  // 连线无对齐概念（恒居中）→ 隐藏对齐两行；
+  // 泳道族：当前文字目标（标题/二级标题）有块级覆盖时回显合并值
+  const font: FontStyle = linkerMode ? linkerFont(first) : effectiveFont(first)
 
   const patchFont = (patch: Partial<FontStyle>): void => {
-    applyShapePatch((el) => ({ fontStyle: { ...el.fontStyle, ...patch } }))
+    // 泳道族当前文字目标 → 写块级样式（独立控制）；其余 → 图形级 fontStyle
+    applyShapePatch((el) => applyFontPatch(el, patch))
     applyLinkerPatch((l) => ({ fontStyle: { ...linkerFont(l), ...patch } }))
   }
 

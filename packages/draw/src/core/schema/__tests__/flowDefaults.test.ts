@@ -23,7 +23,7 @@ describe('流程图形状默认样式', () => {
   it('流程图形状默认尺寸', () => {
     const expected: Record<string, [number, number]> = {
       process: [96, 54],
-      decision: [69, 54],
+      decision: [96, 54],
       terminator: [108, 54],
       document: [96, 54],
       data: [96, 54],

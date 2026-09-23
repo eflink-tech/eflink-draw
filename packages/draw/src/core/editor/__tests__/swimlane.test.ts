@@ -30,13 +30,22 @@ const grid = (orientation: 'v' | 'h', laneCount: number, stageCount = 0): Swimla
   hasHeadRow: true,
 })
 
-/** 泳池族（无二级标题行）布局 */
+/** 泳池族布局（无二级标题行） */
 const pool = (orientation: 'v' | 'h', laneCount = 1, titleSize = 40): SwimlaneLayout => ({
   orientation,
   laneCount,
   stageCount: 0,
   titleSize,
   hasHeadRow: false,
+})
+
+/** 双向泳池布局（带二级标题行） */
+const bidir = (orientation: 'v' | 'h', laneCount = 2): SwimlaneLayout => ({
+  orientation,
+  laneCount,
+  stageCount: 0,
+  titleSize: 40,
+  hasHeadRow: true,
 })
 
 describe('buildSwimlanePath', () => {
@@ -126,7 +135,7 @@ describe('buildSwimlanePath', () => {
 })
 
 describe('buildSwimlanePath 泳池族（无二级标题行）', () => {
-  it('单泳道：仅外框 + 标题带线，无头线无泳道线', () => {
+  it('单泳道：外框 + 标题带线，无二级标题线无泳道分隔线', () => {
     const paths = buildSwimlanePath(pool('v', 1, 40))
     expect(paths).toHaveLength(2)
     expect(paths[1]).toEqual([
@@ -135,16 +144,20 @@ describe('buildSwimlanePath 泳池族（无二级标题行）', () => {
     ])
   })
 
-  it('双向（2 泳道）：标题带线 + 1 条泳道分隔线', () => {
-    const paths = buildSwimlanePath(pool('v', 2, 40))
-    expect(paths).toHaveLength(3)
+  it('双向泳池（2 泳道）：标题带线 + 二级标题线 + 1 条泳道分隔线', () => {
+    const paths = buildSwimlanePath(bidir('v', 2))
+    expect(paths).toHaveLength(4)
     expect(paths[2]).toEqual([
+      { action: 'move', x: 0, y: 80 },
+      { action: 'line', x: 'w', y: 80 },
+    ])
+    expect(paths[3]).toEqual([
       { action: 'move', x: 'w*1/2', y: 40 },
       { action: 'line', x: 'w*1/2', y: 'h' },
     ])
   })
 
-  it('泳道(垂直) 标题带厚 30：分隔线从 y=30 起', () => {
+  it('泳道(垂直) 标题带厚 30：无二级标题线，分隔线从 y=30 起', () => {
     const paths = buildSwimlanePath(pool('v', 2, 30))
     expect(paths).toHaveLength(3)
     expect(paths[1]).toEqual([
@@ -158,9 +171,9 @@ describe('buildSwimlanePath 泳池族（无二级标题行）', () => {
   })
 
   it('水平双向：泳道分隔线为 h 表达式，从标题列右缘起', () => {
-    const paths = buildSwimlanePath(pool('h', 2, 40))
-    expect(paths).toHaveLength(3)
-    expect(paths[2]).toEqual([
+    const paths = buildSwimlanePath(bidir('h', 2))
+    expect(paths).toHaveLength(4)
+    expect(paths[3]).toEqual([
       { action: 'move', x: 40, y: 'h*1/2' },
       { action: 'line', x: 'w', y: 'h*1/2' },
     ])
@@ -268,6 +281,16 @@ describe('buildSwimlaneTextBlocks', () => {
     expect(blocks[2]!.position.x).toBe('w*0.3+8')
   })
 
+  it('重建保留各块块级样式（fontStyle）与文字', () => {
+    const prev = buildSwimlaneTextBlocks(grid('v', 2))
+    prev[0]!.fontStyle = { size: 18, bold: true }
+    prev[1]!.fontStyle = { color: '200,40,40', textAlign: 'left' }
+    const next = buildSwimlaneTextBlocks(grid('v', 3), prev)
+    expect(next[0]!.fontStyle).toEqual({ size: 18, bold: true })
+    expect(next[1]!.fontStyle).toEqual({ color: '200,40,40', textAlign: 'left' })
+    expect(next[2]!.fontStyle).toBeUndefined() // 新增块无覆盖，继承图形级样式
+  })
+
   it('泳池族：仅标题块，厚度随 titleSize', () => {
     expect(buildSwimlaneTextBlocks(pool('v', 1, 40))).toEqual([
       { position: { x: 10, y: 0, w: 'w-20', h: 40 }, text: '', fontStyle: { size: 16 } },
@@ -276,6 +299,8 @@ describe('buildSwimlaneTextBlocks', () => {
     expect(buildSwimlaneTextBlocks(pool('h', 1, 40))).toEqual([
       { position: { x: 0, y: 10, w: 40, h: 'h-20' }, text: '', fontStyle: { size: 16, orientation: 'vertical' } },
     ])
+    // 双向泳池带泳道头块
+    expect(buildSwimlaneTextBlocks(bidir('v', 2))).toHaveLength(3)
   })
 })
 
@@ -393,8 +418,9 @@ describe('buildSwimlaneUpdate 泳池族', () => {
     expect(swimlaneLayoutOf(shapeRegistry.createElement('verticalLane', 0, 0)!).titleSize).toBe(30)
     expect(swimlaneLayoutOf(shapeRegistry.createElement('horizontalLane', 0, 0)!).hasHeadRow).toBe(false)
     expect(swimlaneLayoutOf(shapeRegistry.createElement('bidirectionalPoolH', 0, 0)!)).toMatchObject({
-      orientation: 'h', laneCount: 2, titleSize: 40, hasHeadRow: false,
+      orientation: 'h', laneCount: 2, titleSize: 40, hasHeadRow: true,
     })
+    expect(swimlaneLayoutOf(shapeRegistry.createElement('verticalPool', 0, 0)!).hasHeadRow).toBe(false)
   })
 
   it('旧数据实例无 laneCount：按图形名兜底（泳池 1 / 双向 2 / 泳道图 2）', () => {
@@ -511,19 +537,22 @@ describe('laneRectOf / targetAtLocal / resolveTarget（泳池族）', () => {
 
   it('双向泳池(垂直)：2 泳道沿 x 轴等分，点选命中各自泳道', () => {
     const el = shapeRegistry.createElement('bidirectionalPoolV', 100, 100)!
-    expect(laneRectOf(el, 0)).toEqual({ x: 0, y: 40, w: 250, h: 500 })
-    expect(laneRectOf(el, 1)).toEqual({ x: 250, y: 40, w: 250, h: 500 })
+    expect(laneRectOf(el, 0)).toEqual({ x: 0, y: 80, w: 250, h: 460 })
+    expect(laneRectOf(el, 1)).toEqual({ x: 250, y: 80, w: 250, h: 460 })
     expect(laneRectOf(el, 2)).toBeNull()
     expect(targetAtLocal(el, 100, 400)).toEqual({ kind: 'lane', index: 0 })
     expect(targetAtLocal(el, 400, 400)).toEqual({ kind: 'lane', index: 1 })
     expect(targetAtLocal(el, 250, 20)).toEqual({ kind: 'title', index: -1 })
+    expect(targetAtLocal(el, 100, 50)).toEqual({ kind: 'head', index: 0 })
   })
 
-  it('泳池族 resolveTarget：head 目标无效，回落第 1 条泳道', () => {
-    const el = shapeRegistry.createElement('verticalPool', 100, 100)!
-    expect(resolveTarget(el, { id: el.id, kind: 'head', index: 0 })).toEqual({ kind: 'lane', index: 0 })
-    expect(resolveTarget(el, { id: el.id, kind: 'lane', index: 0 })).toEqual({ kind: 'lane', index: 0 })
-    expect(resolveTarget(el, { id: el.id, kind: 'title', index: -1 })).toEqual({ kind: 'title', index: -1 })
+  it('泳池 resolveTarget：head 目标无效回落第 1 条泳道；双向泳池有效', () => {
+    const pool = shapeRegistry.createElement('verticalPool', 100, 100)!
+    expect(resolveTarget(pool, { id: pool.id, kind: 'head', index: 0 })).toEqual({ kind: 'lane', index: 0 })
+    expect(resolveTarget(pool, { id: pool.id, kind: 'lane', index: 0 })).toEqual({ kind: 'lane', index: 0 })
+    expect(resolveTarget(pool, { id: pool.id, kind: 'title', index: -1 })).toEqual({ kind: 'title', index: -1 })
+    const bidir = shapeRegistry.createElement('bidirectionalPoolV', 100, 100)!
+    expect(resolveTarget(bidir, { id: bidir.id, kind: 'head', index: 0 })).toEqual({ kind: 'head', index: 0 })
   })
 })
 

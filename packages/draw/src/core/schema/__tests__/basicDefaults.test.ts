@@ -39,7 +39,7 @@ describe('基础图形默认样式', () => {
       rectangle: [96, 54],
       roundRectangle: [96, 54],
       round: [54, 54],
-      diamond: [81, 54],
+      diamond: [96, 54],
       triangle: [62, 54],
       polygon: [57, 54],
       hexagon: [65, 54],

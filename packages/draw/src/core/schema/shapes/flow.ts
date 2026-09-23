@@ -33,7 +33,7 @@ const decision: ShapeDefinition = {
   name: 'decision',
   title: '判定',
   category: 'flow',
-  props: { w: 69, h: 54 },
+  props: { w: 96, h: 54 },
   path: [[
     { action: 'move', x: 0, y: 'h/2' },
     { action: 'line', x: 'w/2', y: 0 },

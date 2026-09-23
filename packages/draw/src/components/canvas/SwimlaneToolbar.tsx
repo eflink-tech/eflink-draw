@@ -1,9 +1,9 @@
 // 泳道族浮动工具栏：单选泳道图/泳池/泳道/双向泳池时显示在图形左上方，
 // 可调泳道数、方向（垂直/水平）、阶段数、颜色（标题背景/泳道背景/边框颜色）；
 // 布局重建见 buildSwimlaneUpdate。
-import { ChevronDown, ChevronUp, Columns, Rows } from 'lucide-react'
+import { AlignCenter, AlignLeft, AlignRight, Bold, ChevronDown, ChevronUp, Columns, Rows } from 'lucide-react'
 import { useEditorStore } from '@/store/editorStore'
-import { isLinker } from '@/types'
+import { isLinker, type FontStyle } from '@/types'
 import { worldToScreen } from '@/core/editor/interaction'
 import { ColorButton } from '@/components/common/ColorPicker'
 import {
@@ -112,6 +112,20 @@ export function SwimlaneToolbar() {
     apply(key === 'laneHeadColors' ? { laneHeadColors: next } : { laneColors: next })
   }
 
+  // ── 目标文字样式：主标题/子标题各自独立的颜色、字号、对齐、加粗 ──
+  // title → textBlock[0]；head i → textBlock[i+1]；泳道体无文字
+  const targetBlockIndex = target.kind === 'title' ? 0 : target.kind === 'head' ? target.index + 1 : null
+  const targetBlockFont: FontStyle | null = targetBlockIndex != null
+    ? { ...el.fontStyle, ...el.textBlock[targetBlockIndex]?.fontStyle }
+    : null
+  const setTargetFont = (patch: Partial<FontStyle>) => {
+    if (targetBlockIndex == null) return
+    const textBlock = el.textBlock.map((tb, i) =>
+      i === targetBlockIndex ? { ...tb, fontStyle: { ...tb.fontStyle, ...patch } } : tb,
+    )
+    useEditorStore.getState().updateElement(el.id, { textBlock })
+  }
+
   return (
     <div
       className="absolute z-30 flex items-center gap-2 rounded-md border border-[#ddd] bg-white px-2.5 py-1 shadow-md"
@@ -140,6 +154,44 @@ export function SwimlaneToolbar() {
           onSelect={setBorderColor}
         />
       </span>
+      {targetBlockFont && (
+        <>
+          <div className="h-4 w-px bg-[#e5e5e5]" />
+          <span className="flex items-center gap-1" title="当前目标的文字样式">
+            <span className="text-xs text-[#555]">文字</span>
+            <ColorButton
+              value={targetBlockFont.color ?? null}
+              onSelect={(rgb) => setTargetFont({ color: rgb ?? undefined })}
+            />
+            <select
+              className="cursor-pointer appearance-none bg-transparent text-xs text-[#333] outline-none"
+              value={targetBlockFont.size ?? el.fontStyle.size ?? 13}
+              onChange={(e) => setTargetFont({ size: Number(e.target.value) })}
+            >
+              {[10, 11, 12, 13, 14, 16, 18, 20, 24].map((sz) => (
+                <option key={sz} value={sz}>{sz}px</option>
+              ))}
+            </select>
+            {(['left', 'center', 'right'] as const).map((al) => (
+              <button
+                key={al}
+                title={{ left: '左对齐', center: '居中', right: '右对齐' }[al]}
+                className={btn(targetBlockFont.textAlign === al)}
+                onClick={() => setTargetFont({ textAlign: al })}
+              >
+                {al === 'left' ? <AlignLeft size={13} /> : al === 'center' ? <AlignCenter size={13} /> : <AlignRight size={13} />}
+              </button>
+            ))}
+            <button
+              title="加粗"
+              className={btn(!!targetBlockFont.bold)}
+              onClick={() => setTargetFont({ bold: !targetBlockFont.bold })}
+            >
+              <Bold size={13} />
+            </button>
+          </span>
+        </>
+      )}
       <div className="h-4 w-px bg-[#e5e5e5]" />
       <button
         title="垂直泳道"

@@ -4,6 +4,7 @@ import { useEditorStore } from '@/store/editorStore'
 import type { ElementInstance, FillStyle, FontStyle, LinkerInstance } from '@/types'
 import { isLinker } from '@/types'
 import { LINKER_FONT_DEFAULTS } from './linker'
+import { isSwimlane, resolveTarget } from './swimlane'
 
 /**
  */
@@ -52,4 +53,38 @@ export function applyLinkerPatch(
 /** 连线字体（无值时用默认兜底，保证面板可编辑） */
 export function linkerFont(l: LinkerInstance): FontStyle {
   return { ...LINKER_FONT_DEFAULTS, ...l.fontStyle }
+}
+
+/**
+ * 泳道族当前文字目标的块下标：标题带 → 0，二级标题格 i → i+1；
+ * 泳道体（无文字）或非泳道族返回 null。
+ */
+export function targetFontBlockIndex(el: ElementInstance): number | null {
+  if (!isSwimlane(el)) return null
+  const target = resolveTarget(el, useEditorStore.getState().activeTarget)
+  if (target.kind === 'title') return 0
+  return target.kind === 'head' ? target.index + 1 : null
+}
+
+/**
+ * 字体补丁路由：泳道族文字目标 → 写对应块的块级 fontStyle（独立控制）；
+ * 其余 → 图形级 fontStyle。返回 updateElement 用的补丁。
+ */
+export function applyFontPatch(
+  el: ElementInstance,
+  patch: Partial<FontStyle>,
+): Partial<ElementInstance> {
+  const idx = targetFontBlockIndex(el)
+  if (idx == null) return { fontStyle: { ...el.fontStyle, ...patch } }
+  return {
+    textBlock: el.textBlock.map((tb, i) =>
+      i === idx ? { ...tb, fontStyle: { ...tb.fontStyle, ...patch } } : tb,
+    ),
+  }
+}
+
+/** 生效字体 = 图形级 + 当前文字目标块的块级覆盖合并（面板回显用） */
+export function effectiveFont(el: ElementInstance): FontStyle {
+  const idx = targetFontBlockIndex(el)
+  return idx == null ? el.fontStyle : { ...el.fontStyle, ...el.textBlock[idx]?.fontStyle }
 }

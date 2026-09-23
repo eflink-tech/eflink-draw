@@ -5,13 +5,13 @@ import {
   type SwimlaneLayout,
 } from '@/core/editor/swimlane'
 
-/** 泳池族（无二级标题行）布局；具体尺寸/方向/标题带厚见各形状定义 */
-const poolLayout = (orientation: 'v' | 'h', laneCount: number, titleSize: number): SwimlaneLayout => ({
+/** 泳池族布局；泳池/泳道无二级标题行，双向泳池带（与泳道图一致） */
+const poolLayout = (orientation: 'v' | 'h', laneCount: number, titleSize: number, hasHeadRow: boolean): SwimlaneLayout => ({
   orientation,
   laneCount,
   stageCount: 0,
   titleSize,
-  hasHeadRow: false,
+  hasHeadRow,
 })
 
 // 文字 orientation（与旧 lane.js 对齐）：
@@ -115,8 +115,8 @@ const verticalPool: ShapeDefinition = {
   stageCount: 0,
   anchors: [],
   drawIcon: verticalPoolDrawIcon,
-  path: buildSwimlanePath(poolLayout('v', 1, 40)),
-  textBlock: buildSwimlaneTextBlocks(poolLayout('v', 1, 40)),
+  path: buildSwimlanePath(poolLayout('v', 1, 40, false)),
+  textBlock: buildSwimlaneTextBlocks(poolLayout('v', 1, 40, false)),
 }
 
 /** 泳道(垂直) 250×500 — 标题带 30 + 1 泳道 */
@@ -132,8 +132,8 @@ const verticalLane: ShapeDefinition = {
   stageCount: 0,
   anchors: [],
   drawIcon: verticalLaneDrawIcon,
-  path: buildSwimlanePath(poolLayout('v', 1, 30)),
-  textBlock: buildSwimlaneTextBlocks(poolLayout('v', 1, 30)),
+  path: buildSwimlanePath(poolLayout('v', 1, 30, false)),
+  textBlock: buildSwimlaneTextBlocks(poolLayout('v', 1, 30, false)),
 }
 
 /** 泳池(水平) 640×200 — 标题列 40 + 1 泳道 */
@@ -149,8 +149,8 @@ const horizontalPool: ShapeDefinition = {
   stageCount: 0,
   anchors: [],
   drawIcon: horizontalPoolDrawIcon,
-  path: buildSwimlanePath(poolLayout('h', 1, 40)),
-  textBlock: buildSwimlaneTextBlocks(poolLayout('h', 1, 40)),
+  path: buildSwimlanePath(poolLayout('h', 1, 40, false)),
+  textBlock: buildSwimlaneTextBlocks(poolLayout('h', 1, 40, false)),
 }
 
 /** 泳道(水平) 600×200 — 标题列 30 + 1 泳道 */
@@ -166,8 +166,8 @@ const horizontalLane: ShapeDefinition = {
   stageCount: 0,
   anchors: [],
   drawIcon: horizontalLaneDrawIcon,
-  path: buildSwimlanePath(poolLayout('h', 1, 30)),
-  textBlock: buildSwimlaneTextBlocks(poolLayout('h', 1, 30)),
+  path: buildSwimlanePath(poolLayout('h', 1, 30, false)),
+  textBlock: buildSwimlaneTextBlocks(poolLayout('h', 1, 30, false)),
 }
 
 // ═══════════════════════════════════════════
@@ -232,8 +232,8 @@ const bidirectionalPoolH: ShapeDefinition = {
   stageCount: 0,
   anchors: [],
   drawIcon: bidirectionalPoolHDrawIcon,
-  path: buildSwimlanePath(poolLayout('h', 2, 40)),
-  textBlock: buildSwimlaneTextBlocks(poolLayout('h', 2, 40)),
+  path: buildSwimlanePath(poolLayout('h', 2, 40, true)),
+  textBlock: buildSwimlaneTextBlocks(poolLayout('h', 2, 40, true)),
 }
 
 /** 双向泳池(垂直) 500×540 — 标题带 40 + 2 泳道 */
@@ -249,8 +249,8 @@ const bidirectionalPoolV: ShapeDefinition = {
   stageCount: 0,
   anchors: [],
   drawIcon: bidirectionalPoolVDrawIcon,
-  path: buildSwimlanePath(poolLayout('v', 2, 40)),
-  textBlock: buildSwimlaneTextBlocks(poolLayout('v', 2, 40)),
+  path: buildSwimlanePath(poolLayout('v', 2, 40, true)),
+  textBlock: buildSwimlaneTextBlocks(poolLayout('v', 2, 40, true)),
 }
 
 // 分隔条（2 个）：窄带 20px + 中线 + 「阶段」标签

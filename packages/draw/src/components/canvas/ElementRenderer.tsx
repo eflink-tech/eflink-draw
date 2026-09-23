@@ -1022,7 +1022,6 @@ export const ElementRenderer = memo(function ElementRenderer({ element, textEngi
               return (
                 <Text
                   key={i}
-                  ref={i === 0 ? textRef : undefined}
                   x={snap(r.x)}
                   y={snap(r.y)}
                   width={r.w}
