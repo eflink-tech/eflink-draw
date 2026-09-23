@@ -28,6 +28,7 @@ import { LinkerControls } from './LinkerControls'
 import { CreatingShapeView } from './CreatingShapeView'
 import { TextEditorOverlay } from './TextEditorOverlay'
 import { TextDisplayOverlay } from './TextDisplayOverlay'
+import { SwimlaneToolbar } from './SwimlaneToolbar'
 import { MarqueeSelection } from './MarqueeSelection'
 import { useEditorShortcuts } from './useEditorShortcuts'
 
@@ -638,6 +639,7 @@ export function Canvas() {
 
       <TextDisplayOverlay />
       <TextEditorOverlay />
+      <SwimlaneToolbar />
 
       {/* ── 自定义滚动条 ── */}
       {/* 水平滚动条（底部） */}

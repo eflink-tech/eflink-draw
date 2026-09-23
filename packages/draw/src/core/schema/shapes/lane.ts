@@ -1,4 +1,8 @@
 import type { PathDefinition, ShapeDefinition } from '@/types'
+import {
+  buildSwimlanePath,
+  buildSwimlaneTextBlocks,
+} from '@/core/editor/swimlane'
 
 // 文字 orientation（与旧 lane.js 对齐）：
 //   顶部标题带（verticalPool 等）→ horizontal（横排，从左到右）
@@ -362,10 +366,120 @@ const verticalSeparator: ShapeDefinition = {
 }
 
 // ═══════════════════════════════════════════
+// 泳道图（2 个）：外框 + 标题带 + N 泳道头格 + N 泳道分隔线 的复合形状。
+// 泳道数/阶段数存于实例 laneCount/stageCount，path 与 textBlock 由
+// core/editor/swimlane 构建（分隔线为 w/h 表达式，resize 按比例缩放）。
+// ═══════════════════════════════════════════
+
+/** 泳道图(垂直) 图标：外框 + 顶部深色标题带 + 泳道头行 + 3 列 */
+function swimlaneVDrawIcon(w: number, h: number): PathDefinition[] {
+  const band = Math.round(h * 0.16)
+  const head = Math.round(h * 0.28)
+  return [
+    [
+      { action: 'move', x: 0, y: 0 },
+      { action: 'line', x: w, y: 0 },
+      { action: 'line', x: w, y: h },
+      { action: 'line', x: 0, y: h },
+      { action: 'line', x: 0, y: 0 },
+    ],
+    [
+      { action: 'move', x: 0, y: 0 },
+      { action: 'line', x: w, y: 0 },
+      { action: 'line', x: w, y: band },
+      { action: 'line', x: 0, y: band },
+      { action: 'close' },
+    ],
+    [
+      { action: 'move', x: 0, y: head },
+      { action: 'line', x: w, y: head },
+    ],
+    [
+      { action: 'move', x: Math.round(w / 3), y: band },
+      { action: 'line', x: Math.round(w / 3), y: h },
+    ],
+    [
+      { action: 'move', x: Math.round((w * 2) / 3), y: band },
+      { action: 'line', x: Math.round((w * 2) / 3), y: h },
+    ],
+  ]
+}
+
+/** 泳道图(水平) 图标：外框 + 左侧深色标题列 + 泳道头列 + 3 行 */
+function swimlaneHDrawIcon(w: number, h: number): PathDefinition[] {
+  const band = Math.round(w * 0.16)
+  const head = Math.round(w * 0.28)
+  return [
+    [
+      { action: 'move', x: 0, y: 0 },
+      { action: 'line', x: w, y: 0 },
+      { action: 'line', x: w, y: h },
+      { action: 'line', x: 0, y: h },
+      { action: 'line', x: 0, y: 0 },
+    ],
+    [
+      { action: 'move', x: 0, y: 0 },
+      { action: 'line', x: band, y: 0 },
+      { action: 'line', x: band, y: h },
+      { action: 'line', x: 0, y: h },
+      { action: 'close' },
+    ],
+    [
+      { action: 'move', x: head, y: 0 },
+      { action: 'line', x: head, y: h },
+    ],
+    [
+      { action: 'move', x: band, y: Math.round(h / 3) },
+      { action: 'line', x: w, y: Math.round(h / 3) },
+    ],
+    [
+      { action: 'move', x: band, y: Math.round((h * 2) / 3) },
+      { action: 'line', x: w, y: Math.round((h * 2) / 3) },
+    ],
+  ]
+}
+
+/** 泳道图(垂直) 720×480，默认 4 泳道 */
+const swimlaneV: ShapeDefinition = {
+  name: 'swimlaneV',
+  title: '泳道图(垂直)',
+  category: 'lane',
+  props: { w: 720, h: 480 },
+  attribute: { container: true, rotatable: false, linkable: false },
+  fillStyle: { type: 'none' },
+  fontStyle: { orientation: 'horizontal' },
+  laneCount: 4,
+  stageCount: 0,
+  anchors: [],
+  drawIcon: swimlaneVDrawIcon,
+  path: buildSwimlanePath('v', 4, 0),
+  textBlock: buildSwimlaneTextBlocks('v', 4),
+}
+
+/** 泳道图(水平) 720×480，默认 4 泳道 */
+const swimlaneH: ShapeDefinition = {
+  name: 'swimlaneH',
+  title: '泳道图(水平)',
+  category: 'lane',
+  props: { w: 720, h: 480 },
+  attribute: { container: true, rotatable: false, linkable: false },
+  fillStyle: { type: 'none' },
+  fontStyle: { orientation: 'horizontal' },
+  laneCount: 4,
+  stageCount: 0,
+  anchors: [],
+  drawIcon: swimlaneHDrawIcon,
+  path: buildSwimlanePath('h', 4, 0),
+  textBlock: buildSwimlaneTextBlocks('h', 4),
+}
+
+// ═══════════════════════════════════════════
 // 导出列表
 // ═══════════════════════════════════════════
 
 export const laneShapes: ShapeDefinition[] = [
+  swimlaneV,
+  swimlaneH,
   verticalPool,
   verticalLane,
   horizontalPool,

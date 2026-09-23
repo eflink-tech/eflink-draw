@@ -40,7 +40,7 @@ const useCase: ShapeDefinition = {
   name: 'useCase',
   title: '用例',
   category: 'uml_usecase',
-  props: { w: 100, h: 70 },
+  props: { w: 96, h: 54 },
   // 内联 round（椭圆）路径
   path: [[
     { action: 'move', x: 0, y: 'h/2' },

@@ -19,9 +19,11 @@ import {
 } from '@/core/editor/linker'
 import {
   attachedLinkerIds,
+  rectGetterOf,
   routeAttachedLinkers,
   type LiveShapeState,
 } from '@/core/editor/documentOps'
+import { resolveJunctionLinkers } from '@/core/editor/linkerJunction'
 import { getElementNode, getLinkerNode, registerElementNode } from '@/core/editor/nodeRegistry'
 import { applyLiveLinker } from '@/core/editor/liveLinker'
 import { createFrameScheduler } from '@/core/editor/dragPerf'
@@ -89,8 +91,16 @@ function clearLiveLinkers(shapeIds: Iterable<string>): void {
 function updateLiveLinkers(livePos: Map<string, LiveShapeState>): void {
   const st = useEditorStore.getState()
   const updated = routeAttachedLinkers(st.document.elements, livePos)
+  // junction 二阶联动：附着在连线上的端点跟随（宿主连线刚被重路由）
+  const merged: typeof st.document.elements = { ...st.document.elements }
+  for (const [lid, nl] of updated) merged[lid] = nl
+  const junction = resolveJunctionLinkers(merged, rectGetterOf(merged))
   let lastId: string | undefined
   for (const [lid, nl] of updated) {
+    applyLiveLinker(lid, nl, { draw: false })
+    lastId = lid
+  }
+  for (const [lid, nl] of junction) {
     applyLiveLinker(lid, nl, { draw: false })
     lastId = lid
   }

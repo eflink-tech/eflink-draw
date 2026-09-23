@@ -15,11 +15,13 @@ import { useEditorStore } from '@/store/editorStore'
 import { applyLiveLinker } from './liveLinker'
 import { STUB_R, type Point } from './linker'
 import { simplifyOrthogonalPoints } from './manualRoute'
+import { projectToSegment, resolveJunctionLinkers } from './linkerJunction'
+import { rectGetterOf } from './documentOps'
 
 /** 轴对齐判定阈值（世界像素，浮点容差） */
 const AXIS_TOLERANCE = 0.5
 
-/** 点到线段的最小距离 */
+/** 点到线段的最小距离（投影逻辑见 linkerJunction.projectToSegment） */
 function distToSegment(
   px: number,
   py: number,
@@ -28,12 +30,7 @@ function distToSegment(
   bx: number,
   by: number,
 ): number {
-  const dx = bx - ax
-  const dy = by - ay
-  const len2 = dx * dx + dy * dy
-  const t =
-    len2 === 0 ? 0 : Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / len2))
-  return Math.hypot(px - (ax + t * dx), py - (ay + t * dy))
+  return projectToSegment(px, py, ax, ay, bx, by).dist
 }
 
 export interface SegmentHit {
@@ -305,6 +302,8 @@ export function startSegmentDrag(
   const startAbs = stage.getPointerPosition()
   if (!startAbs) return
   let live: LinkerInstance | null = null
+  // junction 二阶联动：附着在本连线上的下游连线 id（拖拽期走 live 通道）
+  const downstream = new Set<string>()
 
   const dragCursor = vertical ? 'e-resize' : 'n-resize'
   stage.container().style.cursor = dragCursor
@@ -323,6 +322,12 @@ export function startSegmentDrag(
     live = { ...l, points }
     // 直操统一通道：liveLinker 重绘 + 文字标签跟随（不重算路由）
     applyLiveLinker(l.id, live)
+    // junction 二阶联动：以 live 覆盖宿主几何后解析，下游连线实时跟随（不提交 store）
+    const merged = { ...useEditorStore.getState().document.elements, [l.id]: live }
+    for (const [lid, nl] of resolveJunctionLinkers(merged, rectGetterOf(merged))) {
+      downstream.add(lid)
+      applyLiveLinker(lid, nl)
+    }
     stage.container().style.cursor = dragCursor
     // 全部段句柄跟随简化后路径（不仅被拖段；否则其它句柄留在旧折点造成错位）
     const livePts = [l.from, ...points, l.to]
@@ -359,6 +364,8 @@ export function startSegmentDrag(
     window.removeEventListener('mouseup', up)
     stage.container().style.cursor = 'default'
     applyLiveLinker(l.id, null)
+    // 清下游 live（提交由 updateLinker 总闸重解析并并入同一条历史）
+    for (const lid of downstream) applyLiveLinker(lid, null)
     if (live) useEditorStore.getState().updateLinker(l.id, { points: live.points, manualRoute: true })
   }
   window.addEventListener('mousemove', move)

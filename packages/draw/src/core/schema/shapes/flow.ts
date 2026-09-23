@@ -8,7 +8,7 @@ import { rectangle, round } from './basic'
 // 引用 basic 图形（spread 复用，仅覆盖 name/title/category）
 // ═══════════════════════════════════════════
 
-/** 流程（复用 rectangle 路径，100×70） */
+/** 流程（复用 rectangle 路径，96×54） */
 const process: ShapeDefinition = {
   ...rectangle,
   name: 'process',
@@ -16,7 +16,7 @@ const process: ShapeDefinition = {
   category: 'flow',
 }
 
-/** 页面内引用（复用 round 路径，70×70） */
+/** 页面内引用（复用 round 路径，54×54） */
 const onPageReference: ShapeDefinition = {
   ...round,
   name: 'onPageReference',
@@ -28,12 +28,12 @@ const onPageReference: ShapeDefinition = {
 // 独立定义（路径从 flow.js 迁移）
 // ═══════════════════════════════════════════
 
-/** 判定（菱形，90×70） */
+/** 判定（菱形，69×54） */
 const decision: ShapeDefinition = {
   name: 'decision',
   title: '判定',
   category: 'flow',
-  props: { w: 90, h: 70 },
+  props: { w: 69, h: 54 },
   path: [[
     { action: 'move', x: 0, y: 'h/2' },
     { action: 'line', x: 'w/2', y: 0 },
@@ -44,12 +44,12 @@ const decision: ShapeDefinition = {
   ]],
 }
 
-/** 开始/结束（胶囊形，100×50） */
+/** 开始/结束（胶囊形，108×54） */
 const terminator: ShapeDefinition = {
   name: 'terminator',
   title: '开始/结束',
   category: 'flow',
-  props: { w: 100, h: 50 },
+  props: { w: 108, h: 54 },
   path: [[
     { action: 'move', x: 'Math.min(w,h)/3', y: 0 },
     { action: 'line', x: 'w-Math.min(w,h)/3', y: 0 },
@@ -65,7 +65,7 @@ const document: ShapeDefinition = {
   name: 'document',
   title: '文档',
   category: 'flow',
-  props: { w: 100, h: 70 },
+  props: { w: 96, h: 54 },
   anchors: [
     { x: 'w*0.5', y: 0 },
     { x: 'w', y: 'h*0.5' },
@@ -89,7 +89,7 @@ const data: ShapeDefinition = {
   name: 'data',
   title: '数据',
   category: 'flow',
-  props: { w: 100, h: 70 },
+  props: { w: 96, h: 54 },
   anchors: [
     { x: 'w*0.5', y: 0 },
     { x: 'w-Math.min(h/3,w/3)/2', y: 'h*0.5' },
@@ -112,7 +112,7 @@ const predefinedProcess: ShapeDefinition = {
   name: 'predefinedProcess',
   title: '子流程',
   category: 'flow',
-  props: { w: 100, h: 70 },
+  props: { w: 96, h: 54 },
   textBlock: [{ position: { x: 'Math.min(w/6,20)', y: 0, w: 'w-Math.min(w/6,20)*2', h: 'h' }, text: '' }],
   path: [[
     { action: 'move', x: 0, y: 0 },
@@ -133,7 +133,7 @@ const storedData: ShapeDefinition = {
   name: 'storedData',
   title: '外部数据',
   category: 'flow',
-  props: { w: 100, h: 70 },
+  props: { w: 96, h: 54 },
   anchors: [
     { x: 'w*0.5', y: 0 },
     { x: 'w-Math.min(w/8,h/8)', y: 'h*0.5' },
@@ -156,7 +156,7 @@ const internalStorage: ShapeDefinition = {
   name: 'internalStorage',
   title: '内部存储',
   category: 'flow',
-  props: { w: 100, h: 70 },
+  props: { w: 96, h: 54 },
   textBlock: [{ position: { x: 'Math.min(w/6,20)', y: 'Math.min(h/5,20)', w: 'w-Math.min(w/6,20)', h: 'h-Math.min(h/5,20)' }, text: '' }],
   path: [[
     { action: 'move', x: 0, y: 0 },
@@ -177,7 +177,7 @@ const sequentialData: ShapeDefinition = {
   name: 'sequentialData',
   title: '队列数据',
   category: 'flow',
-  props: { w: 70, h: 70 },
+  props: { w: 54, h: 54 },
   path: [[
     { action: 'move', x: 'w/2', y: 'h' },
     { action: 'curve', x1: 'w/2-w*2/3', y1: 'h', x2: 'w/2-w*2/3', y2: 0, x: 'w/2', y: 0 },
@@ -192,7 +192,7 @@ const directData: ShapeDefinition = {
   name: 'directData',
   title: '数据库',
   category: 'flow',
-  props: { w: 100, h: 70 },
+  props: { w: 96, h: 54 },
   textBlock: [{ position: { x: 0, y: 0, w: 'w*0.8', h: 'h' }, text: '' }],
   path: [[
     { action: 'move', x: 'w*0.15', y: 0 },
@@ -212,7 +212,7 @@ const manualInput: ShapeDefinition = {
   name: 'manualInput',
   title: '人工输入',
   category: 'flow',
-  props: { w: 100, h: 70 },
+  props: { w: 96, h: 54 },
   anchors: [
     { x: 0, y: 'h*0.5' },
     { x: 'w*0.5', y: 'Math.min(h/2,w/6)/2' },
@@ -235,7 +235,7 @@ const card: ShapeDefinition = {
   name: 'card',
   title: '卡片',
   category: 'flow',
-  props: { w: 100, h: 70 },
+  props: { w: 96, h: 54 },
   path: [[
     { action: 'move', x: 0, y: 'Math.min(h/2,w/4)' },
     { action: 'line', x: 'Math.min(h/2,w/4)', y: 0 },
@@ -252,7 +252,7 @@ const paperTape: ShapeDefinition = {
   name: 'paperTape',
   title: '条带',
   category: 'flow',
-  props: { w: 100, h: 70 },
+  props: { w: 96, h: 54 },
   textBlock: [{ position: { x: 0, y: 'h*0.1', w: 'w', h: 'h*0.8' }, text: '' }],
   anchors: [
     { x: 'w*0.5', y: 'Math.min(Math.min(w,h)/8,w/12)' },
@@ -277,7 +277,7 @@ const display: ShapeDefinition = {
   name: 'display',
   title: '展示',
   category: 'flow',
-  props: { w: 100, h: 70 },
+  props: { w: 96, h: 54 },
   path: [[
     { action: 'move', x: 'w-w/6', y: 0 },
     { action: 'line', x: 'w/6', y: 0 },
@@ -295,7 +295,7 @@ const manualOperation: ShapeDefinition = {
   name: 'manualOperation',
   title: '人工操作',
   category: 'flow',
-  props: { w: 100, h: 70 },
+  props: { w: 96, h: 54 },
   textBlock: [{ position: { x: 'w*0.1', y: 0, w: 'w*0.8', h: 'h' }, text: '' }],
   anchors: [
     { x: 'w*0.5', y: 0 },
@@ -318,7 +318,7 @@ const preparation: ShapeDefinition = {
   name: 'preparation',
   title: '预备',
   category: 'flow',
-  props: { w: 100, h: 70 },
+  props: { w: 96, h: 54 },
   path: [[
     { action: 'move', x: 0, y: 'h*0.5' },
     { action: 'line', x: 'Math.min(h/2,w/6)', y: 0 },
@@ -337,7 +337,7 @@ const parallelMode: ShapeDefinition = {
   title: '并行模式',
   category: 'flow',
   attribute: { container: true },
-  props: { w: 100, h: 70 },
+  props: { w: 96, h: 54 },
   fillStyle: { type: 'none' },
   anchors: [
     { x: 'w*0.5', y: 0 },
@@ -356,7 +356,7 @@ const loopLimit: ShapeDefinition = {
   name: 'loopLimit',
   title: '循环限值',
   category: 'flow',
-  props: { w: 100, h: 70 },
+  props: { w: 96, h: 54 },
   path: [[
     { action: 'move', x: 0, y: 'Math.min(h/2,w/6)' },
     { action: 'line', x: 'Math.min(h/2,w/6)', y: 0 },
@@ -369,12 +369,12 @@ const loopLimit: ShapeDefinition = {
   ]],
 }
 
-/** 跨页引用（五边形/房子形，70×60） */
+/** 跨页引用（五边形/房子形，63×54） */
 const offPageReference: ShapeDefinition = {
   name: 'offPageReference',
   title: '跨页引用',
   category: 'flow',
-  props: { w: 70, h: 60 },
+  props: { w: 63, h: 54 },
   textBlock: [{ position: { x: 0, y: 0, w: 'w', h: 'h-Math.min(h,w)/3' }, text: '' }],
   path: [[
     { action: 'move', x: 0, y: 0 },
@@ -393,7 +393,7 @@ const annotation: ShapeDefinition = {
   title: '注释',
   category: 'flow',
   attribute: { container: true },
-  props: { w: 100, h: 70 },
+  props: { w: 96, h: 54 },
   fillStyle: { type: 'none' },
   anchors: [{ x: 0, y: 'h*0.5' }],
   path: [[

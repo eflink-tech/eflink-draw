@@ -3,6 +3,7 @@ import { useEditorStore } from '../editorStore'
 import { createEmptyDocument, isLinker } from '@/types'
 import type { ElementInstance, LinkerInstance, ResizeDirection } from '@/types'
 import { createLinkerInstance } from '@/core/editor/linker'
+import { cursorPointAt } from '@/core/editor/linkerCursor'
 import { shapeRegistry } from '@/core/schema/registry'
 import '@/core/schema/shapes'
 
@@ -258,5 +259,205 @@ describe('textEdit 和 updatePage', () => {
     // 未指定字段保持默认
     expect(page.width).toBe(1600)
     expect(useEditorStore.getState().isDirty).toBe(true)
+  })
+})
+
+describe('junction 联动（store 集成）', () => {
+  beforeEach(() => {
+    useEditorStore.setState({
+      document: createEmptyDocument(),
+      selectedIds: new Set(),
+      viewport: { x: 0, y: 0, scale: 1 },
+      isDirty: false,
+    })
+  })
+
+  /** shape-a(120×60 @100,100) ← 宿主 broken 连线（from 附着右锚点）← dep 连线（to junction 附着 host t=0.25） */
+  function setupJunction(): { host: LinkerInstance; dep: LinkerInstance } {
+    const store = useEditorStore.getState()
+    store.addElement(createTestElement('shape-a'))
+    const base = createLinkerInstance(
+      { id: 'shape-a', x: 220, y: 130, angle: Math.PI },
+      { id: null, x: 300, y: 220, angle: 0 },
+      1,
+    )
+    const host: LinkerInstance = {
+      ...base,
+      id: 'host',
+      linkerType: 'broken',
+      manualRoute: true,
+      // 路径 from(220,130)→(220,200)→(300,200)→(300,220)，总长 170，t=0.25 → (222.5,200)
+      points: [
+        { x: 220, y: 200 },
+        { x: 300, y: 200 },
+      ],
+    }
+    store.addLinker(host)
+    const depBase = createLinkerInstance(
+      { id: null, x: 500, y: 500, angle: 0 },
+      { id: null, x: 222.5, y: 200, angle: 0 },
+      2,
+    )
+    const dep: LinkerInstance = {
+      ...depBase,
+      id: 'dep',
+      to: { ...depBase.to, junction: { linkerId: 'host', t: 0.25 } },
+    }
+    store.addLinker(dep)
+    return { host, dep }
+  }
+
+  it('updateLinker 改宿主 points：下游 junction 端点跟随且并入单条历史', () => {
+    setupJunction()
+    useEditorStore.getState().updateLinker('host', {
+      points: [
+        { x: 220, y: 240 },
+        { x: 300, y: 240 },
+      ],
+    })
+    const dep = useEditorStore.getState().document.elements['dep'] as LinkerInstance
+    // 新路径总长 210，t=0.25 → 第一段 52.5 → (220,182.5)
+    expect(dep.to.x).toBeCloseTo(220, 6)
+    expect(dep.to.y).toBeCloseTo(182.5, 6)
+    expect(dep.to.junction).toEqual({ linkerId: 'host', t: 0.25 })
+
+    // undo 一次：宿主与下游同时回位
+    useEditorStore.getState().undo()
+    const st = useEditorStore.getState().document.elements
+    const hostBack = st['host'] as LinkerInstance
+    const depBack = st['dep'] as LinkerInstance
+    expect(hostBack.points).toEqual([
+      { x: 220, y: 200 },
+      { x: 300, y: 200 },
+    ])
+    expect(depBack.to.x).toBeCloseTo(222.5, 6)
+    expect(depBack.to.y).toBeCloseTo(200, 6)
+    expect(depBack.to.junction).toEqual({ linkerId: 'host', t: 0.25 })
+  })
+
+  it('moveElements 移动宿主附着图形：junction 线跟随且 undo 一次回位', () => {
+    setupJunction()
+    useEditorStore.getState().moveElements(['shape-a'], 30, 0)
+    const st = useEditorStore.getState().document.elements
+    const host = st['host'] as LinkerInstance
+    const dep = st['dep'] as LinkerInstance
+    // 宿主 from 跟随图形右锚点平移
+    expect(host.from.x).toBe(250)
+    // 下游附着点 = cursorPointAt(新宿主, 0.25)（用 store 现值自洽断言）
+    expect(dep.to.junction).toEqual({ linkerId: 'host', t: 0.25 })
+
+    useEditorStore.getState().undo()
+    const back = useEditorStore.getState().document.elements
+    expect((back['host'] as LinkerInstance).from.x).toBe(220)
+    expect(((back['dep'] as LinkerInstance).to)).toMatchObject({ x: 222.5, y: 200 })
+    expect((back['host'] as LinkerInstance).points).toEqual([
+      { x: 220, y: 200 },
+      { x: 300, y: 200 },
+    ])
+  })
+})
+
+describe('junction 删除脱附 + 复制粘贴（store 集成）', () => {
+  beforeEach(() => {
+    useEditorStore.setState({
+      document: createEmptyDocument(),
+      selectedIds: new Set(),
+      viewport: { x: 0, y: 0, scale: 1 },
+      isDirty: false,
+      clipboard: null,
+    })
+  })
+
+  /** shape-a ← 宿主连线 host（from 附着 shape-a，broken 手工 points）← dep（to junction 附着 host） */
+  function setupJunction() {
+    const store = useEditorStore.getState()
+    store.addElement(createTestElement('shape-a'))
+    const base = createLinkerInstance(
+      { id: 'shape-a', x: 220, y: 130, angle: Math.PI },
+      { id: null, x: 300, y: 220, angle: 0 },
+      1,
+    )
+    const host: LinkerInstance = {
+      ...base,
+      id: 'host',
+      linkerType: 'broken',
+      manualRoute: true,
+      points: [
+        { x: 220, y: 200 },
+        { x: 300, y: 200 },
+      ],
+    }
+    store.addLinker(host)
+    const depBase = createLinkerInstance(
+      { id: null, x: 500, y: 500, angle: 0 },
+      { id: null, x: 222.5, y: 200, angle: 0 },
+      2,
+    )
+    const dep: LinkerInstance = {
+      ...depBase,
+      id: 'dep',
+      to: { ...depBase.to, junction: { linkerId: 'host', t: 0.25 } },
+    }
+    store.addLinker(dep)
+    return { host, dep }
+  }
+
+  it('删除宿主连线：附着线脱附幸存，undo 一次整体恢复 junction', () => {
+    setupJunction()
+    useEditorStore.getState().deleteElements(['host'])
+    const dep = useEditorStore.getState().document.elements['dep'] as LinkerInstance
+    expect(dep).toBeDefined()
+    expect(dep.to.junction).toBeUndefined()
+    expect(dep.to.x).toBeCloseTo(222.5, 6)
+
+    useEditorStore.getState().undo()
+    const st = useEditorStore.getState().document.elements
+    expect(st['host']).toBeDefined()
+    expect((st['dep'] as LinkerInstance).to.junction).toEqual({ linkerId: 'host', t: 0.25 })
+  })
+
+  it('copy：宿主在选区 → junction remap 新宿主 ID；宿主不在 → 脱附', () => {
+    setupJunction()
+    const store = useEditorStore.getState()
+    // 宿主 + 附着线一起复制：junction 指向复制出的新宿主
+    store.selectElement('shape-a')
+    store.selectElement('host', true)
+    store.selectElement('dep', true)
+    store.copySelectedElements()
+    const clip = useEditorStore.getState().clipboard!
+    expect(clip.linkers).toHaveLength(2)
+    const newHost = clip.linkers.find((l) => l.from.id != null)!
+    const newDep = clip.linkers.find((l) => l.id !== newHost.id)!
+    expect(newDep.to.junction).toEqual({ linkerId: newHost.id, t: 0.25 })
+
+    // 只复制附着线：宿主不在选区 → 脱附保坐标
+    store.selectElement('dep')
+    store.copySelectedElements()
+    const clip2 = useEditorStore.getState().clipboard!
+    expect(clip2.linkers).toHaveLength(1)
+    expect(clip2.linkers[0]!.to.junction).toBeUndefined()
+    expect(clip2.linkers[0]!.to.x).toBeCloseTo(222.5, 6)
+  })
+
+  it('paste：junction 指向粘贴出的新宿主且附着点归位', () => {
+    setupJunction()
+    const store = useEditorStore.getState()
+    store.selectElement('shape-a')
+    store.selectElement('host', true)
+    store.selectElement('dep', true)
+    store.copySelectedElements()
+    store.pasteElements()
+    const els = useEditorStore.getState().document.elements
+    const pastedLinkers = Object.values(els).filter(
+      (el): el is LinkerInstance => isLinker(el) && el.id !== 'host' && el.id !== 'dep',
+    )
+    expect(pastedLinkers).toHaveLength(2)
+    const pHost = pastedLinkers.find((l) => l.from.id != null)!
+    const pDep = pastedLinkers.find((l) => l.id !== pHost.id)!
+    expect(pDep.to.junction).toEqual({ linkerId: pHost.id, t: 0.25 })
+    // 附着点坐标 = cursorPointAt(新宿主路径, 0.25)（自洽断言）
+    const p = cursorPointAt(pHost, 0.25)
+    expect(pDep.to.x).toBeCloseTo(p.x, 6)
+    expect(pDep.to.y).toBeCloseTo(p.y, 6)
   })
 })

@@ -11,7 +11,7 @@ export const rectangle: ShapeDefinition = {
   name: 'rectangle',
   title: '矩形',
   category: 'basic',
-  props: { w: 100, h: 70 },
+  props: { w: 96, h: 54 },
   path: [[
     { action: 'move', x: 0, y: 0 },
     { action: 'line', x: 'w', y: 0 },
@@ -26,7 +26,7 @@ export const roundRectangle: ShapeDefinition = {
   name: 'roundRectangle',
   title: '圆角矩形',
   category: 'basic',
-  props: { w: 100, h: 70 },
+  props: { w: 96, h: 54 },
   path: [
     [
       { action: 'move', x: 0, y: 4 },
@@ -47,7 +47,7 @@ export const round: ShapeDefinition = {
   name: 'round',
   title: '圆形',
   category: 'basic',
-  props: { w: 70, h: 70 },
+  props: { w: 54, h: 54 },
   path: [
     [
       { action: 'move', x: 0, y: 'h/2' },
@@ -73,7 +73,7 @@ const triangle: ShapeDefinition = {
   name: 'triangle',
   title: '三角形',
   category: 'basic',
-  props: { w: 80, h: 70 },
+  props: { w: 62, h: 54 },
   textBlock: [{ position: { x: 10, y: 'h*0.25', w: 'w-20', h: 'h*0.75' }, text: '' }],
   anchors: [
     { x: 'w/2', y: 0 },
@@ -94,7 +94,7 @@ const diamond: ShapeDefinition = {
   name: 'diamond',
   title: '菱形',
   category: 'basic',
-  props: { w: 120, h: 80 },
+  props: { w: 81, h: 54 },
   textBlock: [{ position: { x: 10, y: 'h*0.13', w: 'w-20', h: 'h*0.75' }, text: '' }],
   anchors: [
     { x: 0, y: 'h/2' },
@@ -116,7 +116,7 @@ const polygon: ShapeDefinition = {
   name: 'polygon',
   title: '五边形',
   category: 'basic',
-  props: { w: 74, h: 70 },
+  props: { w: 57, h: 54 },
   textBlock: [{ position: { x: 10, y: 'h*0.15', w: 'w-20', h: 'h*0.85' }, text: '' }],
   anchors: [
     { x: 'w/2', y: 0 },
@@ -139,7 +139,7 @@ const hexagon: ShapeDefinition = {
   name: 'hexagon',
   title: '六边形',
   category: 'basic',
-  props: { w: 84, h: 70 },
+  props: { w: 65, h: 54 },
   path: [[
     { action: 'move', x: 'Math.min(w,h)*0.21', y: 0 },
     { action: 'line', x: 'w-Math.min(w,h)*0.21', y: 0 },
@@ -156,7 +156,7 @@ const octagon: ShapeDefinition = {
   name: 'octagon',
   title: '八边形',
   category: 'basic',
-  props: { w: 70, h: 70 },
+  props: { w: 54, h: 54 },
   textBlock: [{ position: { x: 10, y: 10, w: 'w-20', h: 'h-20' }, text: '' }],
   path: [[
     { action: 'move', x: 'Math.min(w,h)*0.29', y: 0 },
@@ -176,7 +176,7 @@ const pentagon: ShapeDefinition = {
   name: 'pentagon',
   title: '五角星',
   category: 'basic',
-  props: { w: 70, h: 70 },
+  props: { w: 54, h: 54 },
   textBlock: [{ position: { x: 'w*0.15', y: 'h*0.20', w: 'w*0.70', h: 'h*0.65' }, text: '' }],
   anchors: [
     { x: 'w*0.5', y: 0 },
@@ -208,7 +208,7 @@ const sector: ShapeDefinition = {
   name: 'sector',
   title: '扇形',
   category: 'basic',
-  props: { w: 80, h: 80 },
+  props: { w: 54, h: 54 },
   anchors: [
     { x: 0, y: '0.134*h' },
     { x: 'w/2', y: 0 },
@@ -228,7 +228,7 @@ const sector2: ShapeDefinition = {
   name: 'sector2',
   title: '扇形2',
   category: 'basic',
-  props: { w: 80, h: 45 },
+  props: { w: 96, h: 54 },
   anchors: [
     { x: 0, y: '0.238*h' },
     { x: 'w/2', y: 0 },
@@ -250,7 +250,7 @@ const cloud: ShapeDefinition = {
   name: 'cloud',
   title: '云',
   category: 'basic',
-  props: { w: 90, h: 70 },
+  props: { w: 69, h: 54 },
   textBlock: [{ position: { x: 10, y: 10, w: 'w-20', h: 'h-20' }, text: '' }],
   anchors: [
     { x: 0, y: 'h*0.5' },
@@ -279,7 +279,7 @@ const comment: ShapeDefinition = {
   name: 'comment',
   title: '对话气泡',
   category: 'basic',
-  props: { w: 90, h: 70 },
+  props: { w: 69, h: 54 },
   anchors: [
     { x: 'w', y: 'h*0.5' },
     { x: 0, y: 'h*0.5' },
@@ -300,7 +300,7 @@ const teardrop: ShapeDefinition = {
   name: 'teardrop',
   title: '水滴',
   category: 'basic',
-  props: { w: 70, h: 70 },
+  props: { w: 54, h: 54 },
   path: [[
     { action: 'move', x: 'w', y: 0 },
     { action: 'line', x: 'w', y: 'h/2' },
@@ -321,7 +321,7 @@ const cross: ShapeDefinition = {
   name: 'cross',
   title: '十字形',
   category: 'basic',
-  props: { w: 70, h: 70 },
+  props: { w: 54, h: 54 },
   textBlock: [{ position: { x: 0, y: 'h*0.5-Math.min(w,h)/8', w: 'w', h: 'Math.min(w,h)*2/8' }, text: '' }],
   path: [[
     { action: 'move', x: 'w*0.5-Math.min(w,h)/8', y: 0 },
@@ -345,7 +345,7 @@ const apqc: ShapeDefinition = {
   name: 'apqc',
   title: 'APQC',
   category: 'basic',
-  props: { w: 200, h: 150 },
+  props: { w: 72, h: 54 },
   path: [[
     { action: 'move', x: 0, y: 'h/8' },
     { action: 'quadraticCurve', x1: 'w*0.5', y1: '-h/8', x: 'w', y: 'h/8' },
@@ -365,7 +365,7 @@ const singleLeftArrow: ShapeDefinition = {
   name: 'singleLeftArrow',
   title: '左箭头',
   category: 'basic',
-  props: { w: 90, h: 60 },
+  props: { w: 81, h: 54 },
   anchors: [
     { x: 'w', y: 'h*0.5' },
     { x: 0, y: 'h*0.5' },
@@ -389,7 +389,7 @@ const singleRightArrow: ShapeDefinition = {
   name: 'singleRightArrow',
   title: '右箭头',
   category: 'basic',
-  props: { w: 90, h: 60 },
+  props: { w: 81, h: 54 },
   anchors: [
     { x: 'w', y: 'h*0.5' },
     { x: 0, y: 'h*0.5' },
@@ -413,7 +413,7 @@ const doubleHorizontalArrow: ShapeDefinition = {
   name: 'doubleHorizontalArrow',
   title: '左右箭头',
   category: 'basic',
-  props: { w: 90, h: 60 },
+  props: { w: 81, h: 54 },
   anchors: [
     { x: 'w', y: 'h*0.5' },
     { x: 0, y: 'h*0.5' },
@@ -440,7 +440,7 @@ const singleUpArrow: ShapeDefinition = {
   name: 'singleUpArrow',
   title: '上箭头',
   category: 'basic',
-  props: { w: 60, h: 90 },
+  props: { w: 36, h: 54 },
   anchors: [
     { x: 'w*0.5', y: 0 },
     { x: 'w*0.5', y: 'h' },
@@ -464,7 +464,7 @@ const singleDownArrow: ShapeDefinition = {
   name: 'singleDownArrow',
   title: '下箭头',
   category: 'basic',
-  props: { w: 60, h: 90 },
+  props: { w: 36, h: 54 },
   anchors: [
     { x: 'w*0.5', y: 0 },
     { x: 'w*0.5', y: 'h' },
@@ -488,7 +488,7 @@ const doubleVerticalArrow: ShapeDefinition = {
   name: 'doubleVerticalArrow',
   title: '上下箭头',
   category: 'basic',
-  props: { w: 60, h: 90 },
+  props: { w: 36, h: 54 },
   anchors: [
     { x: 'w*0.5', y: 0 },
     { x: 'w*0.5', y: 'h' },
@@ -516,7 +516,7 @@ const backArrow: ShapeDefinition = {
   title: '左返回箭头',
   category: 'basic',
   attribute: { container: true },
-  props: { w: 70, h: 70 },
+  props: { w: 54, h: 54 },
   anchors: [
     { x: 'w-Math.min(w*0.12,20)', y: 'h*0.5' },
     { x: 0, y: 'h*0.5' },
@@ -549,7 +549,7 @@ const rightBackArrow: ShapeDefinition = {
   title: '右返回箭头',
   category: 'basic',
   attribute: { container: true },
-  props: { w: 70, h: 70 },
+  props: { w: 54, h: 54 },
   anchors: [
     { x: 'Math.min(w*0.12,20)', y: 'h*0.5' },
     { x: 'w', y: 'h*0.5' },
@@ -582,7 +582,7 @@ const corner: ShapeDefinition = {
   title: '拐角',
   category: 'basic',
   attribute: { container: true },
-  props: { w: 70, h: 70 },
+  props: { w: 54, h: 54 },
   anchors: [
     { x: 'w*0.5', y: 0 },
     { x: 0, y: 'h*0.5' },

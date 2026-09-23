@@ -1,15 +1,23 @@
 // 文档操作测试（移动/删除 + 连线跟随）
 import { describe, it, expect } from 'vitest'
 import {
+  attachedLinkerIds,
   moveElementsInDoc,
   deleteElementsInDoc,
   resizeElementInDoc,
   routeAttachedLinkers,
 } from '../documentOps'
 import { createLinkerInstance } from '../linker'
+import { cursorPointAt } from '../linkerCursor'
 import { shapeRegistry } from '@/core/schema/registry'
 import '@/core/schema/shapes'
-import { createEmptyDocument, isLinker, type DocumentData, type ElementInstance } from '@/types'
+import {
+  createEmptyDocument,
+  isLinker,
+  type DocumentData,
+  type ElementInstance,
+  type LinkerInstance,
+} from '@/types'
 
 // 固定 120×60：测试连线跟随移动的数学，与 schema 默认尺寸解耦
 function shape(
@@ -179,5 +187,197 @@ describe('deleteElementsInDoc', () => {
     const linkerGone = Object.values(next.elements).every((el) => !isLinker(el))
     expect(linkerGone).toBe(true)
     expect(removedIds.size).toBe(2)
+  })
+})
+
+describe('junction 联动（端点附着到连线的跟随）', () => {
+  /** 两端自由、手工 points 的折线宿主：from(0,0)→(0,40)→(100,40)→to(100,100) */
+  function hostLinker(id: string, fromShapeId: string | null = null): LinkerInstance {
+    const l = createLinkerInstance(
+      { id: fromShapeId, x: 0, y: 0, angle: 0 },
+      { id: null, x: 100, y: 100, angle: 0 },
+      1,
+    )
+    return {
+      ...l,
+      id,
+      linkerType: 'broken',
+      points: [
+        { x: 0, y: 40 },
+        { x: 100, y: 40 },
+      ],
+    }
+  }
+
+  /** to 端 junction 附着到宿主 t=0.25 的自由连线 */
+  function depLinker(id: string, hostId: string): LinkerInstance {
+    const l = createLinkerInstance(
+      { id: null, x: 500, y: 500, angle: 0 },
+      { id: null, x: 10, y: 40, angle: 0 },
+      2,
+    )
+    return {
+      ...l,
+      id,
+      linkerType: 'broken',
+      to: { ...l.to, junction: { linkerId: hostId, t: 0.25 } },
+    }
+  }
+
+  it('移动宿主附着图形：junction 附着点二阶跟随新路径', () => {
+    const a = shape(0, 0, 'shape-a', 'rectangle', 1, 1)
+    // 宿主 from 附着 a（自由尺寸 1×1 时比例映射为平移），points 手工给定
+    const host = hostLinker('host', a.id)
+    const dep = depLinker('dep', host.id)
+    const doc: DocumentData = {
+      ...createEmptyDocument(),
+      elements: { [a.id]: a, [host.id]: host, [dep.id]: dep },
+    }
+    const before = { x: dep.to.x, y: dep.to.y }
+
+    const next = moveElementsInDoc(doc, [a.id], 30, 0)
+    const movedHost = next.elements[host.id] as LinkerInstance
+    const movedDep = next.elements[dep.id] as LinkerInstance
+    // 宿主几何确实变了（宿主端点跟随图形平移）
+    expect(movedHost.from.x).toBe(30)
+    // 附着点跟随新路径：坐标 = cursorPointAt(新宿主, t)
+    const p = cursorPointAt(movedHost, 0.25)
+    expect(movedDep.to.x).toBeCloseTo(p.x, 6)
+    expect(movedDep.to.y).toBeCloseTo(p.y, 6)
+    // 且确实发生了变化（不是原值）
+    expect(movedDep.to.x !== before.x || movedDep.to.y !== before.y).toBe(true)
+    // junction 字段保留
+    expect(movedDep.to.junction).toEqual({ linkerId: host.id, t: 0.25 })
+  })
+
+  it('resize 宿主附着图形：junction 附着点同样跟随', () => {
+    const a = shape(0, 0, 'shape-a', 'rectangle', 1, 1)
+    const host = hostLinker('host', a.id)
+    const dep = depLinker('dep', host.id)
+    const doc: DocumentData = {
+      ...createEmptyDocument(),
+      elements: { [a.id]: a, [host.id]: host, [dep.id]: dep },
+    }
+    const next = resizeElementInDoc(doc, a.id, 0, 0, 2, 2)
+    const movedHost = next.elements[host.id] as LinkerInstance
+    const movedDep = next.elements[dep.id] as LinkerInstance
+    const p = cursorPointAt(movedHost, 0.25)
+    expect(movedDep.to.x).toBeCloseTo(p.x, 6)
+    expect(movedDep.to.y).toBeCloseTo(p.y, 6)
+  })
+
+  it('宿主未变动时 junction 连线不出现在更新中', () => {
+    const host = hostLinker('host')
+    const dep = depLinker('dep', host.id)
+    const doc: DocumentData = {
+      ...createEmptyDocument(),
+      elements: { [host.id]: host, [dep.id]: dep },
+    }
+    // 移动一个与宿主无关的图形
+    const c = shape(1000, 1000, 'shape-c')
+    const next = moveElementsInDoc({ ...doc, elements: { ...doc.elements, [c.id]: c } }, [c.id], 10, 10)
+    expect(next.elements[dep.id]).toBe(dep) // 引用未变
+  })
+
+  it('attachedLinkerIds：junction 附着的连线纳入传递闭包', () => {
+    const a = shape(100, 100, 'shape-a')
+    const host = createLinkerInstance(
+      { id: a.id, x: 220, y: 130, angle: Math.PI },
+      { id: null, x: 300, y: 130, angle: 0 },
+      1,
+    )
+    const dep = depLinker('dep', host.id)
+    const unrelated = createLinkerInstance(
+      { id: null, x: 900, y: 900, angle: 0 },
+      { id: null, x: 950, y: 950, angle: 0 },
+      3,
+    )
+    const elements = { [a.id]: a, [host.id]: host, [dep.id]: dep, [unrelated.id]: unrelated }
+    const ids = attachedLinkerIds(elements, [a.id])
+    expect(ids).toContain(host.id)
+    expect(ids).toContain(dep.id)
+    expect(ids).not.toContain(unrelated.id)
+  })
+})
+
+describe('deleteElementsInDoc junction 脱附', () => {
+  /** 两端自由、手工 points 的折线宿主 */
+  function hostLinker(id: string): LinkerInstance {
+    const l = createLinkerInstance(
+      { id: null, x: 0, y: 0, angle: 0 },
+      { id: null, x: 100, y: 100, angle: 0 },
+      1,
+    )
+    return {
+      ...l,
+      id,
+      linkerType: 'broken',
+      points: [
+        { x: 0, y: 40 },
+        { x: 100, y: 40 },
+      ],
+    }
+  }
+
+  function depLinker(id: string, hostId: string): LinkerInstance {
+    const l = createLinkerInstance(
+      { id: null, x: 500, y: 500, angle: 0 },
+      { id: null, x: 10, y: 40, angle: 0 },
+      2,
+    )
+    return {
+      ...l,
+      id,
+      linkerType: 'broken',
+      to: { ...l.to, junction: { linkerId: hostId, t: 0.25 } },
+    }
+  }
+
+  it('删除宿主连线：附着连线脱附为自由端点（保坐标，不级联删除）', () => {
+    const host = hostLinker('host')
+    const dep = depLinker('dep', host.id)
+    const doc: DocumentData = {
+      ...createEmptyDocument(),
+      elements: { [host.id]: host, [dep.id]: dep },
+    }
+    const { document: next, removedIds, detached } = deleteElementsInDoc(doc, [host.id])
+    expect(removedIds.has('host')).toBe(true)
+    expect(detached).toEqual(['dep'])
+    expect(next.elements['host']).toBeUndefined()
+    const nd = next.elements['dep'] as LinkerInstance
+    expect(nd.to.junction).toBeUndefined()
+    expect(nd.to.x).toBe(dep.to.x)
+    expect(nd.to.y).toBe(dep.to.y)
+    // 原文档不被修改
+    expect((doc.elements['dep'] as LinkerInstance).to.junction).toEqual({ linkerId: 'host', t: 0.25 })
+  })
+
+  it('删除宿主附着的图形（级联删宿主连线）：junction 同样脱附', () => {
+    const a = shape(0, 0, 'shape-a', 'rectangle', 1, 1)
+    const host = hostLinker('host')
+    // host.from 附着 a：删除 a 时 host 被级联删除
+    const hostAttached = { ...host, from: { ...host.from, id: a.id } }
+    const dep = depLinker('dep', host.id)
+    const doc: DocumentData = {
+      ...createEmptyDocument(),
+      elements: { [a.id]: a, [host.id]: hostAttached, [dep.id]: dep },
+    }
+    const { document: next, removedIds, detached } = deleteElementsInDoc(doc, [a.id])
+    expect(removedIds.has('host')).toBe(true)
+    expect(detached).toEqual(['dep'])
+    expect(next.elements['dep']).toBeDefined()
+    expect((next.elements['dep'] as LinkerInstance).to.junction).toBeUndefined()
+  })
+
+  it('宿主未被删除时无脱附', () => {
+    const unrelated = shape(900, 900, 'shape-x')
+    const host = hostLinker('host')
+    const dep = depLinker('dep', host.id)
+    const doc: DocumentData = {
+      ...createEmptyDocument(),
+      elements: { [unrelated.id]: unrelated, [host.id]: host, [dep.id]: dep },
+    }
+    const { detached } = deleteElementsInDoc(doc, [unrelated.id])
+    expect(detached).toEqual([])
   })
 })

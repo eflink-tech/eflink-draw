@@ -64,7 +64,7 @@ const task: ShapeDefinition = {
   category: 'bpmn',
 }
 
-/** 活动/调用活动（100×70，roundRectangle + 粗边框） */
+/** 活动/调用活动（96×54，roundRectangle + 粗边框） */
 const callActivity: ShapeDefinition = {
   ...roundRectangle,
   name: 'callActivity',
@@ -136,7 +136,7 @@ const dataStore: ShapeDefinition = {
   name: 'dataStore',
   title: '数据存储',
   category: 'bpmn',
-  props: { w: 70, h: 70 },
+  props: { w: 54, h: 54 },
   attribute: { container: true },
   path: [
     // 圆柱体
@@ -208,7 +208,7 @@ const textAnnotation: ShapeDefinition = {
   name: 'textAnnotation',
   title: '注释',
   category: 'bpmn',
-  props: { w: 100, h: 70 },
+  props: { w: 96, h: 54 },
   attribute: { container: true },
   fillStyle: { type: 'none' },
   anchors: [{ x: 0, y: 'h*0.5' }],

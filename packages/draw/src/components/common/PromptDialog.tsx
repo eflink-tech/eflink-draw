@@ -1,6 +1,7 @@
 // src/components/common/PromptDialog.tsx
 // 通用单行输入浮层（重命名文件用）：蒙层 + 居中卡片 + 自动聚焦 + Enter 提交
 import { useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 
 interface PromptDialogProps {
   title: string
@@ -19,7 +20,9 @@ export function PromptDialog({ title, defaultValue, onSubmit, onCancel }: Prompt
 
   const submit = () => onSubmit(inputRef.current?.value ?? '')
 
-  return (
+  // 通过 Portal 挂到 body，脱离 BottomBar/TopBar 的 stacking context，
+  // 避免 z-[60] 被祖先 z-10 压制、被画布文字层（z-[15]）盖住
+  return createPortal(
     <div
       className="fixed inset-0 z-[60] flex items-center justify-center bg-black/30"
       onMouseDown={(e) => e.target === e.currentTarget && onCancel()}
@@ -52,6 +55,7 @@ export function PromptDialog({ title, defaultValue, onSubmit, onCancel }: Prompt
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

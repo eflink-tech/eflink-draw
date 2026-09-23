@@ -139,6 +139,10 @@ export interface ShapeDefinition {
   lineStyle?: LineStyle
   fillStyle?: FillStyle
   fontStyle?: FontStyle
+  /** 泳道图：泳道（列/行）数量 */
+  laneCount?: number
+  /** 泳道图：阶段分隔数量 */
+  stageCount?: number
   shapeStyle?: {
     alpha?: number
     /** 阴影开关（false 时即使有 shadow* 字段也不渲染） */
@@ -196,14 +200,31 @@ export interface ElementInstance {
   fontStyle: FontStyle
   textBlock: TextBlock[]
   anchors: Anchor[]
+  /** 泳道图：泳道（列/行）数量（path/textBlock 由其重建） */
+  laneCount?: number
+  /** 泳道图：阶段分隔数量 */
+  stageCount?: number
+}
+
+/**
+ * 连线端点持久附着到另一条连线（junction 交叉连接）
+ * 仅当端点 id 为 null（非图形锚点附着）时有意义。
+ * t 语义与 cursorPointAt 参数一致：line=lerp 参数 / broken=全路径累计
+ * 长度比例 / curve=三次贝塞尔参数，解析时零换算直接 cursorPointAt(宿主, t)。
+ */
+export interface LinkerJunction {
+  /** 宿主连线 id */
+  linkerId: string
+  /** 路径参数 ∈ [0,1] */
+  t: number
 }
 
 export interface LinkerInstance {
   id: string
   name: 'linker'
-  /** id 为 null 表示自由端点（未吸附到图形锚点） */
-  from: { id: string | null; x: number; y: number; angle: number }
-  to: { id: string | null; x: number; y: number; angle: number }
+  /** id 为 null 表示自由端点（未吸附到图形锚点）；junction 表示附着在另一条连线上 */
+  from: { id: string | null; x: number; y: number; angle: number; junction?: LinkerJunction }
+  to: { id: string | null; x: number; y: number; angle: number; junction?: LinkerJunction }
   text: string
   fontStyle?: FontStyle
   linkerType: 'curve' | 'broken' | 'line'

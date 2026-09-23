@@ -133,7 +133,7 @@ const umlNote: ShapeDefinition = {
   title: '注释',
   category: 'uml_common',
   attribute: { linkable: false },
-  props: { w: 100, h: 70 },
+  props: { w: 96, h: 54 },
   anchors: [],
   textBlock: [{ position: { x: 10, y: 10, w: 'w-20', h: 'h-20' }, text: '' }],
   drawIcon: (a, b) => [

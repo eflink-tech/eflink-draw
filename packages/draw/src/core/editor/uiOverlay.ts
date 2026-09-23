@@ -94,12 +94,15 @@ export function registerEndpointPreview(node: Konva.Circle | null): void {
   previewNode = node
 }
 
-/** 在吸附锚点处显示大圆预览（世界坐标） */
-export function showEndpointPreview(x: number, y: number, scale: number): void {
+/** 在吸附锚点处显示大圆预览（世界坐标）；active=true 吸附到连线 junction（醒目蓝） */
+export function showEndpointPreview(x: number, y: number, scale: number, active = false): void {
   if (!previewNode) return
   previewNode.position({ x, y })
-  previewNode.radius(15 / scale)
-  previewNode.strokeWidth(1 / scale)
+  previewNode.radius((active ? 18 : 15) / scale)
+  previewNode.strokeWidth((active ? 2.5 : 1) / scale)
+  previewNode.fill(active ? 'rgba(24, 144, 255, 0.25)' : '#833')
+  previewNode.stroke(active ? 'rgb(24, 144, 255)' : '#833')
+  previewNode.opacity(active ? 1 : 0.3)
   previewNode.visible(true)
   previewNode.getLayer()?.batchDraw()
 }

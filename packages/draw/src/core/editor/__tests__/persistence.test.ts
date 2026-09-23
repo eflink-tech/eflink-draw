@@ -4,6 +4,7 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { saveDocumentToStorage, loadDocumentFromStorage, STORAGE_KEY } from '../persistence'
 import { useEditorStore, historyManager } from '@/store/editorStore'
 import { createEmptyDocument } from '@/types'
+import { createLinkerInstance } from '../linker'
 
 beforeEach(() => {
   localStorage.clear()
@@ -95,5 +96,32 @@ describe('store saveDocument / loadDocument', () => {
     expect(s.currentTool).toBe('select')
     expect(s.clipboard).toBeNull()
     expect(s.isDirty).toBe(false)
+  })
+})
+
+describe('junction 持久化往返', () => {
+  it('带 junction 端点的文档保存后完整读回', () => {
+    const host = createLinkerInstance(
+      { id: null, x: 0, y: 0, angle: 0 },
+      { id: null, x: 100, y: 100, angle: 0 },
+      1,
+    )
+    const dep = createLinkerInstance(
+      { id: null, x: 500, y: 500, angle: 0 },
+      { id: null, x: 10, y: 40, angle: 0 },
+      2,
+    )
+    const doc = createEmptyDocument('junction')
+    doc.elements = {
+      [host.id]: { ...host, linkerType: 'broken', points: [{ x: 0, y: 40 }] },
+      [dep.id]: { ...dep, to: { ...dep.to, junction: { linkerId: host.id, t: 0.25 } } },
+    }
+    expect(saveDocumentToStorage(doc)).toBe(true)
+    const loaded = loadDocumentFromStorage()!
+    const ld = loaded.elements[dep.id] as typeof dep
+    expect(ld.to.junction).toEqual({ linkerId: host.id, t: 0.25 })
+    // 端点仍为自由点（id null），坐标不变
+    expect(ld.to.id).toBeNull()
+    expect(ld.to.x).toBe(dep.to.x)
   })
 })

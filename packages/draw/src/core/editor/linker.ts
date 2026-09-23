@@ -5,10 +5,11 @@
 // - getAngleDir: 1=上锚点 2=右锚点 3=下锚点 4=左锚点
 // - broken 折线：按两端锚点方向组合路由，stub 长度 r=30
 // - curve 曲线：控制点距离 k = 两端距离 * 0.4，沿内向角反向（即向外）延伸
-import type { ElementInstance, FontStyle, LinkerInstance } from '@/types'
+import type { DocumentData, ElementInstance, FontStyle, LinkerInstance, LinkerJunction } from '@/types'
 import { DEFAULT_FONT_SIZE, DEFAULT_LINE_WIDTH } from '@/types'
 import { evaluateExpression } from '@/core/utils/expression'
 import { snapLinkerLine } from './alignment'
+import { findJunctionSnap } from './linkerJunction'
 import { DEFAULT_FONT_VALUE } from './fontMap'
 
 /** 世界坐标点 */
@@ -31,6 +32,8 @@ export interface LinkerEndpoint {
   x: number
   y: number
   angle: number | null
+  /** 持久附着到另一条连线（仅 id === null 时有意义） */
+  junction?: LinkerJunction
 }
 
 /** 折线路由 stub 长度（端段锚点方向短段，路由与手动拖拽共用） */
@@ -731,8 +734,8 @@ export function createLinkerInstance(
   return {
     id: newLinkerId(),
     name: 'linker',
-    from: { id: from.id, x: from.x, y: from.y, angle: from.angle ?? 0 },
-    to: { id: to.id, x: to.x, y: to.y, angle: to.angle ?? 0 },
+    from: { id: from.id, x: from.x, y: from.y, angle: from.angle ?? 0, ...(from.junction && { junction: from.junction }) },
+    to: { id: to.id, x: to.x, y: to.y, angle: to.angle ?? 0, ...(to.junction && { junction: to.junction }) },
     text: '',
     linkerType: 'broken',
     lineStyle: {
@@ -791,6 +794,7 @@ export function findSnapAnchor(
 // ═══════════════════════════════════════════
 
 const ANCHOR_HIT_PX = 7
+const ANCHOR_PROX_PX = 20
 const ENDPOINT_ALIGN_PX = 6
 
 export interface EndpointSnapInput {
@@ -801,8 +805,14 @@ export interface EndpointSnapInput {
   worldX: number
   worldY: number
   scale: number
-  /** 连线另一端（决定锚点选择） */
-  otherEnd: { id: string | null; x: number; y: number }
+  /** 连线另一端（决定锚点选择；junction 用于同宿主双端判定） */
+  otherEnd: { id: string | null; x: number; y: number; junction?: LinkerJunction }
+  /** 候选宿主连线（junction 吸附；不传则不做连线吸附，旧行为不变） */
+  linkers?: LinkerInstance[]
+  /** 文档元素表（junction 防环判定用，与 linkers 同时传入） */
+  elements?: DocumentData['elements']
+  /** 被拖连线自身 id（junction 吸附排除自吸；自由连线草稿传 null） */
+  selfLinkerId?: string | null
 }
 
 export interface EndpointSnapResult {
@@ -816,7 +826,11 @@ export interface EndpointSnapResult {
  * 1. 鼠标 7px 内命中悬停图形的具体锚点 → 直接选中该锚点
  * 2. 悬停图形 == 另一端所属图形 → 脱附为自由点（不允许两端连同一图形）
  * 3. 悬停图形内部 → 吸附到距另一端最近的锚点
- * 4. 空白 → 自由点：图形边吸附（2px）后，±6px 与另一端对齐拉直
+ * 4. 未命中图形但光标 20px 内有其他图形的锚点 → 邻近吸附该锚点
+ *    （从外侧接近目标左/右侧时提前附着，箭头按锚点法向驶入而非保持朝下）
+ * 5. 传入 linkers 且光标 10px 内落在其他连线的渲染路径上 → junction 附着
+ *    （端点 id 为 null、带 junction { linkerId, t }；跳过锁定/自身/成环宿主）
+ * 6. 空白 → 自由点：图形边吸附（2px）后，±6px 与另一端对齐拉直
  */
 export function snapLinkerEndpoint(input: EndpointSnapInput): EndpointSnapResult {
   const { shapes, hitShapeId, worldX, worldY, scale, otherEnd } = input
@@ -858,6 +872,66 @@ export function snapLinkerEndpoint(input: EndpointSnapInput): EndpointSnapResult
     return {
       endpoint: { id: hit.id, x: best.x, y: best.y, angle: best.angle },
       snapAnchor: { x: best.x, y: best.y },
+    }
+  }
+
+  // 邻近吸附：光标未进入任何图形本体时，20px（屏幕像素）内最近的锚点直接吸附
+  const proxTol = ANCHOR_PROX_PX / scale
+  let proxBest: LinkerEndpoint | null = null
+  let proxDist = Infinity
+  for (const s of shapes) {
+    if (s.locked || s.id === otherEnd.id || s.attribute?.linkable === false) continue
+    const { x, y, w, h, angle: rot } = s.props
+    // 预过滤框需覆盖旋转后的锚点（getAnchorPoints 返回旋转后世界坐标）：
+    // 旋转图形用绕中心的旋转外接矩形，否则锚点可能落在未旋转框外被漏吸附
+    let bx = x
+    let by = y
+    let bw = w
+    let bh = h
+    if (rot) {
+      const cos = Math.abs(Math.cos(rot))
+      const sin = Math.abs(Math.sin(rot))
+      bw = w * cos + h * sin
+      bh = w * sin + h * cos
+      bx = x + (w - bw) / 2
+      by = y + (h - bh) / 2
+    }
+    if (
+      worldX < bx - proxTol || worldX > bx + bw + proxTol ||
+      worldY < by - proxTol || worldY > by + bh + proxTol
+    ) {
+      continue
+    }
+    for (const a of getAnchorPoints(s)) {
+      const dist = measureDistance({ x: worldX, y: worldY }, a)
+      if (dist <= proxTol && dist < proxDist) {
+        proxDist = dist
+        proxBest = { id: s.id, x: a.x, y: a.y, angle: a.angle }
+      }
+    }
+  }
+  if (proxBest) {
+    return { endpoint: proxBest, snapAnchor: { x: proxBest.x, y: proxBest.y } }
+  }
+
+  // 邻近吸附：光标 10px（屏幕像素）内落在其他连线的渲染路径上 → junction 附着
+  if (input.linkers && input.linkers.length > 0) {
+    const j = findJunctionSnap(input.linkers, worldX, worldY, scale, {
+      selfId: input.selfLinkerId ?? null,
+      elements: input.elements,
+      otherJunctionHostId: otherEnd.junction?.linkerId ?? null,
+    })
+    if (j) {
+      return {
+        endpoint: {
+          id: null,
+          x: j.x,
+          y: j.y,
+          angle: null,
+          junction: { linkerId: j.linkerId, t: j.t },
+        },
+        snapAnchor: { x: j.x, y: j.y },
+      }
     }
   }
 

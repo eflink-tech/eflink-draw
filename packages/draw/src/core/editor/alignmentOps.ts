@@ -4,7 +4,7 @@
 // store 侧的落库（联动连线 + 历史）见 editorStore 的 alignShapes/distributeShapes/matchSize。
 import type { ElementInstance, LinkerInstance } from '@/types'
 import { isLinker } from '@/types'
-import { routeAttachedLinkers, type LiveShapeState } from './documentOps'
+import { applyJunctionResolution, routeAttachedLinkers, type LiveShapeState } from './documentOps'
 
 export type AlignDir = 'left' | 'center' | 'right' | 'top' | 'middle' | 'bottom'
 export type DistDir = 'horizontal' | 'vertical'
@@ -104,6 +104,10 @@ export function applyShapeTransform(
 
   for (const [lid, linker] of routeAttachedLinkers(elements, livePos)) {
     updates[lid] = linker
+    changed.add(lid)
+  }
+  // 二阶联动：附着在连线上的 junction 端点跟随
+  for (const lid of applyJunctionResolution(updates)) {
     changed.add(lid)
   }
   return { elements: updates, changedIds: [...changed] }

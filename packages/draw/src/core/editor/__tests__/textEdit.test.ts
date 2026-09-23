@@ -4,7 +4,7 @@ import '@/core/schema/shapes'
 import type { ElementInstance } from '@/types'
 import { evalTextBlockRect, hitTextBlock } from '../textEdit'
 
-/** rectangle：100×70，默认文本块 {x:10, y:0, w:'w-20', h:'h'} → 局部 (10,0)-(90,70) */
+/** rectangle：96×54，默认文本块 {x:10, y:0, w:'w-20', h:'h'} → 局部 (10,0)-(86,54) */
 function makeElement(): ElementInstance {
   const el = shapeRegistry.createElement('rectangle', 100, 100)
   if (!el) throw new Error('rectangle 未注册')
@@ -15,7 +15,7 @@ describe('evalTextBlockRect', () => {
   it('求值表达式 position', () => {
     const el = makeElement()
     const r = evalTextBlockRect(el.textBlock[0]!, el.props.w, el.props.h)
-    expect(r).toEqual({ x: 10, y: 0, w: 80, h: 70 })
+    expect(r).toEqual({ x: 10, y: 0, w: 76, h: 54 })
   })
 
   it('evalTextBlockRect 对多块 textBlock 各自求值', () => {

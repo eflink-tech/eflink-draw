@@ -12,7 +12,7 @@ const simpleClass: ShapeDefinition = {
   name: 'simpleClass',
   title: '简单类',
   category: 'uml_class',
-  props: { w: 100, h: 70 },
+  props: { w: 96, h: 54 },
   // 内联 roundRectangle 路径
   path: [[
     { action: 'move', x: 0, y: 4 },
@@ -155,7 +155,7 @@ const activeClass: ShapeDefinition = {
   name: 'activeClass',
   title: '活动类',
   category: 'uml_class',
-  props: { w: 100, h: 70 },
+  props: { w: 96, h: 54 },
   textBlock: [{ position: { x: 'Math.min(w/6,20)', y: 0, w: 'w-Math.min(w/6,20)*2', h: 'h' }, text: '' }],
   drawIcon: (a, b) => [[
     // 圆角矩形
@@ -202,7 +202,7 @@ const multiplictyClass: ShapeDefinition = {
   name: 'multiplictyClass',
   title: '多例类',
   category: 'uml_class',
-  props: { w: 100, h: 70 },
+  props: { w: 96, h: 54 },
   attribute: { container: true },
   textBlock: [{ position: { x: 'Math.min(w/6,20)-4', y: 8, w: 'w-Math.min(w/6,20)*2', h: 'h-8' }, text: '' }],
   // 4 个特殊锚点（适配折叠角）
@@ -290,7 +290,7 @@ const constraint: ShapeDefinition = {
   title: '约束',
   category: 'uml_class',
   attribute: { linkable: false, container: true },
-  props: { w: 110, h: 70 },
+  props: { w: 85, h: 54 },
   fillStyle: { type: 'none' },
   anchors: [{ x: 'w', y: 'h*0.5' }, { x: 0, y: 'h*0.5' }],
   path: [

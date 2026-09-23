@@ -4,8 +4,8 @@ import { laneShapes } from '../shapes/lane'
 import '@/core/schema/shapes'
 
 describe('泳池/泳道形状默认样式', () => {
-  it('laneShapes 共 8 个', () => {
-    expect(laneShapes).toHaveLength(8)
+  it('laneShapes 共 10 个', () => {
+    expect(laneShapes).toHaveLength(10)
   })
 
   it('registry 已注册全部 lane 形状', () => {
@@ -14,8 +14,8 @@ describe('泳池/泳道形状默认样式', () => {
     }
   })
 
-  it('registry lane 分类数量 = 8', () => {
-    expect(shapeRegistry.getShapesByCategory('lane')).toHaveLength(8)
+  it('registry lane 分类数量 = 10', () => {
+    expect(shapeRegistry.getShapesByCategory('lane')).toHaveLength(10)
   })
 
   it('所有 lane 形状 category 均为 lane', () => {
@@ -27,6 +27,8 @@ describe('泳池/泳道形状默认样式', () => {
 
   it('lane 形状默认尺寸', () => {
     const expected: Record<string, [number, number]> = {
+      swimlaneV:             [720, 480],
+      swimlaneH:             [720, 480],
       verticalPool:          [250, 540],
       verticalLane:          [250, 500],
       horizontalPool:        [640, 200],
@@ -113,6 +115,18 @@ describe('泳池/泳道形状默认样式', () => {
     for (const name of ['horizontalPool', 'horizontalLane', 'bidirectionalPoolH', 'horizontalSeparator']) {
       const el = shapeRegistry.createElement(name, 0, 0)!
       expect(el.fontStyle.orientation, `${name}.fontStyle.orientation`).toBe('vertical')
+    }
+  })
+
+  it('泳道图实例携带 laneCount/stageCount 默认值', () => {
+    for (const name of ['swimlaneV', 'swimlaneH']) {
+      const el = shapeRegistry.createElement(name, 0, 0)!
+      expect(el.laneCount, `${name}.laneCount`).toBe(4)
+      expect(el.stageCount, `${name}.stageCount`).toBe(0)
+      // 1 标题块 + 4 泳道头块
+      expect(el.textBlock, `${name}.textBlock`).toHaveLength(5)
+      // 外框 + 标题带线 + 泳道头线 + 3 泳道分隔线
+      expect(el.path, `${name}.path`).toHaveLength(6)
     }
   })
 })

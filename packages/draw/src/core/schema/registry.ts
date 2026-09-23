@@ -100,6 +100,8 @@ export class ShapeRegistry {
         { x: 0, y: 'h/2' },
         { x: 'w', y: 'h/2' },
       ]).map((a) => ({ ...a })),
+      ...(schema.laneCount != null && { laneCount: schema.laneCount }),
+      ...(schema.stageCount != null && { stageCount: schema.stageCount }),
     }
   }
 

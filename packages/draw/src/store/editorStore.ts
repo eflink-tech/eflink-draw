@@ -8,6 +8,8 @@ import {
   resizeElementInDoc,
 } from '@/core/editor/documentOps'
 import { LINKER_FONT_DEFAULTS } from '@/core/editor/linker'
+import { resolveJunctionLinkers } from '@/core/editor/linkerJunction'
+import { applyJunctionResolution, rectGetterOf } from '@/core/editor/documentOps'
 import { resetManualRoute } from '@/core/editor/manualRoute'
 import { expandGroupIds, newGroupId, remapGroupIdsForCopy } from '@/core/editor/groupOps'
 import { saveDocumentToStorage, mirrorToRemote } from '@/core/editor/persistence'
@@ -448,14 +450,24 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       if (!el || !isLinker(el)) return state
       const oldEl = JSON.parse(JSON.stringify(el))
       const newEl = { ...el, ...updates } as LinkerInstance
-      historyManager.send('update', { shapes: [oldEl], updates: [newEl] })
+      const shapes: Array<ElementInstance | LinkerInstance> = [oldEl]
+      const newSnapshots: Array<ElementInstance | LinkerInstance> = [newEl]
+      const merged = { ...state.document.elements, [id]: newEl }
+      // junction 二阶联动：本连线是宿主时，附着其上的端点跟随（含拓扑链式），
+      // 联动结果并入同一条历史记录（一次撤销整体回位）
+      if (updates.points != null || updates.from != null || updates.to != null || updates.manualRoute != null) {
+        for (const [lid, nl] of resolveJunctionLinkers(merged, rectGetterOf(merged))) {
+          if (lid === id) continue
+          shapes.push(JSON.parse(JSON.stringify(state.document.elements[lid])))
+          newSnapshots.push(JSON.parse(JSON.stringify(nl)))
+          merged[lid] = nl
+        }
+      }
+      historyManager.send('update', { shapes, updates: newSnapshots })
       return {
         document: {
           ...state.document,
-          elements: {
-            ...state.document.elements,
-            [id]: newEl,
-          },
+          elements: merged,
         },
         isDirty: true,
       }
@@ -467,8 +479,17 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     if (next === state.document) return
     const oldEl = JSON.parse(JSON.stringify(state.document.elements[id]))
     const newEl = JSON.parse(JSON.stringify(next.elements[id]!))
-    historyManager.send('update', { shapes: [oldEl], updates: [newEl] })
-    set({ document: next, isDirty: true })
+    const shapes: Array<ElementInstance | LinkerInstance> = [oldEl]
+    const updates: Array<ElementInstance | LinkerInstance> = [newEl]
+    // junction 二阶联动：重算路由后附着其上的端点跟随（并入同一条历史）
+    const elements = { ...next.elements }
+    for (const lid of applyJunctionResolution(elements)) {
+      if (lid === id) continue
+      shapes.push(JSON.parse(JSON.stringify(state.document.elements[lid])))
+      updates.push(JSON.parse(JSON.stringify(elements[lid])))
+    }
+    historyManager.send('update', { shapes, updates })
+    set({ document: { ...next, elements }, isDirty: true })
   },
 
   deleteElement: (id) => get().deleteElements([id]),
@@ -481,7 +502,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         .map((id) => state.document.elements[id])
         .filter((el): el is ElementInstance | LinkerInstance => el != null)
         .map((el) => JSON.parse(JSON.stringify(el)))
-      const { document, removedIds } = deleteElementsInDoc(state.document, ids)
+      const { document, removedIds, detached } = deleteElementsInDoc(state.document, ids)
       // 还需要包含级联删除的连线
       const cascadedLinkers = [...removedIds]
         .filter((id) => !ids.includes(id))
@@ -489,8 +510,25 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         .filter((el): el is LinkerInstance => el != null && isLinker(el))
         .map((el) => JSON.parse(JSON.stringify(el)))
       const allRemoved = [...removedElements, ...cascadedLinkers]
-      if (allRemoved.length > 0) {
-        historyManager.send('remove', { elements: allRemoved })
+      // junction 脱附更新与删除并入同一条历史（beginBatch 分组，undo 一次整体恢复）
+      const detachedUpdates = detached
+        .map((id) => ({ old: state.document.elements[id], next: document.elements[id] }))
+        .filter(
+          (d): d is { old: ElementInstance | LinkerInstance; next: ElementInstance | LinkerInstance } =>
+            d.old != null && d.next != null,
+        )
+      if (allRemoved.length > 0 || detachedUpdates.length > 0) {
+        historyManager.beginBatch()
+        if (allRemoved.length > 0) {
+          historyManager.send('remove', { elements: allRemoved })
+        }
+        if (detachedUpdates.length > 0) {
+          historyManager.send('update', {
+            shapes: detachedUpdates.map((d) => JSON.parse(JSON.stringify(d.old))),
+            updates: detachedUpdates.map((d) => JSON.parse(JSON.stringify(d.next))),
+          })
+        }
+        historyManager.commit()
       }
       return {
         document,
@@ -518,28 +556,44 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         .filter((el): el is ElementInstance | LinkerInstance => el != null)
         .sort((a, b) => a.props.zindex - b.props.zindex)
 
+      // 两遍法：第一遍统一发新 ID，第二遍 remap 端点/ junction 引用
+      //（单遍法中后出现的图形尚未进 idMap，其连线端点会被误判为自由端）
+      const copies = new Map<string, ElementInstance | LinkerInstance>()
       for (const el of sorted) {
         const newId = `el-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
         idMap[el.id] = newId
-        if (isLinker(el)) {
-          const l: LinkerInstance = JSON.parse(JSON.stringify(el))
-          l.id = newId
+        const copy: ElementInstance | LinkerInstance = JSON.parse(JSON.stringify(el))
+        copy.id = newId
+        copies.set(el.id, copy)
+      }
+      for (const el of sorted) {
+        const copy = copies.get(el.id)!
+        if (isLinker(copy)) {
           // 连线端点：对端在选区则映射新 ID，否则变为自由端点
-          if (l.from.id && selectedIds.has(l.from.id)) {
-            l.from.id = idMap[l.from.id] ?? null
+          if (copy.from.id && selectedIds.has(copy.from.id)) {
+            copy.from.id = idMap[copy.from.id] ?? null
           } else {
-            l.from.id = null
+            copy.from.id = null
           }
-          if (l.to.id && selectedIds.has(l.to.id)) {
-            l.to.id = idMap[l.to.id] ?? null
+          if (copy.to.id && selectedIds.has(copy.to.id)) {
+            copy.to.id = idMap[copy.to.id] ?? null
           } else {
-            l.to.id = null
+            copy.to.id = null
           }
-          linkers.push(l)
+          // junction：宿主在选区则映射新宿主 ID（t 保留）；不在选区则脱附保坐标
+          if (copy.from.junction) {
+            copy.from.junction = selectedIds.has(copy.from.junction.linkerId)
+              ? { ...copy.from.junction, linkerId: idMap[copy.from.junction.linkerId] ?? copy.from.junction.linkerId }
+              : undefined
+          }
+          if (copy.to.junction) {
+            copy.to.junction = selectedIds.has(copy.to.junction.linkerId)
+              ? { ...copy.to.junction, linkerId: idMap[copy.to.junction.linkerId] ?? copy.to.junction.linkerId }
+              : undefined
+          }
+          linkers.push(copy)
         } else {
-          const shape: ElementInstance = JSON.parse(JSON.stringify(el))
-          shape.id = newId
-          shapes.push(shape)
+          shapes.push(copy)
         }
       }
 
@@ -607,6 +661,12 @@ export const useEditorStore = create<EditorState>((set, get) => ({
           l.points = l.points.map((p) => ({ x: p.x + dx, y: p.y + dy }))
         }
         newElements[l.id] = l
+      }
+
+      // junction 归位：粘贴后附着端点按新宿主路径重求坐标（宿主不在选区时复制阶段已脱附）
+      const merged = { ...state.document.elements, ...newElements }
+      for (const [lid, nl] of resolveJunctionLinkers(merged, rectGetterOf(merged))) {
+        if (newElements[lid] != null) newElements[lid] = nl
       }
 
       // 记录到历史（用于 undo）

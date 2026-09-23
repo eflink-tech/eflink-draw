@@ -12,7 +12,7 @@ const umlObject: ShapeDefinition = {
   name: 'umlObject',
   title: '对象',
   category: 'uml_stateactivity',
-  props: { w: 100, h: 70 },
+  props: { w: 96, h: 54 },
   // 内联 rectangle 路径
   path: [[
     { action: 'move', x: 0, y: 0 },
@@ -28,7 +28,7 @@ const umlState: ShapeDefinition = {
   name: 'umlState',
   title: '状态',
   category: 'uml_stateactivity',
-  props: { w: 100, h: 70 },
+  props: { w: 96, h: 54 },
   drawIcon: (a, b) => [[
     { action: 'move', x: 0, y: 6 },
     { action: 'quadraticCurve', x1: 0, y1: 0, x: 6, y: 0 },
@@ -200,7 +200,7 @@ const sendSignal: ShapeDefinition = {
   name: 'sendSignal',
   title: '发送信号',
   category: 'uml_stateactivity',
-  props: { w: 150, h: 70 },
+  props: { w: 116, h: 54 },
   textBlock: [{ position: { x: 'w*0.1', y: 2, w: '(w-Math.min(h/2,w/6))*0.8', h: 'h-2' }, text: '' }],
   path: [[
     { action: 'move', x: 0, y: 0 },
@@ -218,7 +218,7 @@ const receiveSignal: ShapeDefinition = {
   name: 'receiveSignal',
   title: '接收信号',
   category: 'uml_stateactivity',
-  props: { w: 150, h: 70 },
+  props: { w: 116, h: 54 },
   textBlock: [{ position: { x: 'w*0.1', y: 2, w: '(w-Math.min(h/2,w/6))*0.8', h: 'h-2' }, text: '' }],
   path: [[
     { action: 'move', x: 0, y: 0 },

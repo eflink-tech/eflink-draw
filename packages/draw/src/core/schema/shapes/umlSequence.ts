@@ -12,7 +12,7 @@ const sequenceObject: ShapeDefinition = {
   name: 'sequenceObject',
   title: '对象',
   category: 'uml_sequence',
-  props: { w: 100, h: 70 },
+  props: { w: 96, h: 54 },
   // 内联 rectangle 路径
   path: [[
     { action: 'move', x: 0, y: 0 },
@@ -134,7 +134,7 @@ const sequenceConstraint: ShapeDefinition = {
   title: '约束',
   category: 'uml_sequence',
   attribute: { linkable: false, container: true },
-  props: { w: 110, h: 70 },
+  props: { w: 85, h: 54 },
   fillStyle: { type: 'none' },
   anchors: [{ x: 'w', y: 'h*0.5' }, { x: 0, y: 'h*0.5' }],
   path: [

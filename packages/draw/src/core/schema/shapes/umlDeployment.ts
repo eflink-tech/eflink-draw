@@ -50,7 +50,7 @@ const devComponentNonInstance: ShapeDefinition = {
   title: '组件',
   category: 'uml_deployment',
   attribute: { container: true },
-  props: { w: 100, h: 70 },
+  props: { w: 96, h: 54 },
   fontStyle: { bold: true },
   textBlock: [{ position: { x: 'w*(1/8)+5', y: 0, w: 'w-w*(1/8)-10', h: 'h' }, text: '组件' }],
   anchors: [
@@ -69,7 +69,7 @@ const devComponent: ShapeDefinition = {
   title: '实例化组件',
   category: 'uml_deployment',
   attribute: { container: true },
-  props: { w: 100, h: 70 },
+  props: { w: 96, h: 54 },
   fontStyle: { underline: true },
   textBlock: [{ position: { x: 'w*(1/8)+5', y: 0, w: 'w-w*(1/8)-10', h: 'h' }, text: '实例化组件' }],
   anchors: [
@@ -141,7 +141,7 @@ const umlDeploymentObject: ShapeDefinition = {
   name: 'uml_deploymentObject',
   title: '对象',
   category: 'uml_deployment',
-  props: { w: 100, h: 70 },
+  props: { w: 96, h: 54 },
   // 内联 rectangle 路径
   path: [[
     { action: 'move', x: 0, y: 0 },
@@ -158,7 +158,7 @@ const umlDeploymentConstraint: ShapeDefinition = {
   title: '约束',
   category: 'uml_deployment',
   attribute: { linkable: false, container: true },
-  props: { w: 110, h: 70 },
+  props: { w: 85, h: 54 },
   fillStyle: { type: 'none' },
   anchors: [{ x: 'w', y: 'h*0.5' }, { x: 0, y: 'h*0.5' }],
   path: [

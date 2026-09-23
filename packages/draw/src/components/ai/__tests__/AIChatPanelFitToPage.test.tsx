@@ -115,8 +115,8 @@ describe('AIChatPanel 落图归位（居中 + 扩页）', () => {
   })
 
   it('内容超出页面时自动扩页', async () => {
-    // 三个横向铺开的元素（terminator 默认宽 100）：总包围盒 x 0..2000（宽 2000 > 1600）
-    // → page.width 扩到 ceil(2000 + 2*60) = 2120，内容按新中心 x=1060 居中
+    // 三个横向铺开的元素（terminator 默认宽 108）：总包围盒 x 0..2008（宽 2008 > 1600）
+    // → page.width 扩到 ceil(2008 + 2*60) = 2128，内容按新中心 x=1064 居中
     vi.mocked(AIService).mockImplementation(
       () =>
         ({
@@ -132,13 +132,13 @@ describe('AIChatPanel 落图归位（居中 + 扩页）', () => {
     )
     await sendImageMessage()
     const doc = useEditorStore.getState().document
-    expect(doc.page.width).toBe(2120)
+    expect(doc.page.width).toBe(2128)
     const els = Object.values(doc.elements).filter(
       (e): e is ElementInstance => e.name !== 'linker',
     )
     const minX = Math.min(...els.map((e) => e.props.x))
     const maxX = Math.max(...els.map((e) => e.props.x + e.props.w))
-    // 平移 60 后内容中心 = (60 + 2060) / 2 = 1060（扩页后页面中心）
-    expect((minX + maxX) / 2).toBeCloseTo(1060, 0)
+    // 平移 60 后内容中心 = (60 + 2068) / 2 = 1064（扩页后页面中心）
+    expect((minX + maxX) / 2).toBeCloseTo(1064, 0)
   })
 })

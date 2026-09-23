@@ -9,7 +9,7 @@ import {
   Square, Circle, Diamond, Triangle, Pentagon, Hexagon,
   GitBranch, ArrowRight, CircleDot, CircleDashed, Disc3,
   Workflow, Box, Users, Database,
-  Columns, Minus, Grid2x2,
+  Columns, Minus, Grid2x2, Rows,
   ChevronDown, ChevronRight, Search,
   // 基础图形扩展
   RectangleHorizontal, RectangleVertical, Octagon, Star,
@@ -122,6 +122,8 @@ const CATEGORY_SHAPES: Record<string, Array<{ name: string; title: string; icon:
     { name: 'choreographyTask', title: '编排任务', icon: Users },
   ],
   lane: [
+    { name: 'swimlaneV', title: '泳道图(垂直)', icon: Columns },
+    { name: 'swimlaneH', title: '泳道图(水平)', icon: Rows },
     { name: 'verticalPool', title: '泳池(垂直)', icon: RectangleVertical },
     { name: 'verticalLane', title: '泳道(垂直)', icon: RectangleVertical },
     { name: 'horizontalPool', title: '泳池(水平)', icon: RectangleHorizontal },

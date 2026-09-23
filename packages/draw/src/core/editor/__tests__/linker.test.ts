@@ -1,6 +1,7 @@
 // 连线几何计算测试
 import { describe, it, expect } from 'vitest'
 import {
+  createLinkerInstance,
   getAngleDir,
   getAnchorPoints,
   getLocalAnchors,
@@ -12,7 +13,7 @@ import {
 } from '../linker'
 import { shapeRegistry } from '@/core/schema/registry'
 import '@/core/schema/shapes'
-import type { ElementInstance } from '@/types'
+import type { ElementInstance, LinkerInstance } from '@/types'
 
 function shape(x: number, y: number, w = 100, h = 60): ElementInstance {
   const el = shapeRegistry.createElement('rectangle', x, y)
@@ -474,16 +475,207 @@ describe('snapLinkerEndpoint', () => {
     expect(r.endpoint).toEqual({ id: null, x: 100, y: 100, angle: null })
   })
 
-  it('空白处自由端靠近图形边时吸附边（2px）', () => {
+  it('空白处自由端靠近图形边（远离锚点 >20px）时吸附边（2px）', () => {
     const el = shape(100, 200, 100, 60)
     const r = snapLinkerEndpoint({
       shapes: [el],
       hitShapeId: null,
-      worldX: 150,
+      worldX: 120, // 距顶部锚点 (150,200) 30px，不触发邻近吸附
       worldY: 201, // 距顶边 1px
       scale: 1,
       otherEnd: { id: null, x: 400, y: 500 },
     })
-    expect(r.endpoint).toEqual({ id: null, x: 150, y: 200, angle: null })
+    expect(r.endpoint).toEqual({ id: null, x: 120, y: 200, angle: null })
+  })
+
+  it('未命中图形但光标 20px 内有锚点：邻近吸附（左侧接近时提前附着，箭头向右驶入）', () => {
+    const target = shape(100, 300, 100, 60) // 左锚点 (100,330)，内向角 0
+    const other = shape(400, 300, 100, 60)
+    const r = snapLinkerEndpoint({
+      shapes: [other, target],
+      hitShapeId: null, // 光标在目标本体之外
+      worldX: 88,
+      worldY: 330, // 距左锚点 12px < 20px
+      scale: 1,
+      otherEnd: { id: other.id, x: 400, y: 330 },
+    })
+    expect(r.endpoint).toMatchObject({ id: target.id, x: 100, y: 330 })
+    expect(r.endpoint.angle).toBeCloseTo(0, 10) // 内向朝右 → 箭头向右
+    expect(r.snapAnchor).toEqual({ x: 100, y: 330 })
+  })
+
+  it('超出 20px 不邻近吸附：仍为自由点', () => {
+    const target = shape(100, 300, 100, 60)
+    const other = shape(400, 300, 100, 60)
+    const r = snapLinkerEndpoint({
+      shapes: [other, target],
+      hitShapeId: null,
+      worldX: 70, // 距左锚点 (100,330) 30px > 20px
+      worldY: 330,
+      scale: 1,
+      otherEnd: { id: other.id, x: 400, y: 330 },
+    })
+    expect(r.endpoint.id).toBeNull()
+    expect(r.snapAnchor).toBeNull()
+  })
+
+  it('邻近吸附跳过另一端所属图形（不自吸）', () => {
+    const src = shape(100, 300, 100, 60)
+    const r = snapLinkerEndpoint({
+      shapes: [src],
+      hitShapeId: null,
+      worldX: 88, // 距 src 左锚点 12px，但 src 是另一端所属图形
+      worldY: 330,
+      scale: 1,
+      otherEnd: { id: src.id, x: 100, y: 330 },
+    })
+    expect(r.endpoint.id).toBeNull()
+  })
+
+  it('邻近吸附半径随缩放换算（scale=2 时 20 屏幕px = 10 世界px）', () => {
+    const target = shape(100, 300, 100, 60)
+    const other = shape(400, 300, 100, 60)
+    const r = snapLinkerEndpoint({
+      shapes: [other, target],
+      hitShapeId: null,
+      worldX: 88, // 世界距离 12px > 10px → 不吸附
+      worldY: 330,
+      scale: 2,
+      otherEnd: { id: other.id, x: 400, y: 330 },
+    })
+    expect(r.endpoint.id).toBeNull()
+  })
+  it('旋转图形的邻近吸附：锚点落在未旋转包围盒外也能吸附', () => {
+    const target = shape(100, 300, 100, 60)
+    // 旋转 90°：左锚点 (100,330) 绕中心 (150,330) 转到 (150,280)，在未旋转框顶边（y=300）之外
+    target.props.angle = Math.PI / 2
+    const other = shape(400, 300, 100, 60)
+    const r = snapLinkerEndpoint({
+      shapes: [other, target],
+      hitShapeId: null,
+      worldX: 150,
+      worldY: 270, // 距旋转后锚点 (150,280) 10px < 20px
+      scale: 1,
+      otherEnd: { id: other.id, x: 400, y: 330 },
+    })
+    expect(r.endpoint.id).toBe(target.id)
+    expect(r.endpoint.x).toBeCloseTo(150, 5)
+    expect(r.endpoint.y).toBeCloseTo(280, 5)
+  })
+})
+
+describe('snapLinkerEndpoint（junction：吸附到另一条连线）', () => {
+  /** from(0,0)→(0,40)→(100,40)→to(100,100) 的折线宿主 */
+  function hostLinker(): LinkerInstance {
+    const l = createLinkerInstance(
+      { id: null, x: 0, y: 0, angle: 0 },
+      { id: null, x: 100, y: 100, angle: 0 },
+      0,
+    )
+    return {
+      ...l,
+      linkerType: 'broken',
+      points: [
+        { x: 0, y: 40 },
+        { x: 100, y: 40 },
+      ],
+    }
+  }
+
+  it('光标 10px 内落在候选连线渲染路径上 → 附着（junction）', () => {
+    const host = hostLinker()
+    const r = snapLinkerEndpoint({
+      shapes: [],
+      hitShapeId: null,
+      worldX: 10,
+      worldY: 50, // 距水平段 (0,40)-(100,40) 10px
+      scale: 1,
+      otherEnd: { id: null, x: 400, y: 500 },
+      linkers: [host],
+      elements: { [host.id]: host },
+      selfLinkerId: null,
+    })
+    expect(r.endpoint).toMatchObject({ id: null, x: 10, y: 40, angle: null })
+    expect(r.endpoint.junction).toEqual({ linkerId: host.id, t: 0.25 })
+    expect(r.snapAnchor).toEqual({ x: 10, y: 40 })
+  })
+
+  it('邻近锚点（20px）优先于 junction 吸附（10px）', () => {
+    const target = shape(100, 300, 100, 60) // 左锚点 (100,330)
+    const host = hostLinker()
+    host.from = { ...host.from, x: 0, y: 660 }
+    host.to = { ...host.to, x: 100, y: 660 }
+    host.points = []
+    const r = snapLinkerEndpoint({
+      shapes: [target],
+      hitShapeId: null,
+      worldX: 95, // 距左锚点 5px（<20 邻近）；宿主水平段 y=660 距光标很远
+      worldY: 330,
+      scale: 1,
+      otherEnd: { id: null, x: 400, y: 500 },
+      linkers: [host],
+      elements: { [target.id]: target, [host.id]: host },
+      selfLinkerId: null,
+    })
+    expect(r.endpoint.id).toBe(target.id)
+    expect(r.endpoint.junction).toBeUndefined()
+  })
+
+  it('另一端已附着该宿主（同宿主双端）→ 不吸附，自由点', () => {
+    const host = hostLinker()
+    const r = snapLinkerEndpoint({
+      shapes: [],
+      hitShapeId: null,
+      worldX: 10,
+      worldY: 50,
+      scale: 1,
+      otherEnd: { id: null, x: 400, y: 500, junction: { linkerId: host.id, t: 0.5 } },
+      linkers: [host],
+      elements: { [host.id]: host },
+      selfLinkerId: null,
+    })
+    expect(r.endpoint.id).toBeNull()
+    expect(r.endpoint.junction).toBeUndefined()
+    expect(r.snapAnchor).toBeNull()
+  })
+
+  it('防环：宿主已附着在被拖连线上 → 不吸附', () => {
+    const self = createLinkerInstance(
+      { id: null, x: 0, y: 500, angle: 0 },
+      { id: null, x: 100, y: 500, angle: 0 },
+      0,
+    )
+    const host = createLinkerInstance(
+      { id: null, x: 0, y: 0, angle: 0, junction: { linkerId: self.id, t: 0.5 } },
+      { id: null, x: 100, y: 100, angle: 0 },
+      0,
+    )
+    const r = snapLinkerEndpoint({
+      shapes: [],
+      hitShapeId: null,
+      worldX: 10,
+      worldY: 50,
+      scale: 1,
+      otherEnd: { id: null, x: 400, y: 500 },
+      linkers: [host],
+      elements: { [self.id]: self, [host.id]: host },
+      selfLinkerId: self.id,
+    })
+    expect(r.endpoint.id).toBeNull()
+    expect(r.endpoint.junction).toBeUndefined()
+  })
+
+  it('不传 linkers 时旧行为不变（向后兼容）', () => {
+    const r = snapLinkerEndpoint({
+      shapes: [],
+      hitShapeId: null,
+      worldX: 10,
+      worldY: 50,
+      scale: 1,
+      otherEnd: { id: null, x: 400, y: 500 },
+    })
+    expect(r.endpoint.id).toBeNull()
+    expect(r.endpoint.junction).toBeUndefined()
+    expect(r.snapAnchor).toBeNull()
   })
 })

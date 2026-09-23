@@ -16,7 +16,7 @@ const component: ShapeDefinition = {
   title: '组件',
   category: 'uml_component',
   attribute: { container: true },
-  props: { w: 100, h: 70 },
+  props: { w: 96, h: 54 },
   textBlock: [{ position: { x: 'w*(1/8)+5', y: 0, w: 'w-w*(1/8)-10', h: 'h' }, text: '' }],
   anchors: [
     { x: 'w*0.5', y: 0 },

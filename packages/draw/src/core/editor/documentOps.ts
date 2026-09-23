@@ -7,6 +7,7 @@ import type { DocumentData, ElementInstance, LinkerInstance } from '@/types'
 import { isLinker } from '@/types'
 import { getLinkerPoints, type ShapeRect } from './linker'
 import { stretchManualPoints } from './manualRoute'
+import { resolveJunctionLinkers } from './linkerJunction'
 
 /** 图形实时状态（resize 直操期间携带 live w/h；移动直操只有位置） */
 export interface LiveShapeState {
@@ -30,11 +31,34 @@ function followEndpoint(
   const rx = w > 0 ? (ep.x - x) / w : 0
   const ry = h > 0 ? (ep.y - y) / h : 0
   return {
+    ...ep, // 防御性透传附加字段（如 junction；附着端点 id != null 时不携带）
     id: ep.id,
     x: live.x + (live.w ?? w) * rx,
     y: live.y + (live.h ?? h) * ry,
     angle: ep.angle,
   }
+}
+
+/** 由元素表构造图形包围盒取值器（junction 解析重路由用） */
+export function rectGetterOf(
+  elements: DocumentData['elements'],
+): (id: string) => ShapeRect | null {
+  return (id) => {
+    const el = elements[id]
+    if (!el || isLinker(el)) return null
+    return { x: el.props.x, y: el.props.y, w: el.props.w, h: el.props.h }
+  }
+}
+
+/** junction 二阶联动：宿主几何变动后重求附着端点并合并进 elements，返回更新的连线 id */
+export function applyJunctionResolution(
+  elements: DocumentData['elements'],
+): string[] {
+  const updated = resolveJunctionLinkers(elements, rectGetterOf(elements))
+  for (const [lid, nl] of updated) {
+    elements[lid] = nl
+  }
+  return [...updated.keys()]
 }
 
 /**
@@ -107,6 +131,8 @@ export function moveElementsInDoc(
   for (const [lid, nl] of routeAttachedLinkers(doc.elements, livePos)) {
     elements[lid] = nl
   }
+  // 二阶联动：附着在连线上的 junction 端点跟随（宿主连线刚被重路由）
+  applyJunctionResolution(elements)
   return { ...doc, elements }
 }
 
@@ -131,33 +157,44 @@ export function resizeElementInDoc(
   for (const [lid, nl] of routeAttachedLinkers(doc.elements, livePos)) {
     elements[lid] = nl
   }
+  // 二阶联动：附着在连线上的 junction 端点跟随
+  applyJunctionResolution(elements)
   return { ...doc, elements }
 }
 
-/** 收集附着在指定图形上的所有连线 ID */
+/** 收集附着在指定图形上的所有连线 ID（含 junction 传递闭包：宿主在集合内的连线也纳入） */
 export function attachedLinkerIds(
   elements: DocumentData['elements'],
   shapeIds: Iterable<string>,
 ): string[] {
   const ids = new Set(shapeIds)
   const out: string[] = []
-  for (const el of Object.values(elements)) {
-    if (
-      isLinker(el) &&
-      ((el.from.id != null && ids.has(el.from.id)) ||
-        (el.to.id != null && ids.has(el.to.id)))
-    ) {
-      out.push(el.id)
+  // 迭代至不动点：图形 → 附着连线 → 附着在该连线上的 junction 连线 → …
+  let grew = true
+  while (grew) {
+    grew = false
+    for (const el of Object.values(elements)) {
+      if (!isLinker(el) || ids.has(el.id)) continue
+      const attached =
+        (el.from.id != null && ids.has(el.from.id)) ||
+        (el.to.id != null && ids.has(el.to.id)) ||
+        (el.from.junction != null && ids.has(el.from.junction.linkerId)) ||
+        (el.to.junction != null && ids.has(el.to.junction.linkerId))
+      if (attached) {
+        ids.add(el.id)
+        out.push(el.id)
+        grew = true
+      }
     }
   }
   return out
 }
 
-/** 批量删除元素（图形 + 连线），同时删除附着其上的连线 */
+/** 批量删除元素（图形 + 连线），同时删除附着其上的连线；junction 宿主被删的连线脱附为自由端点 */
 export function deleteElementsInDoc(
   doc: DocumentData,
   ids: string[],
-): { document: DocumentData; removedIds: Set<string> } {
+): { document: DocumentData; removedIds: Set<string>; detached: string[] } {
   const idSet = new Set(ids)
   const removed = new Set(ids)
   const elements: DocumentData['elements'] = {}
@@ -174,5 +211,25 @@ export function deleteElementsInDoc(
     }
     elements[id] = el
   }
-  return { document: { ...doc, elements }, removedIds: removed }
+  // junction 脱附：宿主（含被级联删除的连线）不在了 → 端点清 junction 保坐标（不级联删除附着线）
+  const detached: string[] = []
+  for (const [id, el] of Object.entries(elements)) {
+    if (!isLinker(el)) continue
+    const fromDetach = el.from.junction != null && removed.has(el.from.junction.linkerId)
+    const toDetach = el.to.junction != null && removed.has(el.to.junction.linkerId)
+    if (!fromDetach && !toDetach) continue
+    detached.push(id)
+    elements[id] = {
+      ...el,
+      from: fromDetach ? stripJunction(el.from) : el.from,
+      to: toDetach ? stripJunction(el.to) : el.to,
+    }
+  }
+  return { document: { ...doc, elements }, removedIds: removed, detached }
+}
+
+/** 脱附：去除端点 junction 字段（其余字段原样保留） */
+function stripJunction(ep: LinkerInstance['from']): LinkerInstance['from'] {
+  const { junction: _junction, ...rest } = ep
+  return rest
 }

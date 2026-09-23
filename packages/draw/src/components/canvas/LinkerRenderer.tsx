@@ -40,6 +40,8 @@ export const LinkerRenderer = memo(function LinkerRenderer({ linker }: LinkerRen
     (context: unknown, shape: Konva.Shape) => {
       const ctx = context as unknown as CanvasRenderingContext2D
       const live = shape.getAttr('liveLinker') as LinkerInstance | undefined
+      // junction 吸附目标高亮（端点拖拽期间由 LinkerEndpoints 直操 setAttr）
+      const snapHost = shape.getAttr('snapHost') === true
       const l = live ?? linker
       strokeLinkerScene(ctx, l, {
         // 选中不改色：原线保持自身颜色，以蓝色光晕表示选中态
@@ -47,9 +49,11 @@ export const LinkerRenderer = memo(function LinkerRenderer({ linker }: LinkerRen
         lineWidth: l.lineStyle.lineWidth ?? 2,
         dash: l.lineStyle.lineStyle ?? 'solid',
         getShapeBorder: shapeBorderWidth,
-        halo: selected
-          ? { color: 'rgba(24, 144, 255, 0.35)', extraWidth: 6 / scale }
-          : null,
+        halo: snapHost
+          ? { color: 'rgba(24, 144, 255, 0.45)', extraWidth: 8 / scale }
+          : selected
+            ? { color: 'rgba(24, 144, 255, 0.35)', extraWidth: 6 / scale }
+            : null,
       })
     },
     [linker, selected, scale],

@@ -7,7 +7,8 @@
 //      + addLinker + 选中
 //
 // 工具保持激活（setTool('linker') 不自动回 select），支持连续画多条连线。
-import type { ElementInstance, LinkerDraft } from '@/types'
+import type { ElementInstance, LinkerDraft, LinkerInstance } from '@/types'
+import { isLinker } from '@/types'
 import { useEditorStore } from '@/store/editorStore'
 import {
   LINKER_DEFAULTS,
@@ -55,7 +56,7 @@ export function resolveLinkerStart(
 
 /** 由 from/to 构造连线草稿（lineStyle 取 LINKER_DEFAULTS，linkerType 固定 broken；angle 归 0） */
 function buildDraft(from: LinkerEndpoint, to: LinkerEndpoint): LinkerDraft {
-  const norm = (ep: LinkerEndpoint): { id: string | null; x: number; y: number; angle: number } => ({
+  const norm = (ep: LinkerEndpoint): LinkerInstance['from'] => ({
     ...ep,
     angle: ep.angle ?? 0,
   })
@@ -96,18 +97,28 @@ export function moveFreeLinker(
   const d = drag
   if (!d) return
   const st = useEditorStore.getState()
+  // 候选宿主：全部连线（草稿尚未入库，无自身可排除；selfLinkerId 传 null）
+  const linkers = Object.values(st.document.elements).filter(isLinker)
   const r = snapLinkerEndpoint({
     shapes: allShapes(),
     hitShapeId,
     worldX,
     worldY,
     scale: st.viewport.scale,
-    otherEnd: { id: d.from.id, x: d.from.x, y: d.from.y },
+    otherEnd: d.from,
+    linkers,
+    elements: st.document.elements,
+    selfLinkerId: null,
   })
-  // 悬停图形显示锚点 / 吸附锚点大圆预览（与锚点拖拽一致）
+  // 悬停图形显示锚点 / 吸附锚点大圆预览（与锚点拖拽一致；junction 吸附变醒目蓝）
   st.setHoveredId(hitShapeId)
   if (r.snapAnchor) {
-    showEndpointPreview(r.snapAnchor.x, r.snapAnchor.y, st.viewport.scale)
+    showEndpointPreview(
+      r.snapAnchor.x,
+      r.snapAnchor.y,
+      st.viewport.scale,
+      r.endpoint.junction != null,
+    )
   } else {
     hideEndpointPreview()
   }
