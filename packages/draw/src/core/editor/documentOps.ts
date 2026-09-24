@@ -105,7 +105,14 @@ export function routeAttachedLinkers(
         if (!base || isLinker(base)) return null
         return { x: base.props.x, y: base.props.y, w: base.props.w, h: base.props.h }
       }
-      const routed = routeSeqMessage(l, oldOf, liveOf)
+      const routed = routeSeqMessage(l, oldOf, liveOf, (id) => {
+        const base = elements[id]
+        if (!base || isLinker(base)) return 'other' as const
+        if (base.name === 'sequenceActivation') return 'activation' as const
+        if (base.name === 'sequenceLifeLine') return 'lifeline' as const
+        if (base.name === 'sequenceDeletion') return 'destroy' as const
+        return 'other' as const
+      })
       if (routed) {
         out.set(l.id, routed)
         continue

@@ -108,6 +108,20 @@ const componentStart: ShapeDefinition = {
   ]],
 }
 
+/** 依赖接口（socket 半圆，开口朝左；与 componentStart 棒棒糖对位拼合） */
+const componentSocket: ShapeDefinition = {
+  name: 'componentSocket',
+  title: '接口(依赖)',
+  category: 'uml_component',
+  props: { w: 40, h: 40 },
+  textBlock: [{ position: { x: -20, y: 'h', w: 'w+40', h: 30 }, text: '' }],
+  anchors: [{ x: 0, y: 'h/2' }],
+  path: [[
+    { action: 'move', x: 0, y: 'h*0.15' },
+    { action: 'curve', x1: 'w*1.5', y1: 'h*0.15', x2: 'w*1.5', y2: 'h*0.85', x: 0, y: 'h*0.85' },
+  ]],
+}
+
 // ═══════════════════════════════════════════
 // 导出列表
 // ═══════════════════════════════════════════
@@ -116,4 +130,5 @@ export const umlComponentShapes: ShapeDefinition[] = [
   component,
   componentNodeNonInstance,
   componentStart,
+  componentSocket,
 ]

@@ -6,7 +6,7 @@ import { ColorButton } from '@/components/common/ColorPicker'
 import { LineStyleDropdown, type LineStyleValue } from '@/components/common/LineStyleDropdown'
 import { LineTypeDropdown } from '@/components/common/LineTypeDropdown'
 import { ArrowStyleDropdown } from '@/components/common/ArrowStyleDropdown'
-import { getLinkerPoints } from '@/core/editor/linker'
+import { getLinkerPoints, matchStylePreset, SEQ_MESSAGE_PRESETS, UML_RELATION_PRESETS } from '@/core/editor/linker'
 import { makeStoreRectGetter } from '@/core/editor/interaction'
 import { applyLinkerPatch, applyShapePatch, convertFillStyle } from '@/core/editor/styleOps'
 import { NumField, Row, Section, SliderField } from '../fields'
@@ -95,6 +95,12 @@ export function LineSection({ first }: { first: ElementInstance | LinkerInstance
       lineStyle: { ...l.lineStyle, endArrowStyle: style },
     }))
   }
+  const linker = linkerMode ? (first as LinkerInstance) : null
+  const applyPreset = (patch: { lineStyle: LineStyleValue; beginArrowStyle: ArrowStyle; endArrowStyle: ArrowStyle }): void => {
+    applyLinkerPatch((l) => ({
+      lineStyle: { ...l.lineStyle, ...patch },
+    }))
+  }
 
   return (
     <Section title="线条">
@@ -125,6 +131,40 @@ export function LineSection({ first }: { first: ElementInstance | LinkerInstance
           }))}
         />
       </Row>
+      {linker && (
+        <Row label="UML 关系">
+          <select
+            className={SELECT_CLS}
+            value={matchStylePreset(UML_RELATION_PRESETS, linker)}
+            onChange={(e) => {
+              const preset = UML_RELATION_PRESETS.find((p) => p.value === e.target.value)
+              if (preset) applyPreset(preset.patch)
+            }}
+          >
+            <option value="">自定义</option>
+            {UML_RELATION_PRESETS.map((p) => (
+              <option key={p.value} value={p.value}>{p.label}</option>
+            ))}
+          </select>
+        </Row>
+      )}
+      {linker?.seq && (
+        <Row label="消息类型">
+          <select
+            className={SELECT_CLS}
+            value={matchStylePreset(SEQ_MESSAGE_PRESETS, linker)}
+            onChange={(e) => {
+              const preset = SEQ_MESSAGE_PRESETS.find((p) => p.value === e.target.value)
+              if (preset) applyPreset(preset.patch)
+            }}
+          >
+            <option value="">自定义</option>
+            {SEQ_MESSAGE_PRESETS.map((p) => (
+              <option key={p.value} value={p.value}>{p.label}</option>
+            ))}
+          </select>
+        </Row>
+      )}
       {linkerMode && (
         <Row label="线型">
           <LineTypeDropdown

@@ -244,7 +244,7 @@ export interface LinkerInstance {
   text: string
   /** 连线文字锚点（世界坐标）：线身双击处；缺省回落到线中点。一条连线仅此一个文字点 */
   textPos?: { x: number; y: number }
-  /** UML 时序消息：两端附着激活条。y = 消息高度（世界坐标，恒水平）；fromDir/toDir = 端点所在条缘（1 右 / -1 左）；loopW/H = 自消息回环尺寸（from.id === to.id 时有效） */
+  /** UML 时序消息：两端附着激活条（fromDir/toDir = 条缘 1 右 / -1 左）或生命线/销毁符中轴（0）。y = 消息高度（恒水平）；loopW/H = 自消息回环尺寸（from.id === to.id 时有效） */
   seq?: SeqMessageData
   fontStyle?: FontStyle
   linkerType: 'curve' | 'broken' | 'line'
@@ -265,10 +265,10 @@ export interface LinkerInstance {
 export interface SeqMessageData {
   /** 消息高度（世界坐标）；两端恒保持此 y（水平消息） */
   y: number
-  /** 源端点所在条缘：1 = 激活条右缘，-1 = 左缘 */
-  fromDir: 1 | -1
-  /** 目标端点所在条缘（水平消息） */
-  toDir: 1 | -1
+  /** 源端点位置：1 = 激活条右缘，-1 = 左缘，0 = 生命线/销毁符中轴 */
+  fromDir: 1 | -1 | 0
+  /** 目标端点位置（含义同 fromDir） */
+  toDir: 1 | -1 | 0
   /** 自消息回环宽/高（世界 px，缺省 36/24）；from.id === to.id 时有效 */
   loopW?: number
   loopH?: number

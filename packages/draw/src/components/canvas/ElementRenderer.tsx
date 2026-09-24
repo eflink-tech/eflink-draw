@@ -279,10 +279,26 @@ export const ElementRenderer = memo(function ElementRenderer({ element, textEngi
       for (const sid of st.selectedIds) {
         const el = st.document.elements[sid]
         if (!el || isLinker(el)) continue
+        let x = el.props.x + dx
+        // 激活条吸附生命线中轴（14px 内自动居中对齐）
+        if (el.name === 'sequenceActivation') {
+          let best: number | null = null
+          let bestDist = Infinity
+          for (const other of Object.values(st.document.elements)) {
+            if (isLinker(other) || other.name !== 'sequenceLifeLine' || other.locked) continue
+            const center = other.props.x + other.props.w / 2
+            const d = Math.abs(center - (x + el.props.w / 2))
+            if (d <= 14 && d < bestDist) {
+              best = center
+              bestDist = d
+            }
+          }
+          if (best != null) x = best - el.props.w / 2
+        }
         live.set(sid, {
           node: getElementNode(sid),
           el,
-          x: el.props.x + dx,
+          x,
           y: el.props.y + dy,
         })
       }

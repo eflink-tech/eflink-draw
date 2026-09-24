@@ -5,7 +5,7 @@
 // - getAngleDir: 1=上锚点 2=右锚点 3=下锚点 4=左锚点
 // - broken 折线：按两端锚点方向组合路由，stub 长度 r=30
 // - curve 曲线：控制点距离 k = 两端距离 * 0.4，沿内向角反向（即向外）延伸
-import type { DocumentData, ElementInstance, FontStyle, LinkerInstance, LinkerJunction } from '@/types'
+import type { ArrowStyle, DocumentData, ElementInstance, FontStyle, LinkerInstance, LinkerJunction } from '@/types'
 import { DEFAULT_FONT_SIZE, DEFAULT_LINE_WIDTH } from '@/types'
 import { evaluateExpression } from '@/core/utils/expression'
 import { snapLinkerLine } from './alignment'
@@ -707,6 +707,42 @@ export const LINKER_DEFAULTS = {
   lineStyle: 'solid' as const,
   beginArrowStyle: 'none' as const,
   endArrowStyle: 'solidArrow' as const,
+}
+
+export interface LinkerStylePreset {
+  value: string
+  label: string
+  patch: { lineStyle: 'solid' | 'dashed' | 'dot' | 'dotdash'; beginArrowStyle: ArrowStyle; endArrowStyle: ArrowStyle }
+}
+
+/** UML 关系预设：一键写入线型与起止箭头（绘制层枚举已全量支持） */
+export const UML_RELATION_PRESETS: LinkerStylePreset[] = [
+  { value: 'association', label: '关联', patch: { lineStyle: 'solid', beginArrowStyle: 'none', endArrowStyle: 'solidArrow' } },
+  { value: 'directed', label: '定向关联', patch: { lineStyle: 'solid', beginArrowStyle: 'none', endArrowStyle: 'normal' } },
+  { value: 'dependency', label: '依赖', patch: { lineStyle: 'dashed', beginArrowStyle: 'none', endArrowStyle: 'normal' } },
+  { value: 'realization', label: '实现', patch: { lineStyle: 'dashed', beginArrowStyle: 'none', endArrowStyle: 'dashedArrow' } },
+  { value: 'generalization', label: '泛化', patch: { lineStyle: 'solid', beginArrowStyle: 'none', endArrowStyle: 'dashedArrow' } },
+  { value: 'aggregation', label: '聚合', patch: { lineStyle: 'solid', beginArrowStyle: 'dashedDiamond', endArrowStyle: 'none' } },
+  { value: 'composition', label: '组合', patch: { lineStyle: 'solid', beginArrowStyle: 'solidDiamond', endArrowStyle: 'none' } },
+]
+
+/** 时序消息类型预设 */
+export const SEQ_MESSAGE_PRESETS: LinkerStylePreset[] = [
+  { value: 'sync', label: '同步消息', patch: { lineStyle: 'solid', beginArrowStyle: 'none', endArrowStyle: 'solidArrow' } },
+  { value: 'async', label: '异步消息', patch: { lineStyle: 'solid', beginArrowStyle: 'none', endArrowStyle: 'normal' } },
+  { value: 'return', label: '返回消息', patch: { lineStyle: 'dashed', beginArrowStyle: 'none', endArrowStyle: 'normal' } },
+]
+
+/** 反向匹配：连线当前样式命中的预设 value；无命中返回 ''（自定义） */
+export function matchStylePreset(presets: LinkerStylePreset[], l: LinkerInstance): string {
+  const ls = l.lineStyle
+  const lineStyle = ls.lineStyle ?? 'solid'
+  const begin = ls.beginArrowStyle ?? 'none'
+  const end = ls.endArrowStyle ?? 'none'
+  const hit = presets.find(
+    (p) => p.patch.lineStyle === lineStyle && p.patch.beginArrowStyle === begin && p.patch.endArrowStyle === end,
+  )
+  return hit ? hit.value : ''
 }
 
 export const LINKER_FONT_DEFAULTS: FontStyle = {

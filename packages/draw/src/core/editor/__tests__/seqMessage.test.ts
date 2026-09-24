@@ -5,6 +5,7 @@ import '@/core/schema/shapes'
 import { createLinkerInstance } from '../linker'
 import { routeAttachedLinkers } from '../documentOps'
 import { barEdgeX, resolveSeqDrop, selfLoopPoints, SEQ_LOOP_H, SEQ_LOOP_W } from '../seqMessage'
+import { matchStylePreset, UML_RELATION_PRESETS } from '../linker'
 import type { ElementInstance, LinkerInstance } from '@/types'
 
 function makeBars() {
@@ -113,5 +114,78 @@ describe('resolveSeqDrop 落点判定', () => {
   it('y 不在条范围内 → null', () => {
     const drop = resolveSeqDrop(elements, a.id, 500, { x: 394, y: 500 })
     expect(drop).toBeNull()
+  })
+
+  it('生命线：中轴吸附（y 需在头部以下区段）→ msg + toDir 0', () => {
+    const life = shapeRegistry.createElement('sequenceLifeLine', 400, 100)! // 70×140 → 中轴 x=435, 虚线区 130..240
+    const els2: Record<string, ElementInstance> = { [a.id]: a, [life.id]: life }
+    const drop = resolveSeqDrop(els2, a.id, 180, { x: 435 - 5, y: 180 })
+    expect(drop).toEqual({ kind: 'msg', toId: life.id, toDir: 0 })
+    // y 在头部区（100..130）→ 不命中
+    const drop2 = resolveSeqDrop(els2, a.id, 110, { x: 435, y: 110 })
+    expect(drop2).toBeNull()
+  })
+
+  it('销毁符：中轴 + 中心高度双吸附 → msg + y 吸附到 × 中心', () => {
+    const x = shapeRegistry.createElement('sequenceDeletion', 380, 260)! // 40×40 → 中轴 400, 中心高 280
+    const els2: Record<string, ElementInstance> = { [a.id]: a, [x.id]: x }
+    const drop = resolveSeqDrop(els2, a.id, 274, { x: 400, y: 274 })
+    expect(drop).toEqual({ kind: 'msg', toId: x.id, toDir: 0, y: 280 })
+  })
+})
+
+describe('时序消息路由（生命线 / 销毁符端点）', () => {
+  it('生命线端点：x = 中轴，y = seq.y；clamp 仅由激活条参与', () => {
+    const a = shapeRegistry.createElement('sequenceActivation', 100, 200)!
+    const life = shapeRegistry.createElement('sequenceLifeLine', 400, 100)!
+    const l = createLinkerInstance(
+      { id: a.id, x: barEdgeX(a.props, 1), y: 260, angle: 0 },
+      { id: life.id, x: barEdgeX(life.props, 0), y: 260, angle: 0 },
+      1,
+    )
+    l.linkerType = 'line'
+    l.seq = { y: 260, fromDir: 1, toDir: 0 }
+    const elements = { [a.id]: a, [life.id]: life, [l.id]: l }
+    // a 上移 80（200 → 120）：seq.y 260−80=180，a 范围 120..220 → 180 在内
+    const routed = routeAttachedLinkers(elements, new Map([[a.id, { x: 100, y: 120 }]]))
+    const nl = routed.get(l.id)!
+    expect(nl.seq!.y).toBe(180)
+    expect(nl.from.y).toBe(180)
+    expect(nl.to.x).toBe(435) // 生命线中轴
+    expect(nl.to.y).toBe(180)
+  })
+
+  it('销毁符端点：x = 中轴；激活条移动时端点 y 跟随 seq.y', () => {
+    const a = shapeRegistry.createElement('sequenceActivation', 100, 200)!
+    const x = shapeRegistry.createElement('sequenceDeletion', 380, 260)!
+    const l = createLinkerInstance(
+      { id: a.id, x: barEdgeX(a.props, 1), y: 280, angle: 0 },
+      { id: x.id, x: barEdgeX(x.props, 0), y: 280, angle: 0 },
+      1,
+    )
+    l.linkerType = 'line'
+    l.seq = { y: 280, fromDir: 1, toDir: 0 }
+    const elements = { [a.id]: a, [x.id]: x, [l.id]: l }
+    const routed = routeAttachedLinkers(elements, new Map([[a.id, { x: 100, y: 230 }]]))
+    const nl = routed.get(l.id)!
+    expect(nl.seq!.y).toBe(310)
+    expect(nl.to.x).toBe(400)
+    expect(nl.to.y).toBe(310)
+  })
+})
+
+describe('UML 预设', () => {
+  it('matchStylePreset：聚合 → 起始空心菱形 + 实线 + 无止箭头', () => {
+    const a = shapeRegistry.createElement('sequenceActivation', 0, 0)!
+    const l = createLinkerInstance(
+      { id: a.id, x: 0, y: 0, angle: 0 },
+      { id: a.id, x: 10, y: 0, angle: 0 },
+      1,
+    )
+    l.lineStyle.beginArrowStyle = 'dashedDiamond'
+    l.lineStyle.endArrowStyle = 'none'
+    expect(matchStylePreset(UML_RELATION_PRESETS, l)).toBe('aggregation')
+    l.lineStyle.lineStyle = 'dashed'
+    expect(matchStylePreset(UML_RELATION_PRESETS, l)).toBe('')
   })
 })

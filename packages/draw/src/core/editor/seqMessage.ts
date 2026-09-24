@@ -3,12 +3,12 @@
 // - 自消息（from.id === to.id）：侧边拉出 → 外 → 下 → 折回同一条侧边的矩形回环，
 //   points 固定 + manualRoute，激活条移动时整体平移
 // - 垂直移动任一激活条：seq.y 跟随被移动的条，clamp 到两端条的 y 范围交集（另一端沿条缘滑动）
-import type { ElementInstance, LinkerInstance, SeqMessageData } from '@/types'
+import { isLinker, type ElementInstance, type LinkerInstance, type SeqMessageData } from '@/types'
 
 /** 激活条缘拖出消息的草稿状态（Canvas 渲染预览、mouseup 提交/取消） */
 export interface SeqMessageDraft {
   fromId: string
-  dir: 1 | -1
+  dir: 1 | -1 | 0
   /** 消息高度（世界坐标，随源条 clamp） */
   y: number
   cur: { x: number; y: number }
@@ -35,9 +35,27 @@ export function isSeqSelfMessage(l: LinkerInstance): boolean {
   return l.seq != null && l.from.id != null && l.from.id === l.to.id
 }
 
-/** 激活条 dir 侧缘的世界 x（1 = 右缘 / -1 = 左缘） */
-export function barEdgeX(rect: BarRect, dir: 1 | -1): number {
+/** 端点 x：1 = 条右缘 / -1 = 左缘 / 0 = 生命线等中轴 */
+export function barEdgeX(rect: BarRect, dir: 1 | -1 | 0): number {
+  if (dir === 0) return rect.x + rect.w / 2
   return dir === 1 ? rect.x + rect.w : rect.x
+}
+
+/** 图形在时序消息中的端点类型 */
+export type SeqEndpointKind = 'activation' | 'lifeline' | 'destroy' | 'other'
+
+export function seqEndpointKind(el: ElementInstance | undefined): SeqEndpointKind {
+  if (!el) return 'other'
+  if (el.name === 'sequenceActivation') return 'activation'
+  if (el.name === 'sequenceLifeLine') return 'lifeline'
+  if (el.name === 'sequenceDeletion') return 'destroy'
+  return 'other'
+}
+
+/** 源端 y 范围：激活条取整个条；生命线取虚线区段（头部以下） */
+export function seqSourceYRange(el: ElementInstance): [number, number] {
+  if (el.name === 'sequenceLifeLine') return [el.props.y + 30, el.props.y + el.props.h]
+  return [el.props.y, el.props.y + el.props.h]
 }
 
 /**
@@ -68,6 +86,7 @@ export function routeSeqMessage(
   l: LinkerInstance,
   oldRectOf: (id: string) => BarRect | null,
   liveOf: (id: string) => BarRect | null,
+  kindOf: (id: string) => SeqEndpointKind = () => 'activation',
 ): LinkerInstance | null {
   if (!l.seq) return null
   const fromId = l.from.id
@@ -76,6 +95,7 @@ export function routeSeqMessage(
 
   // 自消息：按条位移整体平移（端点用比例映射结果推导位移，回环同步平移）
   if (fromId === toId) {
+    // 自回环必有条缘方向（生命线不支持自回环，resolveSeqDrop 已拦截）
     const oldRect = oldRectOf(fromId)
     const live = liveOf(fromId)
     if (!oldRect || !live) return null
@@ -107,12 +127,20 @@ export function routeSeqMessage(
   const eps = seqMessageEndpoints({ ...l, seq }, (id) => liveOf(id) ?? oldRectOf(id))
   if (!eps) return null
 
-  // clamp 到两端条（新位置）y 范围交集；交集为空（条已错开）则保持 y
-  const ra = liveOf(fromId) ?? oldRectOf(fromId)
-  const rb = liveOf(toId) ?? oldRectOf(toId)
-  if (ra && rb) {
-    const lo = Math.max(ra.y, rb.y)
-    const hi = Math.min(ra.y + ra.h, rb.y + rb.h)
+  // clamp：仅激活条端参与（生命线/销毁符端跟随 seq.y）；交集为空（条已错开）则保持 y
+  const ranges: Array<{ top: number; bottom: number }> = []
+  for (const [id, dir] of [
+    [fromId, seq.fromDir],
+    [toId, seq.toDir],
+  ] as const) {
+    if (dir !== 0 && kindOf(id) === 'activation') {
+      const r = liveOf(id) ?? oldRectOf(id)
+      if (r) ranges.push({ top: r.y, bottom: r.y + r.h })
+    }
+  }
+  if (ranges.length > 0) {
+    const lo = Math.max(...ranges.map((r) => r.top))
+    const hi = Math.min(...ranges.map((r) => r.bottom))
     if (lo <= hi) seq.y = Math.min(hi, Math.max(lo, seq.y))
     const eps2 = seqMessageEndpoints({ ...l, seq }, (id) => liveOf(id) ?? oldRectOf(id))
     if (eps2) return { ...l, seq, ...eps2, points: [] }
@@ -121,7 +149,7 @@ export function routeSeqMessage(
 }
 
 export type SeqDropResult =
-  | { kind: 'msg'; toId: string; toDir: 1 | -1 }
+  | { kind: 'msg'; toId: string; toDir: 1 | -1 | 0; y?: number }
   | { kind: 'self' }
   | null
 
@@ -139,32 +167,78 @@ export function resolveSeqDrop(
 ): SeqDropResult {
   const src = elements[fromId]
   if (!src) return null
-  let best: { id: string; dir: 1 | -1; dist: number } | null = null
+  const srcKind = seqEndpointKind(src)
+  let best: { id: string; dir: 1 | -1 | 0; dist: number; snapY?: number } | null = null
   for (const el of Object.values(elements)) {
-    if (el.name !== 'sequenceActivation' || el.locked) continue
+    if (el.locked) continue
+    const kind = seqEndpointKind(el)
     const { x, y: top, w, h } = el.props
-    if (y < top - 4 || y > top + h + 4) continue
-    const dir: 1 | -1 = cur.x >= x + w / 2 ? 1 : -1
-    const ex = dir === 1 ? x + w : x
-    const dist = Math.abs(cur.x - ex)
-    if (dist > SEQ_EDGE_SNAP) continue
-    if (!best || dist < best.dist) best = { id: el.id, dir, dist }
+    // 激活条：条缘吸附，y 需在条范围内
+    if (kind === 'activation') {
+      if (y < top - 4 || y > top + h + 4) continue
+      const dir: 1 | -1 = cur.x >= x + w / 2 ? 1 : -1
+      const ex = dir === 1 ? x + w : x
+      const dist = Math.abs(cur.x - ex)
+      if (dist > SEQ_EDGE_SNAP) continue
+      if (!best || dist < best.dist) best = { id: el.id, dir, dist }
+      continue
+    }
+    // 生命线：中轴吸附，y 需在虚线区段（头部以下）
+    if (kind === 'lifeline') {
+      if (y < top + 30 - 4 || y > top + h + 4) continue
+      const ex = x + w / 2
+      const dist = Math.abs(cur.x - ex)
+      if (dist > SEQ_EDGE_SNAP) continue
+      if (!best || dist < best.dist) best = { id: el.id, dir: 0, dist }
+      continue
+    }
+    // 销毁符：中轴 + 中心高度双吸附（消息 y 自动对齐 × 中心）
+    if (kind === 'destroy') {
+      const cx = x + w / 2
+      const cy = top + h / 2
+      if (Math.abs(cur.x - cx) > 16 || Math.abs(y - cy) > 14) continue
+      const dist = Math.abs(cur.x - cx)
+      if (!best || dist < best.dist) best = { id: el.id, dir: 0, dist, snapY: cy }
+      continue
+    }
   }
   if (best) {
-    return best.id === fromId ? { kind: 'self' } : { kind: 'msg', toId: best.id, toDir: best.dir }
+    if (best.id === fromId) {
+      // 生命线不支持自回环（两端同 x 退化为点）
+      if (srcKind === 'lifeline') return null
+      return { kind: 'self' }
+    }
+    return { kind: 'msg', toId: best.id, toDir: best.dir, ...(best.snapY != null ? { y: best.snapY } : {}) }
   }
-  // 自消息兜底：光标仍在源条扩展范围内
-  const { x, y: top, w, h } = src.props
-  if (cur.x > x - 28 && cur.x < x + w + 28 && y > top - 8 && y < top + h + 28) {
-    return { kind: 'self' }
+  // 自消息兜底：仅激活条源；光标仍在源条扩展范围内
+  if (srcKind === 'activation') {
+    const { x, y: top, w, h } = src.props
+    if (cur.x > x - 28 && cur.x < x + w + 28 && y > top - 8 && y < top + h + 28) {
+      return { kind: 'self' }
+    }
   }
   return null
+}
+
+/** 拖拽移动：更新 cur/y（y clamp 到源端范围；销毁符目标时吸附其中心高度） */
+export function moveSeqDraft(
+  elements: Record<string, ElementInstance>,
+  draft: SeqMessageDraft,
+  cur: { x: number; y: number },
+): SeqMessageDraft {
+  const src = elements[draft.fromId]
+  if (!src || isLinker(src)) return { ...draft, cur }
+  const [lo, hi] = seqSourceYRange(src)
+  let y = Math.min(Math.max(cur.y, lo), hi)
+  const drop = resolveSeqDrop(elements as Record<string, ElementInstance>, draft.fromId, y, cur)
+  if (drop?.kind === 'msg' && drop.y != null) y = drop.y
+  return { ...draft, y, cur }
 }
 
 /** 自消息回环中间折点（from/to 端点在条缘上，由调用方生成） */
 export function selfLoopPoints(
   rect: BarRect,
-  dir: 1 | -1,
+  dir: 1 | -1 | 0,
   y: number,
   loopW = SEQ_LOOP_W,
   loopH = SEQ_LOOP_H,

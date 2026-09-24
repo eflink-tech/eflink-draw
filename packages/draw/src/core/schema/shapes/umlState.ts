@@ -28,7 +28,15 @@ const umlState: ShapeDefinition = {
   name: 'umlState',
   title: '状态',
   category: 'uml_stateactivity',
-  props: { w: 96, h: 54 },
+  props: { w: 120, h: 90 },
+  textBlock: [
+    { position: { x: 10, y: 0, w: 'w-20', h: 30 }, text: '状态' },
+    {
+      position: { x: 10, y: 30, w: 'w-20', h: 'h-30' },
+      text: 'entry / action\nexit / action',
+      fontStyle: { textAlign: 'left', size: 12, bold: false },
+    },
+  ],
   drawIcon: (a, b) => [[
     { action: 'move', x: 0, y: 6 },
     { action: 'quadraticCurve', x1: 0, y1: 0, x: 6, y: 0 },
@@ -52,6 +60,10 @@ const umlState: ShapeDefinition = {
     { action: 'quadraticCurve', x1: 0, y1: 'h', x: 0, y: 'h-18' },
     { action: 'line', x: 0, y: 18 },
     { action: 'close' },
+  ], [
+    // 名称 / 内部分区分隔线
+    { action: 'move', x: 0, y: 30 },
+    { action: 'line', x: 'w', y: 30 },
   ]],
 }
 
@@ -255,10 +267,16 @@ const synchronization: ShapeDefinition = {
   category: 'uml_stateactivity',
   props: { w: 120, h: 20 },
   resizeDir: ['l', 'r'],
+  attribute: { linkable: true, container: false, rotatable: false },
   fillStyle: { type: 'solid', color: '50,50,50' },
   lineStyle: { lineWidth: 0 },
   textBlock: [],
-  anchors: [],
+  anchors: [
+    { x: 'w/2', y: 0 },
+    { x: 'w/2', y: 'h' },
+    { x: 0, y: 'h/2' },
+    { x: 'w', y: 'h/2' },
+  ],
   drawIcon: (a, b) => {
     const bh = b + 2
     return [[
