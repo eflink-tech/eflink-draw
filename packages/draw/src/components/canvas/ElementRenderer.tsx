@@ -45,6 +45,7 @@ import {
   worldToScreen,
 } from '@/core/editor/interaction'
 import { LINKER_DEFAULTS } from '@/core/editor/linker'
+import { SEQ_LOOP_H, SEQ_LOOP_W, barEdgeX, resolveSeqDrop, selfLoopPoints } from '@/core/editor/seqMessage'
 import { hitTextBlock, evalTextBlockRect } from '@/core/editor/textEdit'
 import { fontFamilyCSS } from '@/core/editor/fontMap'
 import { layoutVerticalText } from '@/core/editor/verticalText'
@@ -576,6 +577,77 @@ export const ElementRenderer = memo(function ElementRenderer({ element, textEngi
     [element.id, props, textEngine],
   )
 
+  // ===== UML 激活条：左右缘拖出时序消息 =====
+  const isActivation = element.name === 'sequenceActivation'
+  const handleSeqEdgeDown = useCallback(
+    (dir: 1 | -1) => (e: Konva.KonvaEventObject<MouseEvent>) => {
+      e.cancelBubble = true
+      e.evt.preventDefault()
+      const stage = e.target.getStage()
+      stage?.stopDrag() // 阻止激活条本体进入拖拽
+      const st = useEditorStore.getState()
+      if (st.currentTool !== 'select' || element.locked) return
+      const pw = pointerWorld(stage)
+      if (!pw) return
+      const y0 = Math.min(Math.max(pw.y, element.props.y), element.props.y + element.props.h)
+      st.setSeqDraft({ fromId: element.id, dir, y: y0, cur: { x: pw.x, y: y0 } })
+
+      const onMove = () => {
+        const s2 = useEditorStore.getState()
+        if (!s2.seqDraft) return
+        const cur = pointerWorld(stage)
+        if (!cur) return
+        s2.setSeqDraft({ ...s2.seqDraft, cur: { x: cur.x, y: cur.y } })
+      }
+      const onUp = () => {
+        stage?.off('mousemove.seqdraft')
+        window.removeEventListener('mouseup', onUp)
+        const s2 = useEditorStore.getState()
+        const draft = s2.seqDraft
+        s2.setSeqDraft(null)
+        if (!draft) return
+        const els = s2.document.elements
+        // resolveSeqDrop 只读 name/props（按图形表处理，linker 会被名称过滤跳过）
+        const drop = resolveSeqDrop(els as Record<string, ElementInstance>, draft.fromId, draft.y, draft.cur)
+        if (!drop) return // 落空取消
+        const src = els[draft.fromId]
+        if (!src || isLinker(src)) return
+        const fromEdge = barEdgeX(src.props, draft.dir)
+        const zmax =
+          Math.max(0, ...Object.values(els).map((o) => (!isLinker(o) ? o.props.zindex : 0))) + 1
+        if (drop.kind === 'self') {
+          const inst = createLinkerInstance(
+            { id: src.id, x: fromEdge, y: draft.y, angle: draft.dir === 1 ? 0 : Math.PI },
+            { id: src.id, x: fromEdge, y: draft.y + SEQ_LOOP_H, angle: draft.dir === 1 ? Math.PI : 0 },
+            zmax,
+          )
+          inst.linkerType = 'broken'
+          inst.seq = { y: draft.y, fromDir: draft.dir, toDir: draft.dir, loopW: SEQ_LOOP_W, loopH: SEQ_LOOP_H }
+          inst.points = selfLoopPoints(src.props, draft.dir, draft.y, SEQ_LOOP_W, SEQ_LOOP_H)
+          inst.manualRoute = true
+          s2.addLinker(inst)
+          s2.selectElement(inst.id, false)
+        } else {
+          const dst = els[drop.toId]
+          if (!dst || isLinker(dst)) return
+          const toEdge = barEdgeX(dst.props, drop.toDir)
+          const inst = createLinkerInstance(
+            { id: src.id, x: fromEdge, y: draft.y, angle: draft.dir === 1 ? 0 : Math.PI },
+            { id: dst.id, x: toEdge, y: draft.y, angle: drop.toDir === 1 ? 0 : Math.PI },
+            zmax,
+          )
+          inst.linkerType = 'line'
+          inst.seq = { y: draft.y, fromDir: draft.dir, toDir: drop.toDir }
+          s2.addLinker(inst)
+          s2.selectElement(inst.id, false)
+        }
+      }
+      stage?.on('mousemove.seqdraft', onMove)
+      window.addEventListener('mouseup', onUp, { once: true })
+    },
+    [element.id, element.locked, element.props.x, element.props.y, element.props.h],
+  )
+
   // ===== 泳道分界线拖拽调整宽度 =====
   const swimlaneEl = isSwimlane(element) ? element : null
   const swimlaneLayout = swimlaneEl ? swimlaneLayoutOf(swimlaneEl) : null
@@ -1064,6 +1136,28 @@ export const ElementRenderer = memo(function ElementRenderer({ element, textEngi
           />
         )
       })()}
+
+      {/* UML 激活条左右缘热区：按下拖出时序消息 */}
+      {isActivation && currentTool === 'select' && !element.locked &&
+        ([-1, 1] as const).map((dir) => (
+          <Rect
+            key={`seq-edge-${dir}`}
+            x={dir === 1 ? props.w - 5 : -5}
+            y={-2}
+            width={10}
+            height={props.h + 4}
+            fill="transparent"
+            onMouseDown={handleSeqEdgeDown(dir)}
+            onMouseEnter={(e) => {
+              const c = e.target.getStage()?.container()
+              if (c) c.style.cursor = 'crosshair'
+            }}
+            onMouseLeave={(e) => {
+              const c = e.target.getStage()?.container()
+              if (c) c.style.cursor = 'default'
+            }}
+          />
+        ))}
 
       {/* 选中控件：包围盒 + 四角缩放手柄 + 右上角弧形旋转图标 */}
       {selected && (

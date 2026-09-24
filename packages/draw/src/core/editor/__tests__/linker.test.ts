@@ -475,6 +475,29 @@ describe('snapLinkerEndpoint', () => {
     expect(r.endpoint).toEqual({ id: null, x: 100, y: 100, angle: null })
   })
 
+  it('自由点对齐容差随缩放换算（屏幕 6px 恒定，放大不猛拽、缩小不失效）', () => {
+    // 另一端 x=200，端点世界 x 偏移 6.5px：
+    // scale=1 → 屏幕 6.5px > 6px → 不对齐（原行为保持）
+    // scale=4 → 6.5 世界px = 26 屏幕px，远超 6px 容差 → 必须不对齐
+    //           （修复前按世界px比较会被强制拉直，端点在放大时"被弹走"）
+    const at = (scale: number, worldOff: number) =>
+      snapLinkerEndpoint({
+        shapes: [],
+        hitShapeId: null,
+        worldX: 200 + worldOff,
+        worldY: 500,
+        scale,
+        otherEnd: { id: null, x: 200, y: 100 },
+      }).endpoint.x
+
+    expect(at(1, 6.5)).toBe(206.5)
+    expect(at(4, 6.5)).toBe(206.5)
+    // 屏幕距离 6px 以内仍应对齐：scale=4 时 6 屏幕px = 1.5 世界px
+    expect(at(4, 1.5)).toBe(200)
+    // scale=0.25 时 6 屏幕px = 24 世界px，修复前 24 世界px 永不触发
+    expect(at(0.25, 20)).toBe(200)
+  })
+
   it('空白处自由端靠近图形边（远离锚点 >20px）时吸附边（2px）', () => {
     const el = shape(100, 200, 100, 60)
     const r = snapLinkerEndpoint({

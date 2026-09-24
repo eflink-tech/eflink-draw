@@ -30,6 +30,7 @@ import { TextEditorOverlay } from './TextEditorOverlay'
 import { TextDisplayOverlay } from './TextDisplayOverlay'
 import { SwimlaneToolbar } from './SwimlaneToolbar'
 import { CodeBlockToolbar } from './CodeBlockToolbar'
+import { SeqMessageDraft } from './SeqMessageDraft'
 import { MarqueeSelection } from './MarqueeSelection'
 import { useEditorShortcuts } from './useEditorShortcuts'
 
@@ -598,12 +599,13 @@ export function Canvas() {
           <GridLayer page={doc.page} scale={viewport.scale} />
         </Layer>
 
-        {/* Layer 2: 连线（图形下方）+ 选中图形的流动光标 */}
+        {/* Layer 2: 连线（图形下方）+ 选中图形的流动光标 + 时序消息草稿 */}
         <Layer>
           {visibleLinkers.map((l) => (
             <LinkerRenderer key={l.id} linker={l} />
           ))}
           <LinkerCursorView />
+          <SeqMessageDraft />
         </Layer>
 
         {/* Layer 3: 图形元素 */}

@@ -8,6 +8,7 @@ import { isLinker } from '@/types'
 import { getLinkerPoints, type ShapeRect } from './linker'
 import { stretchManualPoints } from './manualRoute'
 import { resolveJunctionLinkers } from './linkerJunction'
+import { routeSeqMessage } from './seqMessage'
 
 /** 图形实时状态（resize 直操期间携带 live w/h；移动直操只有位置） */
 export interface LiveShapeState {
@@ -88,6 +89,28 @@ export function routeAttachedLinkers(
     const fromMoved = l.from.id != null && livePos.has(l.from.id)
     const toMoved = l.to.id != null && livePos.has(l.to.id)
     if (!fromMoved && !toMoved) continue
+
+    // 时序消息：水平保持（seq.y 跟随被移动的条，端点落到各自条缘）；自消息整体平移回环
+    if (l.seq) {
+      const liveOf = (id: string): ShapeRect | null => {
+        // 仅返回「发生移动/缩放」的条；未移动返回 null（区分位移来源）
+        const lp = livePos.get(id)
+        if (!lp) return null
+        const base = elements[id]
+        if (!base || isLinker(base)) return null
+        return { x: lp.x, y: lp.y, w: lp.w ?? base.props.w, h: lp.h ?? base.props.h }
+      }
+      const oldOf = (id: string): ShapeRect | null => {
+        const base = elements[id]
+        if (!base || isLinker(base)) return null
+        return { x: base.props.x, y: base.props.y, w: base.props.w, h: base.props.h }
+      }
+      const routed = routeSeqMessage(l, oldOf, liveOf)
+      if (routed) {
+        out.set(l.id, routed)
+        continue
+      }
+    }
 
     let from = l.from
     let to = l.to

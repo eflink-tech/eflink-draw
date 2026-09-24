@@ -795,6 +795,7 @@ export function findSnapAnchor(
 
 const ANCHOR_HIT_PX = 7
 const ANCHOR_PROX_PX = 20
+/** 自由端与另一端对齐拉直的容差（屏幕像素，须 /scale 换算，与其余阈值同口径） */
 const ENDPOINT_ALIGN_PX = 6
 
 export interface EndpointSnapInput {
@@ -830,7 +831,7 @@ export interface EndpointSnapResult {
  *    （从外侧接近目标左/右侧时提前附着，箭头按锚点法向驶入而非保持朝下）
  * 5. 传入 linkers 且光标 10px 内落在其他连线的渲染路径上 → junction 附着
  *    （端点 id 为 null、带 junction { linkerId, t }；跳过锁定/自身/成环宿主）
- * 6. 空白 → 自由点：图形边吸附（2px）后，±6px 与另一端对齐拉直
+ * 6. 空白 → 自由点：图形边吸附（2px）后，±6px（屏幕像素）与另一端对齐拉直
  */
 export function snapLinkerEndpoint(input: EndpointSnapInput): EndpointSnapResult {
   const { shapes, hitShapeId, worldX, worldY, scale, otherEnd } = input
@@ -940,7 +941,8 @@ export function snapLinkerEndpoint(input: EndpointSnapInput): EndpointSnapResult
   const edge = snapLinkerLine(worldX, worldY, shapes)
   if (edge.v != null) x = edge.v
   if (edge.h != null) y = edge.h
-  if (Math.abs(x - otherEnd.x) <= ENDPOINT_ALIGN_PX) x = otherEnd.x
-  if (Math.abs(y - otherEnd.y) <= ENDPOINT_ALIGN_PX) y = otherEnd.y
+  const alignTol = ENDPOINT_ALIGN_PX / scale
+  if (Math.abs(x - otherEnd.x) <= alignTol) x = otherEnd.x
+  if (Math.abs(y - otherEnd.y) <= alignTol) y = otherEnd.y
   return { endpoint: { id: null, x, y, angle: null }, snapAnchor: null }
 }

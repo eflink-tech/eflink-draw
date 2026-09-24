@@ -8,6 +8,7 @@ import { useEditorStore } from '@/store/editorStore'
 import { pointerWorld } from '@/core/editor/interaction'
 import { applyLiveLinker } from '@/core/editor/liveLinker'
 import { isSegmentDraggable, startSegmentDrag } from '@/core/editor/linkerSegment'
+import { SEQ_LOOP_H, barEdgeX, isSeqSelfMessage, type BarRect } from '@/core/editor/seqMessage'
 
 const CONTROL_COLOR = '#833'
 const CONTROL_ACTIVE = '#db5e5e'
@@ -31,7 +32,11 @@ export function LinkerControls() {
 
   if (!linker) return null
   if (linker.linkerType === 'curve') return <CurveControls linker={linker} />
-  if (linker.linkerType === 'broken') return <SegmentHandles linker={linker} />
+  if (linker.linkerType === 'broken') {
+    // 时序自消息：回环顶点专属控制（拖角改回环宽/高/位置）
+    if (isSeqSelfMessage(linker)) return <SelfLoopControls linker={linker} />
+    return <SegmentHandles linker={linker} />
+  }
   // line：仅端点圆点（LinkerEndpoints 已渲染）
   return null
 }
@@ -192,6 +197,121 @@ function SegmentHandles({ linker }: { linker: LinkerInstance }) {
           }}
         />
       ))}
+    </>
+  )
+}
+
+const LOOP_MIN = 12
+const LOOP_MAX = 400
+
+/** clamp 回环参数到条范围/最小尺寸 */
+function clampLoop(
+  bar: BarRect,
+  seqY: number,
+  loopW: number,
+  loopH: number,
+): { y: number; loopW: number; loopH: number } {
+  const w = Math.min(LOOP_MAX, Math.max(LOOP_MIN, loopW))
+  const y = Math.min(Math.max(bar.y, seqY), bar.y + bar.h - LOOP_MIN)
+  const hMax = bar.y + bar.h - y
+  const h = Math.min(Math.max(LOOP_MIN, loopH), hMax)
+  return { y, loopW: w, loopH: h }
+}
+
+/** 自消息回环顶点控制：两个角点可拖——水平改回环宽、垂直分别改回环顶/高 */
+function SelfLoopControls({ linker }: { linker: LinkerInstance }) {
+  const scale = useEditorStore((s) => s.viewport.scale)
+  const elements = useEditorStore((s) => s.document.elements)
+  const seq = linker.seq!
+  const barEl = linker.from.id != null ? elements[linker.from.id] : null
+  if (!barEl || isLinker(barEl)) return null
+  const bar = barEl.props
+  const dir = seq.fromDir
+  const edgeX = barEdgeX(bar, dir)
+
+  const live = useRef<LinkerInstance | null>(null)
+
+  const geomOf = (pw: { x: number; y: number }, which: 0 | 1): LinkerInstance => {
+    const cur = live.current ?? linker
+    const curSeq = cur.seq!
+    const loopW = Math.min(LOOP_MAX, Math.max(LOOP_MIN, (pw.x - edgeX) * dir))
+    let y = curSeq.y
+    let loopH = curSeq.loopH ?? SEQ_LOOP_H
+    if (which === 0) y = pw.y
+    else loopH = pw.y - curSeq.y
+    const clamped = clampLoop(bar, y, loopW, loopH)
+    const px = edgeX + dir * clamped.loopW
+    const next: LinkerInstance = {
+      ...cur,
+      seq: { ...curSeq, y: clamped.y, loopW: clamped.loopW, loopH: clamped.loopH },
+      from: { ...cur.from, x: edgeX, y: clamped.y },
+      to: { ...cur.to, x: edgeX, y: clamped.y + clamped.loopH },
+      points: [
+        { x: px, y: clamped.y },
+        { x: px, y: clamped.y + clamped.loopH },
+      ],
+    }
+    live.current = next
+    return next
+  }
+
+  const dragMove = (which: 0 | 1, e: Konva.KonvaEventObject<DragEvent>): void => {
+    e.cancelBubble = true
+    const stage = e.target.getStage()
+    const pw = pointerWorld(stage)
+    if (!pw) return
+    const next = geomOf(pw, which)
+    // 拖动的角点吸附到指针（另一角保持矩形）
+    e.target.position(next.points[which]!)
+    applyLiveLinker(linker.id, next)
+    e.target.getLayer()?.batchDraw()
+  }
+
+  const dragEnd = (e: Konva.KonvaEventObject<DragEvent>): void => {
+    e.cancelBubble = true
+    const next = live.current
+    live.current = null
+    applyLiveLinker(linker.id, null)
+    e.target.getLayer()?.batchDraw()
+    if (next) {
+      const { seq: seqNext, from, to, points } = next
+      useEditorStore.getState().updateLinker(linker.id, { seq: seqNext, from, to, points })
+    }
+  }
+
+  return (
+    <>
+      {([0, 1] as const).map((idx) => {
+        const p = linker.points[idx]!
+        return (
+          <Circle
+            key={idx}
+            x={p.x}
+            y={p.y}
+            radius={5 / scale}
+            fill="#fff"
+            stroke={CONTROL_COLOR}
+            strokeWidth={1 / scale}
+            hitStrokeWidth={20 / scale}
+            draggable
+            onMouseEnter={(e) => {
+              e.cancelBubble = true
+              paintStroke(e, CONTROL_ACTIVE)
+            }}
+            onMouseLeave={(e) => {
+              e.cancelBubble = true
+              paintStroke(e, CONTROL_COLOR)
+            }}
+            onDragStart={(e) => {
+              e.cancelBubble = true
+              live.current = null
+              paintStroke(e, CONTROL_ACTIVE)
+            }}
+            onDragMove={(e) => dragMove(idx, e)}
+            onDragEnd={dragEnd}
+          />
+        )
+      })}
     </>
   )
 }

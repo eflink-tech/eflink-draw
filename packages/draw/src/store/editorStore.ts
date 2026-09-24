@@ -16,6 +16,7 @@ import { saveDocumentToStorage, mirrorToRemote } from '@/core/editor/persistence
 import { HistoryManager, applyCommand, reverseCommand, getPageFromCommand } from '@/core/editor/history'
 import { alignShapes, applyShapeTransform, distributeShapes, matchSize } from '@/core/editor/alignmentOps'
 import type { ActiveSwimlaneTarget } from '@/core/editor/swimlane'
+import type { SeqMessageDraft } from '@/core/editor/seqMessage'
 
 /** 剪贴板数据（复制时深拷贝的选中元素，含端点引用映射） */
 export interface ClipboardData {
@@ -71,6 +72,8 @@ interface EditorState {
   activeTarget: ActiveSwimlaneTarget | null
   /** 面板拖拽创建中的图形预览（creating_from_panel；位置由 panelDrag 直操） */
   creatingShape: ElementInstance | null
+  /** UML 时序消息拖拽草稿（从激活条缘拉出；Canvas 渲染预览、mouseup 提交/取消） */
+  seqDraft: SeqMessageDraft | null
   /** 剪贴板（复制时存入，粘贴时读取） */
   clipboard: ClipboardData | null
   /** 当前工具 */
@@ -119,6 +122,7 @@ interface EditorState {
   setTextEdit: (v: { id: string; block: number; fresh?: boolean } | null) => void
   updatePage: (patch: Partial<PageConfig>) => void
   setCreatingShape: (el: ElementInstance | null) => void
+  setSeqDraft: (d: SeqMessageDraft | null) => void
   updateViewport: (viewport: Partial<Viewport>) => void
   getVisibleElements: () => (ElementInstance | LinkerInstance)[]
 
@@ -164,6 +168,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   textEdit: null,
   activeTarget: null,
   creatingShape: null,
+  seqDraft: null,
   clipboard: null,
   currentTool: 'select',
   isDirty: false,
@@ -715,6 +720,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     }),
 
   setCreatingShape: (el) => set((s) => (s.creatingShape === el ? s : { creatingShape: el })),
+
+  setSeqDraft: (d) => set((s) => (s.seqDraft === d ? s : { seqDraft: d })),
 
   updateViewport: (vp) =>
     set((state) => ({

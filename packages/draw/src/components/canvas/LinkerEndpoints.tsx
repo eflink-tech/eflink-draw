@@ -22,6 +22,7 @@ import {
   registerEndpointPreview,
   showEndpointPreview,
 } from '@/core/editor/uiOverlay'
+import { isSeqMessage } from '@/core/editor/seqMessage'
 import { allShapes, hitElementId, makeStoreRectGetter, pointerWorld } from '@/core/editor/interaction'
 
 const ENDPOINT_HIT_PX = 10
@@ -35,6 +36,8 @@ export function LinkerEndpoints() {
     () =>
       Object.values(elements)
         .filter(isLinker)
+        // 时序消息端点绑定激活条缘（seq.y），不提供通用端点拖拽（拖拽会破坏水平约束/回环几何）
+        .filter((l) => !isSeqMessage(l))
         .sort((a, b) => a.props.zindex - b.props.zindex) as LinkerInstance[],
     [elements],
   )

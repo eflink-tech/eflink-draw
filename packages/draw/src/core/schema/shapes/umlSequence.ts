@@ -168,6 +168,7 @@ const sequenceActivation: ShapeDefinition = {
   category: 'uml_sequence',
   props: { w: 30, h: 100 },
   resizeDir: ['t', 'b'],
+  attribute: { linkable: true, container: false, rotatable: false },
   anchors: [],
   textBlock: [],
   drawIcon: (b, c) => {
