@@ -12,9 +12,9 @@ const actor: ShapeDefinition = {
   name: 'actor',
   title: '角色',
   category: 'uml_usecase',
-  props: { w: 70, h: 100 },
+  props: { w: 40, h: 50 },
   attribute: { container: true },
-  textBlock: [{ position: { x: -20, y: 'h', w: 'w+40', h: 30 }, text: '' }],
+  textBlock: [{ position: { x: -20, y: 'h', w: 'w+40', h: 30 }, text: 'Actor' }],
   path: [[
     // 头部（圆）
     { action: 'move', x: 'w*(4/12)', y: 'h*(1/8)' },
@@ -89,9 +89,92 @@ const rectangleContainer: ShapeDefinition = {
 // 导出列表
 // ═══════════════════════════════════════════
 
+
+/** 抽象用例（椭圆 + 中线，名称斜体） */
+const abstractUseCase: ShapeDefinition = {
+  name: 'abstractUseCase',
+  title: '抽象用例',
+  category: 'uml_usecase',
+  props: { w: 96, h: 54 },
+  fontStyle: { italic: true },
+  textBlock: [{ position: { x: 10, y: 4, w: 'w-20', h: 'h/2' }, text: '抽象用例' }],
+  path: [
+    [
+      { action: 'move', x: 0, y: 'h/2' },
+      { action: 'curve', x1: 0, y1: '-h/6', x2: 'w', y2: '-h/6', x: 'w', y: 'h/2' },
+      { action: 'curve', x1: 'w', y1: 'h+h/6', x2: 0, y2: 'h+h/6', x: 0, y: 'h/2' },
+      { action: 'close' },
+    ],
+    [{ action: 'move', x: 'w*0.12', y: 'h/2' }, { action: 'line', x: 'w*0.88', y: 'h/2' }],
+  ],
+}
+
+/** 主体 Subject（系统边界：标题栏 + 小人图标，可包含用例） */
+const subject: ShapeDefinition = {
+  name: 'subject',
+  title: '主体',
+  category: 'uml_usecase',
+  attribute: { container: true, rotatable: false },
+  props: { w: 300, h: 240 },
+  textBlock: [
+    { position: { x: 44, y: 4, w: 'w-54', h: 30 }, text: '主体' },
+    { position: { x: 10, y: 40, w: 'w-20', h: 'h-48' }, text: '' },
+  ],
+  path: [
+    // 外框
+    [
+      { action: 'move', x: 0, y: 4 },
+      { action: 'quadraticCurve', x1: 0, y1: 0, x: 4, y: 0 },
+      { action: 'line', x: 'w-4', y: 0 },
+      { action: 'quadraticCurve', x1: 'w', y1: 0, x: 'w', y: 4 },
+      { action: 'line', x: 'w', y: 'h-4' },
+      { action: 'quadraticCurve', x1: 'w', y1: 'h', x: 'w-4', y: 'h' },
+      { action: 'line', x: 4, y: 'h' },
+      { action: 'quadraticCurve', x1: 0, y1: 'h', x: 0, y: 'h-4' },
+      { action: 'close' },
+    ],
+    // 标题分隔线（比例坐标：缩略图缩放后装饰不越界）
+    [{ action: 'move', x: 0, y: 'h*0.158' }, { action: 'line', x: 'w', y: 'h*0.158' }],
+    // 头部小人：头
+    [
+      { action: 'move', x: 'w*0.047', y: 'h*0.058' },
+      { action: 'curve', x1: 'w*0.047', y1: 'h*0.025', x2: 'w*0.087', y2: 'h*0.025', x: 'w*0.087', y: 'h*0.058' },
+      { action: 'curve', x1: 'w*0.087', y1: 'h*0.092', x2: 'w*0.047', y2: 'h*0.092', x: 'w*0.047', y: 'h*0.058' },
+    ],
+    // 身体 + 手臂 + 腿
+    [
+      { action: 'move', x: 'w*0.067', y: 'h*0.083' },
+      { action: 'line', x: 'w*0.067', y: 'h*0.125' },
+      { action: 'move', x: 'w*0.05', y: 'h*0.1' },
+      { action: 'line', x: 'w*0.083', y: 'h*0.1' },
+      { action: 'move', x: 'w*0.067', y: 'h*0.125' },
+      { action: 'line', x: 'w*0.053', y: 'h*0.146' },
+      { action: 'move', x: 'w*0.067', y: 'h*0.125' },
+      { action: 'line', x: 'w*0.08', y: 'h*0.146' },
+    ],
+  ],
+}
+
+/** 竖排用例（椭圆变体） */
+const useCaseVertical: ShapeDefinition = {
+  name: 'useCaseVertical',
+  title: '用例(竖排)',
+  category: 'uml_usecase',
+  props: { w: 54, h: 96 },
+  path: [[
+    { action: 'move', x: 0, y: 'h/2' },
+    { action: 'curve', x1: 0, y1: '-h/6', x2: 'w', y2: '-h/6', x: 'w', y: 'h/2' },
+    { action: 'curve', x1: 'w', y1: 'h+h/6', x2: 0, y2: 'h+h/6', x: 0, y: 'h/2' },
+    { action: 'close' },
+  ]],
+}
+
 export const umlUsecaseShapes: ShapeDefinition[] = [
   actor,
   useCase,
   ovalContainer,
   rectangleContainer,
+  abstractUseCase,
+  subject,
+  useCaseVertical,
 ]

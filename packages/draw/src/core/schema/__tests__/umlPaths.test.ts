@@ -18,6 +18,15 @@ const UML_SHAPES = [
   'devComponentNonInstance', 'devComponent', 'devNodeNonInstance',
   'devNodeInstance', 'uml_deploymentObject', 'uml_deploymentConstraint',
   'component', 'componentNodeNonInstance', 'componentStart',
+  // UML2.5 补充图形
+  'informationItem',
+  'abstractUseCase', 'subject', 'useCaseVertical',
+  'sequenceActorLifeLine', 'sequenceStateInvariant', 'sequenceLostMessageTarget',
+  'abstractClass', 'signal', 'prototypeClass', 'primitive',
+  'glyphAggregation', 'glyphComposition', 'glyphGeneralization',
+  'glyphDependency', 'glyphAssociation',
+  'timeSignalFlag', 'entryPoint', 'exitPoint', 'exception',
+  'executionEnvironment', 'artifact',
 ] as const
 
 const dummyContext = {
@@ -58,7 +67,7 @@ describe('UML 关键行为属性', () => {
       'devComponentNonInstance', 'devComponent', 'devNodeNonInstance', 'devNodeInstance',
       'uml_deploymentConstraint', 'sequenceConstraint', 'sequenceTimerSignal',
       'sequenceDeletion', 'umlEnd', 'flowFinal', 'simpleHistory', 'detialHistory',
-      'swimlane', 'horizontalSwimlane',
+      'swimlane', 'horizontalSwimlane', 'subject', 'executionEnvironment',
     ]
     for (const name of needContainer) {
       const schema = shapeRegistry.getShape(name)!

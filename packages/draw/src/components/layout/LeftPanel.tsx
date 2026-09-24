@@ -150,6 +150,7 @@ const CATEGORY_SHAPES: Record<string, Array<{ name: string; title: string; icon:
     { name: 'combinedFragment', title: '组合片段', icon: SquareStack },
     { name: 'umlNote', title: '注释', icon: StickyNote },
     { name: 'umlText', title: '文本', icon: Type },
+    { name: 'informationItem', title: '信息项', icon: Box },
   ],
   // UML 类图
   uml_class: [
@@ -161,6 +162,15 @@ const CATEGORY_SHAPES: Record<string, Array<{ name: string; title: string; icon:
     { name: 'simpleInterface', title: '简单接口', icon: Box },
     { name: 'constraint', title: '约束', icon: Braces },
     { name: 'port', title: '端口', icon: Square },
+    { name: 'abstractClass', title: '抽象类', icon: FileText },
+    { name: 'signal', title: '信号', icon: FileText },
+    { name: 'prototypeClass', title: '原型类', icon: FileText },
+    { name: 'primitive', title: '原始类型', icon: Box },
+    { name: 'glyphAggregation', title: '聚合符号', icon: Diamond },
+    { name: 'glyphComposition', title: '组合符号', icon: Diamond },
+    { name: 'glyphGeneralization', title: '泛化符号', icon: Triangle },
+    { name: 'glyphDependency', title: '依赖符号', icon: ArrowRight },
+    { name: 'glyphAssociation', title: '关联符号', icon: ArrowRight },
   ],
   // UML 序列图
   uml_sequence: [
@@ -173,6 +183,9 @@ const CATEGORY_SHAPES: Record<string, Array<{ name: string; title: string; icon:
     { name: 'sequenceActivation', title: '激活', icon: RectangleVertical },
     { name: 'sequenceLifeLine', title: '生命线', icon: ArrowUpDown },
     { name: 'sequenceDeletion', title: '删除', icon: X },
+    { name: 'sequenceActorLifeLine', title: '角色生命线', icon: Users },
+    { name: 'sequenceStateInvariant', title: '状态不变式', icon: CircleDot },
+    { name: 'sequenceLostMessageTarget', title: '丢失消息目标', icon: Box },
   ],
   // UML 用例图
   uml_usecase: [
@@ -180,6 +193,9 @@ const CATEGORY_SHAPES: Record<string, Array<{ name: string; title: string; icon:
     { name: 'useCase', title: '用例', icon: Circle },
     { name: 'ovalContainer', title: '椭圆容器', icon: Circle },
     { name: 'rectangleContainer', title: '矩形容器', icon: Square },
+    { name: 'abstractUseCase', title: '抽象用例', icon: Circle },
+    { name: 'subject', title: '主体', icon: Square },
+    { name: 'useCaseVertical', title: '用例(竖排)', icon: Circle },
   ],
   // UML 状态/活动图
   uml_stateactivity: [
@@ -197,6 +213,10 @@ const CATEGORY_SHAPES: Record<string, Array<{ name: string; title: string; icon:
     { name: 'stateRectangleContainer', title: '容器', icon: Square },
     { name: 'swimlane', title: '泳道(垂直)', icon: RectangleVertical },
     { name: 'horizontalSwimlane', title: '泳道(水平)', icon: RectangleHorizontal },
+    { name: 'timeSignalFlag', title: '时间信号', icon: Hourglass },
+    { name: 'entryPoint', title: '进入点', icon: CircleDot },
+    { name: 'exitPoint', title: '退出点', icon: CircleDot },
+    { name: 'exception', title: '异常', icon: Octagon },
   ],
   // UML 部署图
   uml_deployment: [
@@ -206,12 +226,15 @@ const CATEGORY_SHAPES: Record<string, Array<{ name: string; title: string; icon:
     { name: 'devNodeInstance', title: '实例化节点', icon: Server },
     { name: 'uml_deploymentObject', title: '对象', icon: Box },
     { name: 'uml_deploymentConstraint', title: '约束', icon: Braces },
+    { name: 'executionEnvironment', title: '执行环境', icon: Server },
+    { name: 'artifact', title: '工件', icon: FileText },
   ],
   // UML 组件图
   uml_component: [
     { name: 'component', title: '组件', icon: Box },
     { name: 'componentNodeNonInstance', title: '节点', icon: Server },
     { name: 'componentStart', title: '接口', icon: Circle },
+    { name: 'componentSocket', title: '接口(依赖)', icon: Circle },
   ],
 }
 

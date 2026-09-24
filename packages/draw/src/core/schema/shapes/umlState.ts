@@ -436,6 +436,104 @@ const horizontalSwimlane: ShapeDefinition = {
 // 导出列表
 // ═══════════════════════════════════════════
 
+
+/** 时间信号（信封形） */
+const timeSignalFlag: ShapeDefinition = {
+  name: 'timeSignalFlag',
+  title: '时间信号',
+  category: 'uml_stateactivity',
+  attribute: { linkable: false },
+  props: { w: 40, h: 40 },
+  textBlock: [],
+  anchors: [],
+  path: [
+    [
+      { action: 'move', x: 0, y: 8 },
+      { action: 'line', x: 'w', y: 8 },
+      { action: 'line', x: 'w', y: 'h-6' },
+      { action: 'line', x: 0, y: 'h-6' },
+      { action: 'close' },
+    ],
+    [
+      { action: 'move', x: 0, y: 8 },
+      { action: 'line', x: 'w/2', y: 'h*0.55' },
+      { action: 'line', x: 'w', y: 8 },
+    ],
+  ],
+}
+
+/** 进入点（圆 + 内向箭头，放置于状态边框） */
+const entryPoint: ShapeDefinition = {
+  name: 'entryPoint',
+  title: '进入点',
+  category: 'uml_stateactivity',
+  attribute: { linkable: false, rotatable: false },
+  props: { w: 20, h: 20 },
+  fillStyle: { type: 'solid', color: '50,50,50' },
+  textBlock: [],
+  anchors: [],
+  path: [
+    [
+      { action: 'move', x: 0, y: 'h/2' },
+      { action: 'curve', x1: 0, y1: '-h/6', x2: 'w', y2: '-h/6', x: 'w', y: 'h/2' },
+      { action: 'curve', x1: 'w', y1: 'h+h/6', x2: 0, y2: 'h+h/6', x: 0, y: 'h/2' },
+      { action: 'close' },
+    ],
+    [
+      { action: 'move', x: 'w*0.25', y: 'h/2' },
+      { action: 'line', x: 'w*0.75', y: 'h/2' },
+      { action: 'line', x: 'w*0.55', y: 'h*0.35' },
+      { action: 'move', x: 'w*0.75', y: 'h/2' },
+      { action: 'line', x: 'w*0.55', y: 'h*0.65' },
+    ],
+  ],
+}
+
+/** 退出点（圆 + 外向箭头） */
+const exitPoint: ShapeDefinition = {
+  name: 'exitPoint',
+  title: '退出点',
+  category: 'uml_stateactivity',
+  attribute: { linkable: false, rotatable: false },
+  props: { w: 20, h: 20 },
+  fillStyle: { type: 'none' },
+  textBlock: [],
+  anchors: [],
+  path: [
+    [
+      { action: 'move', x: 0, y: 'h/2' },
+      { action: 'curve', x1: 0, y1: '-h/6', x2: 'w', y2: '-h/6', x: 'w', y: 'h/2' },
+      { action: 'curve', x1: 'w', y1: 'h+h/6', x2: 0, y2: 'h+h/6', x: 0, y: 'h/2' },
+      { action: 'close' },
+    ],
+    [
+      { action: 'move', x: 'w*0.25', y: 'h/2' },
+      { action: 'line', x: 'w*0.75', y: 'h/2' },
+      { action: 'line', x: 'w*0.55', y: 'h*0.35' },
+      { action: 'move', x: 'w*0.75', y: 'h/2' },
+      { action: 'line', x: 'w*0.55', y: 'h*0.65' },
+    ],
+  ],
+}
+
+/** 异常（不规则四边形，异常处理器） */
+const exception: ShapeDefinition = {
+  name: 'exception',
+  title: '异常',
+  category: 'uml_stateactivity',
+  attribute: { container: true },
+  props: { w: 60, h: 40 },
+  textBlock: [{ position: { x: 6, y: 4, w: 'w-12', h: 'h-8' }, text: '异常' }],
+  path: [[
+    { action: 'move', x: 0, y: 6 },
+    { action: 'line', x: 'w*0.62', y: 0 },
+    { action: 'line', x: 'w', y: 'h*0.3' },
+    { action: 'line', x: 'w*0.92', y: 'h' },
+    { action: 'line', x: 0, y: 'h*0.86' },
+    { action: 'close' },
+  ]],
+}
+
 export const umlStateShapes: ShapeDefinition[] = [
   umlObject,
   umlState,
@@ -451,4 +549,8 @@ export const umlStateShapes: ShapeDefinition[] = [
   stateRectangleContainer,
   swimlane,
   horizontalSwimlane,
+  timeSignalFlag,
+  entryPoint,
+  exitPoint,
+  exception,
 ]

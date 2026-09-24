@@ -340,6 +340,160 @@ const port: ShapeDefinition = {
 // 导出列表
 // ═══════════════════════════════════════════
 
+
+/** 抽象类（类三段式 + 斜体名） */
+const abstractClass: ShapeDefinition = {
+  ...cls,
+  name: 'abstractClass',
+  title: '抽象类',
+  textBlock: [
+    { ...cls.textBlock![0]!, text: '抽象类', fontStyle: { italic: true } },
+    ...cls.textBlock!.slice(1),
+  ],
+}
+
+/** 信号 Signal（两段：名称 / 属性） */
+const signal: ShapeDefinition = {
+  name: 'signal',
+  title: '信号',
+  category: 'uml_class',
+  attribute: { container: true },
+  props: { w: 120, h: 60 },
+  textBlock: [
+    { position: { x: 10, y: 0, w: 'w-20', h: 20 }, text: '信号' },
+    {
+      position: { x: 10, y: 20, w: 'w-20', h: 'h-20' },
+      text: '',
+      fontStyle: { textAlign: 'left', bold: false },
+    },
+  ],
+  path: [
+    [
+      { action: 'move', x: 0, y: 4 },
+      { action: 'quadraticCurve', x1: 0, y1: 0, x: 4, y: 0 },
+      { action: 'line', x: 'w-4', y: 0 },
+      { action: 'quadraticCurve', x1: 'w', y1: 0, x: 'w', y: 4 },
+      { action: 'line', x: 'w', y: 'h-4' },
+      { action: 'quadraticCurve', x1: 'w', y1: 'h', x: 'w-4', y: 'h' },
+      { action: 'line', x: 4, y: 'h' },
+      { action: 'quadraticCurve', x1: 0, y1: 'h', x: 0, y: 'h-4' },
+      { action: 'close' },
+    ],
+    [{ action: 'move', x: 0, y: 20 }, { action: 'line', x: 'w', y: 20 }],
+  ],
+}
+
+/** 原型类（类三段式，名称 «prototype»） */
+const prototypeClass: ShapeDefinition = {
+  ...cls,
+  name: 'prototypeClass',
+  title: '原型类',
+  props: { w: 160, h: 120 },
+  textBlock: [
+    { ...cls.textBlock![0]!, text: '«prototype»\n原型类' },
+    ...cls.textBlock!.slice(1),
+  ],
+}
+
+/** 原始类型 Primitive（小矩形 + 类型名） */
+const primitive: ShapeDefinition = {
+  name: 'primitive',
+  title: '原始类型',
+  category: 'uml_class',
+  props: { w: 80, h: 40 },
+  fontStyle: { bold: true },
+  textBlock: [{ position: { x: 6, y: 0, w: 'w-12', h: 'h' }, text: 'int' }],
+  path: [[
+    { action: 'move', x: 0, y: 4 },
+    { action: 'quadraticCurve', x1: 0, y1: 0, x: 4, y: 0 },
+    { action: 'line', x: 'w-4', y: 0 },
+    { action: 'quadraticCurve', x1: 'w', y1: 0, x: 'w', y: 4 },
+    { action: 'line', x: 'w', y: 'h-4' },
+    { action: 'quadraticCurve', x1: 'w', y1: 'h', x: 'w-4', y: 'h' },
+    { action: 'line', x: 4, y: 'h' },
+    { action: 'quadraticCurve', x1: 0, y1: 'h', x: 0, y: 'h-4' },
+    { action: 'close' },
+  ]],
+}
+
+/** 关系符号（可放置的静态示意图形，非连线）：聚合/组合/泛化/依赖/关联 */
+const glyphAggregation: ShapeDefinition = {
+  name: 'glyphAggregation',
+  title: '聚合符号',
+  category: 'uml_class',
+  attribute: { linkable: false },
+  props: { w: 60, h: 24 },
+  fillStyle: { type: 'none' },
+  textBlock: [],
+  path: [[
+    { action: 'move', x: 0, y: 'h/2' },
+    { action: 'line', x: 'w/2', y: 0 },
+    { action: 'line', x: 'w', y: 'h/2' },
+    { action: 'line', x: 'w/2', y: 'h' },
+    { action: 'close' },
+  ]],
+}
+
+const glyphComposition: ShapeDefinition = {
+  ...glyphAggregation,
+  name: 'glyphComposition',
+  title: '组合符号',
+  fillStyle: { type: 'solid', color: '50,50,50' },
+}
+
+const glyphGeneralization: ShapeDefinition = {
+  name: 'glyphGeneralization',
+  title: '泛化符号',
+  category: 'uml_class',
+  attribute: { linkable: false },
+  props: { w: 60, h: 24 },
+  fillStyle: { type: 'none' },
+  textBlock: [],
+  path: [[
+    { action: 'move', x: 0, y: 2 },
+    { action: 'line', x: 0, y: 'h-2' },
+    { action: 'line', x: 'w-2', y: 'h/2' },
+    { action: 'close' },
+  ]],
+}
+
+const glyphDependency: ShapeDefinition = {
+  name: 'glyphDependency',
+  title: '依赖符号',
+  category: 'uml_class',
+  attribute: { linkable: false },
+  props: { w: 60, h: 24 },
+  fillStyle: { type: 'none' },
+  textBlock: [],
+  path: [
+    { lineStyle: { lineStyle: 'dashed' }, actions: [{ action: 'move', x: 0, y: 'h/2' }, { action: 'line', x: 'w*0.8', y: 'h/2' }] },
+    [
+      { action: 'move', x: 'w*0.8', y: 'h/2-5' },
+      { action: 'line', x: 'w-1', y: 'h/2' },
+      { action: 'line', x: 'w*0.8', y: 'h/2+5' },
+    ],
+  ],
+}
+
+const glyphAssociation: ShapeDefinition = {
+  name: 'glyphAssociation',
+  title: '关联符号',
+  category: 'uml_class',
+  attribute: { linkable: false },
+  props: { w: 60, h: 24 },
+  fillStyle: { type: 'none' },
+  textBlock: [],
+  path: [
+    [{ action: 'move', x: 0, y: 'h/2' }, { action: 'line', x: 'w*0.8', y: 'h/2' }],
+    [
+      { action: 'move', x: 'w*0.8', y: 'h/2-5' },
+      { action: 'line', x: 'w-1', y: 'h/2' },
+      { action: 'line', x: 'w*0.8', y: 'h/2+5' },
+      { action: 'close' },
+    ],
+  ],
+}
+
 export const umlClassShapes: ShapeDefinition[] = [
   simpleClass,
   cls,
@@ -349,4 +503,13 @@ export const umlClassShapes: ShapeDefinition[] = [
   simpleInterface,
   constraint,
   port,
+  abstractClass,
+  signal,
+  prototypeClass,
+  primitive,
+  glyphAggregation,
+  glyphComposition,
+  glyphGeneralization,
+  glyphDependency,
+  glyphAssociation,
 ]

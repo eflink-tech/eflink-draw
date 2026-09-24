@@ -219,9 +219,44 @@ const umlText: ShapeDefinition = {
 // 导出列表
 // ═══════════════════════════════════════════
 
+
+/** 信息项（UML2.5 InformationItem：矩形 + 左缘上下双凸耳） */
+const informationItem: ShapeDefinition = {
+  name: 'informationItem',
+  title: '信息项',
+  category: 'uml_common',
+  props: { w: 60, h: 32 },
+  textBlock: [{ position: { x: 12, y: 0, w: 'w-18', h: 'h' }, text: '' }],
+  path: [
+    [
+      { action: 'move', x: 8, y: 0 },
+      { action: 'line', x: 'w', y: 0 },
+      { action: 'line', x: 'w', y: 'h' },
+      { action: 'line', x: 8, y: 'h' },
+      { action: 'line', x: 8, y: 0 },
+      { action: 'close' },
+    ],
+    // 左缘上耳
+    [
+      { action: 'move', x: 0, y: 4 },
+      { action: 'line', x: 8, y: 4 },
+      { action: 'line', x: 8, y: 12 },
+      { action: 'line', x: 0, y: 12 },
+    ],
+    // 左缘下耳
+    [
+      { action: 'move', x: 0, y: 'h-12' },
+      { action: 'line', x: 8, y: 'h-12' },
+      { action: 'line', x: 8, y: 'h-4' },
+      { action: 'line', x: 0, y: 'h-4' },
+    ],
+  ],
+}
+
 export const umlCommonShapes: ShapeDefinition[] = [
   pkg,
   combinedFragment,
   umlNote,
   umlText,
+  informationItem,
 ]

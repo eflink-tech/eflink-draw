@@ -189,6 +189,55 @@ const umlDeploymentConstraint: ShapeDefinition = {
 // 导出列表
 // ═══════════════════════════════════════════
 
+
+/** 执行环境（3D 节点内嵌矩形，«executionEnvironment»） */
+const executionEnvironment: ShapeDefinition = {
+  name: 'executionEnvironment',
+  title: '执行环境',
+  category: 'uml_deployment',
+  attribute: { container: true },
+  props: { w: 270, h: 270 },
+  fontStyle: { bold: true },
+  textBlock: [{ position: { x: 10, y: 'h*(1/9)', w: 'w*(8/9)-20', h: 'h*(8/9)' }, text: '执行环境' }],
+  fillStyle: { type: 'solid', color: '220,220,220' },
+  path: [
+    ...nodeBoxPath(),
+    // 内嵌矩形（正面）
+    [
+      { action: 'move', x: 'w*0.2', y: 'h*(2/9)' },
+      { action: 'line', x: 'w*0.7', y: 'h*(2/9)' },
+      { action: 'line', x: 'w*0.7', y: 'h*0.85' },
+      { action: 'line', x: 'w*0.2', y: 'h*0.85' },
+      { action: 'close' },
+    ],
+  ],
+}
+
+/** 工件 Artifact（折角文档形，名称下划线） */
+const artifact: ShapeDefinition = {
+  name: 'artifact',
+  title: '工件',
+  category: 'uml_deployment',
+  props: { w: 80, h: 100 },
+  fontStyle: { underline: true },
+  textBlock: [{ position: { x: 4, y: 16, w: 'w-8', h: 'h-20' }, text: '工件' }],
+  path: [
+    [
+      { action: 'move', x: 0, y: 0 },
+      { action: 'line', x: 'w-14', y: 0 },
+      { action: 'line', x: 'w', y: 14 },
+      { action: 'line', x: 'w', y: 'h' },
+      { action: 'line', x: 0, y: 'h' },
+      { action: 'close' },
+    ],
+    [
+      { action: 'move', x: 'w-14', y: 0 },
+      { action: 'line', x: 'w-14', y: 14 },
+      { action: 'line', x: 'w', y: 14 },
+    ],
+  ],
+}
+
 export const umlDeploymentShapes: ShapeDefinition[] = [
   devComponentNonInstance,
   devComponent,
@@ -196,4 +245,6 @@ export const umlDeploymentShapes: ShapeDefinition[] = [
   devNodeInstance,
   umlDeploymentObject,
   umlDeploymentConstraint,
+  executionEnvironment,
+  artifact,
 ]

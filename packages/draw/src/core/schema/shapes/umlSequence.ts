@@ -206,29 +206,27 @@ const sequenceLifeLine: ShapeDefinition = {
   name: 'sequenceLifeLine',
   title: '生命线',
   category: 'uml_sequence',
-  props: { w: 70, h: 140 },
+  props: { w: 70, h: 300 },
   attribute: { linkable: false },
   textBlock: [{ position: { x: 10, y: 0, w: 'w-20', h: 30 }, text: '' }],
   anchors: [],
-  drawIcon: (a, b) => {
-    const aw = a + 4
-    return [
-      {
-        lineStyle: { lineWidth: 2, lineStyle: 'dot' },
-        actions: [
-          { action: 'move', x: aw / 2 - 1, y: b * 0.2 },
-          { action: 'line', x: aw / 2 - 1, y: b },
-        ],
-      },
-      [
-        { action: 'move', x: -6, y: 0 },
-        { action: 'line', x: aw + 3, y: 0 },
-        { action: 'line', x: aw + 3, y: b * 0.2 },
-        { action: 'line', x: -6, y: b * 0.2 },
-        { action: 'close' },
+  // 面板图标：方形格子内绘制（头部矩形 + 虚线到底）
+  drawIcon: (w, h) => [
+    [
+      { action: 'move', x: w * 0.12, y: h * 0.02 },
+      { action: 'line', x: w * 0.88, y: h * 0.02 },
+      { action: 'line', x: w * 0.88, y: h * 0.16 },
+      { action: 'line', x: w * 0.12, y: h * 0.16 },
+      { action: 'close' },
+    ],
+    {
+      lineStyle: { lineStyle: 'dot' },
+      actions: [
+        { action: 'move', x: w / 2, y: h * 0.16 },
+        { action: 'line', x: w / 2, y: h * 0.97 },
       ],
-    ]
-  },
+    },
+  ],
   path: [
     {
       lineStyle: { lineWidth: 2, lineStyle: 'dot' },
@@ -282,6 +280,116 @@ const sequenceDeletion: ShapeDefinition = {
 // 导出列表
 // ═══════════════════════════════════════════
 
+
+/** 角色生命线（小人头部 + 虚线延伸） */
+const sequenceActorLifeLine: ShapeDefinition = {
+  name: 'sequenceActorLifeLine',
+  title: '角色生命线',
+  category: 'uml_sequence',
+  attribute: { linkable: false },
+  props: { w: 70, h: 300 },
+  textBlock: [{ position: { x: -20, y: 34, w: 'w+40', h: 26 }, text: '' }],
+  anchors: [],
+  // 面板图标：方形格子内绘制（小人占上部 40%，虚线到底），不受真实高度压缩
+  drawIcon: (w, h) => {
+    const cx = w / 2
+    const headR = h * 0.055
+    const headY = h * 0.11
+    const bodyTop = headY + headR
+    const bodyBottom = h * 0.38
+    const armY = h * 0.24
+    const armHalf = h * 0.09
+    const legSpread = h * 0.07
+    return [
+      // 小人
+      [
+        { action: 'move', x: cx, y: headY },
+        { action: 'curve', x1: cx - headR, y1: headY - headR * 1.2, x2: cx + headR, y2: headR * -1.2 + headY, x: cx, y: headY + headR },
+        { action: 'curve', x1: cx + headR, y1: headY + headR * 1.2, x2: cx - headR, y2: headY + headR * 1.2, x: cx, y: headY },
+        { action: 'move', x: cx, y: bodyTop },
+        { action: 'line', x: cx, y: bodyBottom },
+        { action: 'move', x: cx - armHalf, y: armY },
+        { action: 'line', x: cx + armHalf, y: armY },
+        { action: 'move', x: cx, y: bodyBottom },
+        { action: 'line', x: cx - legSpread, y: h * 0.47 },
+        { action: 'move', x: cx, y: bodyBottom },
+        { action: 'line', x: cx + legSpread, y: h * 0.47 },
+      ],
+      // 虚线延伸
+      {
+        lineStyle: { lineStyle: 'dot' },
+        actions: [
+          { action: 'move', x: cx, y: h * 0.47 },
+          { action: 'line', x: cx, y: h * 0.97 },
+        ],
+      },
+    ]
+  },
+  path: [
+    // 小人（头 + 身体 + 手臂 + 腿）
+    [
+      { action: 'move', x: 'w/2-5', y: 10 },
+      { action: 'curve', x1: 'w/2-5', y1: 4, x2: 'w/2+5', y2: 4, x: 'w/2+5', y: 10 },
+      { action: 'curve', x1: 'w/2+5', y1: 16, x2: 'w/2-5', y2: 16, x: 'w/2-5', y: 10 },
+      { action: 'move', x: 'w/2', y: 16 },
+      { action: 'line', x: 'w/2', y: 30 },
+      { action: 'move', x: 'w/2-8', y: 20 },
+      { action: 'line', x: 'w/2+8', y: 20 },
+      { action: 'move', x: 'w/2', y: 30 },
+      { action: 'line', x: 'w/2-6', y: 38 },
+      { action: 'move', x: 'w/2', y: 30 },
+      { action: 'line', x: 'w/2+6', y: 38 },
+    ],
+    // 虚线延伸
+    {
+      lineStyle: { lineStyle: 'dot' },
+      actions: [
+        { action: 'move', x: 'w/2', y: 38 },
+        { action: 'line', x: 'w/2', y: 'h' },
+      ],
+    },
+  ],
+}
+
+/** 状态不变式（圆 + 内部下划线，标注文本在圆内上方） */
+const sequenceStateInvariant: ShapeDefinition = {
+  name: 'sequenceStateInvariant',
+  title: '状态不变式',
+  category: 'uml_sequence',
+  attribute: { linkable: false },
+  props: { w: 50, h: 50 },
+  textBlock: [{ position: { x: 6, y: 10, w: 'w-12', h: 12 }, text: '' }],
+  anchors: [],
+  path: [
+    [
+      { action: 'move', x: 0, y: 'h/2' },
+      { action: 'curve', x1: 0, y1: '-h/6', x2: 'w', y2: '-h/6', x: 'w', y: 'h/2' },
+      { action: 'curve', x1: 'w', y1: 'h+h/6', x2: 0, y2: 'h+h/6', x: 0, y: 'h/2' },
+      { action: 'close' },
+    ],
+    [{ action: 'move', x: 'w*0.2', y: 'h*0.62' }, { action: 'line', x: 'w*0.8', y: 'h*0.62' }],
+  ],
+}
+
+/** 丢失消息目标（实心矩形） */
+const sequenceLostMessageTarget: ShapeDefinition = {
+  name: 'sequenceLostMessageTarget',
+  title: '丢失消息目标',
+  category: 'uml_sequence',
+  attribute: { linkable: false },
+  props: { w: 30, h: 20 },
+  fillStyle: { type: 'solid', color: '50,50,50' },
+  textBlock: [],
+  anchors: [],
+  path: [[
+    { action: 'move', x: 0, y: 0 },
+    { action: 'line', x: 'w', y: 0 },
+    { action: 'line', x: 'w', y: 'h' },
+    { action: 'line', x: 0, y: 'h' },
+    { action: 'close' },
+  ]],
+}
+
 export const umlSequenceShapes: ShapeDefinition[] = [
   sequenceObject,
   sequenceEntity,
@@ -292,4 +400,7 @@ export const umlSequenceShapes: ShapeDefinition[] = [
   sequenceActivation,
   sequenceLifeLine,
   sequenceDeletion,
+  sequenceActorLifeLine,
+  sequenceStateInvariant,
+  sequenceLostMessageTarget,
 ]
