@@ -35,6 +35,7 @@ const CATEGORY_ICONS: Record<string, LucideIcon> = {
   bpmn: Workflow,
   lane: Columns,
   // UML 分类
+  uml: Folder,
   uml_common: Folder,
   uml_class: Box,
   uml_sequence: ArrowRight,
@@ -235,6 +236,55 @@ export function LeftPanel() {
     })
   }
 
+  /** 图形九宫格（单级分类与 UML 二级分组共用） */
+  const renderShapeGrid = (shapes: Array<{ name: string; title: string; icon: LucideIcon }>) => (
+    <div className="grid grid-cols-5 gap-1 p-2">
+      {shapes.map((shape) => {
+        const ShapeIcon = shape.icon
+        return (
+          <div
+            key={shape.name}
+            onMouseDown={(e) => {
+              // 拖入画布后立即显示真实图形跟随鼠标）
+              e.preventDefault()
+              setTooltip(null)
+              startPanelDrag(shape.name, e)
+            }}
+            onDoubleClick={() => {
+              const { viewport } = useEditorStore.getState()
+              const cx = (-viewport.x + 400) / viewport.scale
+              const cy = (-viewport.y + 300) / viewport.scale
+              // 与拖拽落点同语义：以 (cx, cy) 为图形中心
+              const el = shapeRegistry.createElementAtCenter(shape.name, cx, cy)
+              if (el) {
+                useEditorStore.getState().addElement(el)
+              }
+            }}
+            onMouseEnter={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect()
+              setTooltip({
+                text: shape.title,
+                x: rect.right + 6,
+                y: rect.top + rect.height / 2,
+              })
+            }}
+            onMouseLeave={() => setTooltip(null)}
+            className={[
+              'flex items-center justify-center w-9 h-9 mx-auto rounded cursor-grab select-none',
+              'hover:bg-[#e8e8e8] transition-colors',
+            ].join(' ')}
+          >
+            {shapeRegistry.getShape(shape.name) ? (
+              <ShapePreview name={shape.name} size={30} />
+            ) : (
+              <ShapeIcon size={28} strokeWidth={1.5} className="text-[#555]" />
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
+
   return (
     <div className="flex flex-col h-full relative">
       {/* 搜索框 */}
@@ -251,6 +301,47 @@ export function LeftPanel() {
           const Icon = CATEGORY_ICONS[cat.id] || Square
           const isExpanded = expandedCategories.has(cat.id)
           const isActive = activeCategory === cat.id
+
+          // 二级分组（UML）：折叠/展开仅作用于主分组，子分组只作二级标题
+          if (cat.children) {
+            const total = cat.children.reduce((n, ch) => n + (CATEGORY_SHAPES[ch.id]?.length ?? 0), 0)
+            return (
+              <div key={cat.id}>
+                <button
+                  className={[
+                    'flex items-center w-full px-3 py-1.5 text-xs cursor-pointer',
+                    'hover:bg-[#f5f5f5] transition-colors',
+                    isActive ? 'bg-blue-50 text-blue-600 font-medium' : 'text-[#555]',
+                  ].join(' ')}
+                  onClick={() => {
+                    setActiveCategory(cat.id)
+                    toggleCategory(cat.id)
+                  }}
+                >
+                  {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                  <Icon size={14} className="ml-1 mr-2" />
+                  <span>{cat.name}</span>
+                  <span className="ml-auto text-[10px] text-gray-400">{total}</span>
+                </button>
+
+                {isExpanded &&
+                  cat.children.map((child) => {
+                    const childShapes = CATEGORY_SHAPES[child.id] || []
+                    if (childShapes.length === 0) return null
+                    return (
+                      <div key={child.id}>
+                        <div className="flex items-center px-3 py-1 pl-8 text-[11px] text-gray-400 bg-[#fafafa] border-y border-[#f0f0f0]">
+                          <span>{child.name}</span>
+                          <span className="ml-auto text-[10px] text-gray-300">{childShapes.length}</span>
+                        </div>
+                        {renderShapeGrid(childShapes)}
+                      </div>
+                    )
+                  })}
+              </div>
+            )
+          }
+
           const catShapes = CATEGORY_SHAPES[cat.id] || []
 
           return (
@@ -274,53 +365,7 @@ export function LeftPanel() {
               </button>
 
               {/* 分类下的图形列表 */}
-              {isExpanded && (
-                <div className="grid grid-cols-5 gap-1 p-2">
-                  {catShapes.map((shape) => {
-                    const ShapeIcon = shape.icon
-                    return (
-                      <div
-                        key={shape.name}
-                        onMouseDown={(e) => {
-                          // 拖入画布后立即显示真实图形跟随鼠标）
-                          e.preventDefault()
-                          setTooltip(null)
-                          startPanelDrag(shape.name, e)
-                        }}
-                        onDoubleClick={() => {
-                          const { viewport } = useEditorStore.getState()
-                          const cx = (-viewport.x + 400) / viewport.scale
-                          const cy = (-viewport.y + 300) / viewport.scale
-                          // 与拖拽落点同语义：以 (cx, cy) 为图形中心
-                          const el = shapeRegistry.createElementAtCenter(shape.name, cx, cy)
-                          if (el) {
-                            useEditorStore.getState().addElement(el)
-                          }
-                        }}
-                        onMouseEnter={(e) => {
-                          const rect = e.currentTarget.getBoundingClientRect()
-                          setTooltip({
-                            text: shape.title,
-                            x: rect.right + 6,
-                            y: rect.top + rect.height / 2,
-                          })
-                        }}
-                        onMouseLeave={() => setTooltip(null)}
-                        className={[
-                          'flex items-center justify-center w-9 h-9 mx-auto rounded cursor-grab select-none',
-                          'hover:bg-[#e8e8e8] transition-colors',
-                        ].join(' ')}
-                      >
-                        {shapeRegistry.getShape(shape.name) ? (
-                          <ShapePreview name={shape.name} size={30} />
-                        ) : (
-                          <ShapeIcon size={28} strokeWidth={1.5} className="text-[#555]" />
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
+              {isExpanded && renderShapeGrid(catShapes)}
             </div>
           )
         })}
