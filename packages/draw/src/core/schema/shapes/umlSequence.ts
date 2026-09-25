@@ -256,12 +256,12 @@ const sequenceDeletion: ShapeDefinition = {
   fillStyle: { type: 'none' },
   textBlock: [],
   drawIcon: (a, b) => [{
-    lineStyle: { lineWidth: 4 },
+    lineStyle: { lineWidth: 2.5 },
     actions: [
-      { action: 'move', x: 0, y: 0 },
-      { action: 'line', x: a * 0.7, y: b * 0.7 },
-      { action: 'move', x: a * 0.7, y: 0 },
-      { action: 'line', x: 0, y: b * 0.7 },
+      { action: 'move', x: a * 0.18, y: b * 0.18 },
+      { action: 'line', x: a * 0.82, y: b * 0.82 },
+      { action: 'move', x: a * 0.82, y: b * 0.18 },
+      { action: 'line', x: a * 0.18, y: b * 0.82 },
     ],
   }],
   path: [{
@@ -290,37 +290,40 @@ const sequenceActorLifeLine: ShapeDefinition = {
   props: { w: 70, h: 300 },
   textBlock: [{ position: { x: -20, y: 34, w: 'w+40', h: 26 }, text: '' }],
   anchors: [],
-  // 面板图标：方形格子内绘制（小人占上部 40%，虚线到底），不受真实高度压缩
+  // 面板图标：方形格子内绘制——参考样式：紧凑小人 + 间隔明显的虚线生命线
   drawIcon: (w, h) => {
     const cx = w / 2
-    const headR = h * 0.055
-    const headY = h * 0.11
-    const bodyTop = headY + headR
-    const bodyBottom = h * 0.38
-    const armY = h * 0.24
-    const armHalf = h * 0.09
-    const legSpread = h * 0.07
+    const headR = h * 0.05
+    const headY = h * 0.07
+    const shoulder = h * 0.16
+    const hip = h * 0.28
+    const armEndX = h * 0.07
+    const armEndY = h * 0.24
+    const legEndX = h * 0.05
+    const legEndY = h * 0.38
     return [
-      // 小人
+      // 小人（头 + 身体 + 下垂手臂 + 腿）
       [
         { action: 'move', x: cx, y: headY },
-        { action: 'curve', x1: cx - headR, y1: headY - headR * 1.2, x2: cx + headR, y2: headR * -1.2 + headY, x: cx, y: headY + headR },
-        { action: 'curve', x1: cx + headR, y1: headY + headR * 1.2, x2: cx - headR, y2: headY + headR * 1.2, x: cx, y: headY },
-        { action: 'move', x: cx, y: bodyTop },
-        { action: 'line', x: cx, y: bodyBottom },
-        { action: 'move', x: cx - armHalf, y: armY },
-        { action: 'line', x: cx + armHalf, y: armY },
-        { action: 'move', x: cx, y: bodyBottom },
-        { action: 'line', x: cx - legSpread, y: h * 0.47 },
-        { action: 'move', x: cx, y: bodyBottom },
-        { action: 'line', x: cx + legSpread, y: h * 0.47 },
+        { action: 'curve', x1: cx - headR, y1: headY - headR * 1.15, x2: cx + headR, y2: headY - headR * 1.15, x: cx, y: headY + headR },
+        { action: 'curve', x1: cx + headR, y1: headY + headR * 1.15, x2: cx - headR, y2: headY + headR * 1.15, x: cx, y: headY },
+        { action: 'move', x: cx, y: headY + headR },
+        { action: 'line', x: cx, y: hip },
+        { action: 'move', x: cx, y: shoulder },
+        { action: 'line', x: cx - armEndX, y: armEndY },
+        { action: 'move', x: cx, y: shoulder },
+        { action: 'line', x: cx + armEndX, y: armEndY },
+        { action: 'move', x: cx, y: hip },
+        { action: 'line', x: cx - legEndX, y: legEndY },
+        { action: 'move', x: cx, y: hip },
+        { action: 'line', x: cx + legEndX, y: legEndY },
       ],
-      // 虚线延伸
+      // 虚线生命线（与小人留出间隔，dash 段更易读）
       {
-        lineStyle: { lineStyle: 'dot' },
+        lineStyle: { lineStyle: 'dashed' },
         actions: [
-          { action: 'move', x: cx, y: h * 0.47 },
-          { action: 'line', x: cx, y: h * 0.97 },
+          { action: 'move', x: cx, y: h * 0.5 },
+          { action: 'line', x: cx, y: h * 0.96 },
         ],
       },
     ]

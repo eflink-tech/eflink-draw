@@ -469,7 +469,7 @@ const entryPoint: ShapeDefinition = {
   category: 'uml_stateactivity',
   attribute: { linkable: false, rotatable: false },
   props: { w: 20, h: 20 },
-  fillStyle: { type: 'solid', color: '50,50,50' },
+  fillStyle: { type: 'none' },
   textBlock: [],
   anchors: [],
   path: [
@@ -480,11 +480,12 @@ const entryPoint: ShapeDefinition = {
       { action: 'close' },
     ],
     [
-      { action: 'move', x: 'w*0.25', y: 'h/2' },
-      { action: 'line', x: 'w*0.75', y: 'h/2' },
-      { action: 'line', x: 'w*0.55', y: 'h*0.35' },
-      { action: 'move', x: 'w*0.75', y: 'h/2' },
-      { action: 'line', x: 'w*0.55', y: 'h*0.65' },
+      // 箭头从左缘指向圆心（进入状态方向）
+      { action: 'move', x: 0, y: 'h/2' },
+      { action: 'line', x: 'w*0.5', y: 'h/2' },
+      { action: 'line', x: 'w*0.3', y: 'h*0.32' },
+      { action: 'move', x: 'w*0.5', y: 'h/2' },
+      { action: 'line', x: 'w*0.3', y: 'h*0.68' },
     ],
   ],
 }
@@ -507,11 +508,12 @@ const exitPoint: ShapeDefinition = {
       { action: 'close' },
     ],
     [
-      { action: 'move', x: 'w*0.25', y: 'h/2' },
-      { action: 'line', x: 'w*0.75', y: 'h/2' },
-      { action: 'line', x: 'w*0.55', y: 'h*0.35' },
-      { action: 'move', x: 'w*0.75', y: 'h/2' },
-      { action: 'line', x: 'w*0.55', y: 'h*0.65' },
+      // 箭头从圆心指向右缘外（离开状态方向）
+      { action: 'move', x: 'w*0.5', y: 'h/2' },
+      { action: 'line', x: 'w', y: 'h/2' },
+      { action: 'line', x: 'w*0.8', y: 'h*0.32' },
+      { action: 'move', x: 'w', y: 'h/2' },
+      { action: 'line', x: 'w*0.8', y: 'h*0.68' },
     ],
   ],
 }
