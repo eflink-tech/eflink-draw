@@ -1025,7 +1025,8 @@ export const ElementRenderer = memo(function ElementRenderer({ element, textEngi
                   id: element.id,
                   x: props.x + w / 2,
                   y: props.y + h / 2,
-                  angle: Math.PI / 2,
+                  // 中心 fallback：path 无可绘制段时几乎不可达，任取方向
+                  angle: 0,
                 }
             handleLinkerDragStart(e, from)
           }}
@@ -1383,6 +1384,7 @@ export const ElementRenderer = memo(function ElementRenderer({ element, textEngi
               if (container) container.style.cursor = 'default'
             }}
             onDragStart={(e) => {
+              e.cancelBubble = true
               const f = anchorEndpointOf(idx)
               if (f) handleLinkerDragStart(e, f)
             }}
