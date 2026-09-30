@@ -113,17 +113,20 @@ push('topo_bridge', '网桥', (w, h) => {
   ])
 })
 
-// 防火墙：砖墙
+// 防火墙：砖墙（错缝横条砖，左右对称不出界）
 push('topo_firewall', '防火墙', (w, h) => {
   const t = ST(w, 0.055)
-  const rows = [0.16, 0.36, 0.56, 0.76]
-  const bricks = rows.flatMap((y, ri) => {
-    const offs = ri % 2 ? [0.06, 0.36, 0.66] : [-0.1, 0.2, 0.5, 0.8]
-    return offs.filter((x) => x + 0.28 <= 0.94 && x + 0.28 > 0.06).map((x) =>
-      hollowRect(w * x, h * y, w * 0.28, h * 0.18, w * 0.02, t * 0.9),
-    )
-  })
-  return icon('black', bricks)
+  const BW = 0.28, HB = 0.1175 // 满砖 / 半砖宽（错缝行两端收半砖）
+  const brick = (x, bw, y) => hollowRect(w * x, h * y, w * bw, h * 0.18, w * 0.02, t * 0.9)
+  const full = [0.035, 0.36, 0.685] // 满砖行：3 砖 2 缝，左右各留 0.035
+  const half = [0.035, 0.1975, 0.5225, 0.8475] // 错缝行：半砖+2 满砖+半砖
+  const halfW = [HB, BW, BW, HB]
+  return icon('black', [
+    ...full.map((x) => brick(x, BW, 0.11)),
+    ...half.map((x, i) => brick(x, halfW[i], 0.31)),
+    ...full.map((x) => brick(x, BW, 0.51)),
+    ...half.map((x, i) => brick(x, halfW[i], 0.71)),
+  ])
 })
 
 // 入侵检测 IDS：盾牌轮廓 + 内部对勾
@@ -175,16 +178,16 @@ push('topo_wireless_ap', '无线 AP', (w, h) => {
   ])
 })
 
-// 天线塔：三角塔 + 顶部发射弧
+// 天线塔：三角塔 + 顶部发射弧（弧顶收进边界内）
 push('topo_antenna', '天线', (w, h) => {
   const t = ST(w, 0.055)
   return icon('black', [
-    ribbon([[w * 0.5, h * 0.18], [w * 0.22, h * 0.92]], t),
-    ribbon([[w * 0.5, h * 0.18], [w * 0.78, h * 0.92]], t),
-    ribbon([[w * 0.32, h * 0.66], [w * 0.68, h * 0.66]], t * 0.8),
-    ribbon([[w * 0.37, h * 0.48], [w * 0.63, h * 0.48]], t * 0.8),
-    bar(w * 0.47, h * 0.04, w * 0.06, h * 0.16),
-    ...[0.12, 0.22].map((r) => arcBand(w * 0.5, h * 0.08, w * r, h * r, t * 0.85, -Math.PI * 0.85, -Math.PI * 0.15, 10)),
+    ribbon([[w * 0.5, h * 0.28], [w * 0.22, h * 0.94]], t),
+    ribbon([[w * 0.5, h * 0.28], [w * 0.78, h * 0.94]], t),
+    ribbon([[w * 0.3, h * 0.71], [w * 0.7, h * 0.71]], t * 0.8),
+    ribbon([[w * 0.36, h * 0.54], [w * 0.64, h * 0.54]], t * 0.8),
+    bar(w * 0.47, h * 0.15, w * 0.06, h * 0.16),
+    ...[0.09, 0.18].map((r) => arcBand(w * 0.5, h * 0.21, w * r, h * r, t * 0.85, -Math.PI * 0.85, -Math.PI * 0.15, 10)),
   ])
 })
 
@@ -688,14 +691,14 @@ const dashedRing = (cx, cy, rx, ry, t, n = 14, gapRatio = 0.42) =>
     return arcBand(cx, cy, rx, ry, t, a0, a1, 3)
   })
 
-// 因特网：实心云 + 三向箭头
+// 因特网：实心云 + 三向箭头（箭头整体上移，头部翼点不出底界）
 push('topo_internet', '因特网', (w, h) => {
   const t = ST(w, 0.055)
   return icon('black', [
     cloudActions(w, h * 0.72),
-    ...arrow([w * 0.5, h * 0.66], [w * 0.5, h * 0.9], t),
-    ...arrow([w * 0.34, h * 0.96], [w * 0.14, h * 0.96], t),
-    ...arrow([w * 0.66, h * 0.96], [w * 0.86, h * 0.96], t),
+    ...arrow([w * 0.5, h * 0.66], [w * 0.5, h * 0.87], t),
+    ...arrow([w * 0.34, h * 0.91], [w * 0.14, h * 0.91], t),
+    ...arrow([w * 0.66, h * 0.91], [w * 0.86, h * 0.91], t),
   ])
 }, 'topo_cloud')
 
