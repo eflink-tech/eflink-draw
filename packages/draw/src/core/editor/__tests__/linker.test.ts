@@ -662,6 +662,21 @@ describe('snapLinkerEndpoint', () => {
     expect(r.endpoint.id).toBeNull()
   })
 
+  it('linkable === false 的图形轮廓不吸附', () => {
+    const target = shape(100, 300, 100, 60)
+    target.attribute.linkable = false
+    const other = shape(100, 100, 100, 60)
+    const r = snapLinkerEndpoint({
+      shapes: [other, target],
+      hitShapeId: null,
+      worldX: 130,
+      worldY: 305, // 不可连线图形顶边带内
+      scale: 1,
+      otherEnd: { id: other.id, x: 150, y: 160 },
+    })
+    expect(r.endpoint.id).toBeNull()
+  })
+
   it('轮廓带容差按屏幕像素换算（scale=2 时 8 世界 px = 16 屏幕px 超带不吸附）', () => {
     const target = shape(100, 300, 100, 60)
     const other = shape(100, 100, 100, 60)
@@ -675,6 +690,21 @@ describe('snapLinkerEndpoint', () => {
     })
     // 不吸轮廓；也无锚点命中 → 自由点
     expect(r.endpoint.id).toBeNull()
+  })
+
+  it('轮廓带竞争：两图形均在带内时吸附距光标更近的轮廓', () => {
+    const a = shape(100, 300, 100, 60) // 底边 y=360
+    const b = shape(100, 372, 100, 60) // 顶边 y=372（两图形间隙 12px）
+    const r = snapLinkerEndpoint({
+      shapes: [a, b],
+      hitShapeId: null,
+      worldX: 130,
+      worldY: 363, // 距 a 底边 3px、距 b 顶边 9px：均在带内
+      scale: 1,
+      otherEnd: { id: null, x: 400, y: 500 },
+    })
+    expect(r.endpoint).toMatchObject({ id: a.id, x: 130, y: 360 })
+    expect(r.endpoint.angle).toBeCloseTo((Math.PI / 2) * 3, 6) // 底边内向朝上
   })
 })
 

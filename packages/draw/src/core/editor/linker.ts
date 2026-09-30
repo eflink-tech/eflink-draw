@@ -12,7 +12,7 @@ import { snapLinkerLine } from './alignment'
 import { findJunctionSnap } from './linkerJunction'
 import { DEFAULT_FONT_VALUE } from './fontMap'
 import { normAngle, type Point } from '@/core/utils/geometry'
-import { nearestContourPoint, pointInRotatedBBox } from './shapeContour'
+import { nearestContourPoint, pointInRotatedBBox, type ContourHit } from './shapeContour'
 
 // Point/normAngle 已迁至基础几何模块（@/core/utils/geometry），此处再导出保持既有
 // 消费方（linkerDraw/linkerJunction/linkerSegment/linkerCursor/manualRoute/actionExecutor 等）零改动
@@ -880,10 +880,11 @@ export function snapLinkerEndpoint(input: EndpointSnapInput): EndpointSnapResult
         )
       : undefined
 
+  // 悬停图形的锚点（下方第 1/4 吸附层共用；hit 为空时短路不求值）
+  const anchors: Array<Point & { angle: number }> = hit ? getAnchorPoints(hit) : []
+
   // 1. 锚点直中：鼠标 7px（屏幕像素）内命中悬停图形的具体锚点 → 直接选中
   if (hit) {
-    const anchors = getAnchorPoints(hit)
-
     const tol = ANCHOR_HIT_PX / scale
     const direct = anchors.find(
       (a) => Math.abs(a.x - worldX) <= tol && Math.abs(a.y - worldY) <= tol,
@@ -899,13 +900,10 @@ export function snapLinkerEndpoint(input: EndpointSnapInput): EndpointSnapResult
   // 2. 轮廓带吸附：光标距任一图形轮廓 ≤12px（屏幕像素）→ 吸附轮廓最近点（任意边点）。
   // 含图形内浅层与外侧近边，蓝点随光标沿边滑动；跳过锁定/不可连线/另一端宿主（防自连）
   const bandTol = CONTOUR_BAND_PX / scale
-  let contourBest: {
-    id: string
-    c: NonNullable<ReturnType<typeof nearestContourPoint>>
-  } | null = null
+  let contourBest: { id: string; c: ContourHit } | null = null
   for (const s of shapes) {
     if (s.locked || s.id === otherEnd.id || s.attribute?.linkable === false) continue
-    // 粗筛：旋转外接盒 ±(带宽容差+2)，最近轮廓点必落在其内
+    // 粗筛：查询点落在旋转外接盒 ±(带宽容差+2px 浮点余量) 内才可能有带内轮廓点
     if (!pointInRotatedBBox(s, worldX, worldY, bandTol + 2)) continue
     const c = nearestContourPoint(s, worldX, worldY)
     if (!c || c.dist > bandTol) continue
@@ -919,12 +917,13 @@ export function snapLinkerEndpoint(input: EndpointSnapInput): EndpointSnapResult
     }
   }
 
+  // 3. 悬停图形 == 另一端所属图形 → 脱附为自由点（不允许两端连同一图形）
   if (hit) {
     if (hit.id === otherEnd.id) {
       return { endpoint: { id: null, x: worldX, y: worldY, angle: null }, snapAnchor: null }
     }
 
-    const anchors = getAnchorPoints(hit)
+    // 4. 图形内部深处 → 吸附到距另一端最近的锚点（决定箭头驶入方向）
     let best = anchors[0]
     let bestDist = Infinity
     for (const a of anchors) {
@@ -940,7 +939,7 @@ export function snapLinkerEndpoint(input: EndpointSnapInput): EndpointSnapResult
     }
   }
 
-  // 邻近吸附：光标未进入任何图形本体时，20px（屏幕像素）内最近的锚点直接吸附
+  // 5. 邻近吸附：光标未进入任何图形本体时，20px（屏幕像素）内最近的锚点直接吸附
   const proxTol = ANCHOR_PROX_PX / scale
   let proxBest: LinkerEndpoint | null = null
   let proxDist = Infinity
@@ -962,7 +961,7 @@ export function snapLinkerEndpoint(input: EndpointSnapInput): EndpointSnapResult
     return { endpoint: proxBest, snapAnchor: { x: proxBest.x, y: proxBest.y } }
   }
 
-  // 邻近吸附：光标 10px（屏幕像素）内落在其他连线的渲染路径上 → junction 附着
+  // 6. 邻近吸附：光标 10px（屏幕像素）内落在其他连线的渲染路径上 → junction 附着
   if (input.linkers && input.linkers.length > 0) {
     const j = findJunctionSnap(input.linkers, worldX, worldY, scale, {
       selfId: input.selfLinkerId ?? null,
@@ -983,6 +982,7 @@ export function snapLinkerEndpoint(input: EndpointSnapInput): EndpointSnapResult
     }
   }
 
+  // 7. 自由点：图形边吸附（2px）后，±6px（屏幕像素）与另一端对齐拉直
   let x = worldX
   let y = worldY
   const edge = snapLinkerLine(worldX, worldY, shapes)
