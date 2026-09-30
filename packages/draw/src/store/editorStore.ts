@@ -13,6 +13,7 @@ import { applyJunctionResolution, rectGetterOf } from '@/core/editor/documentOps
 import { resetManualRoute } from '@/core/editor/manualRoute'
 import { expandGroupIds, newGroupId, remapGroupIdsForCopy } from '@/core/editor/groupOps'
 import { saveDocumentToStorage, mirrorToRemote } from '@/core/editor/persistence'
+import { preloadNetworkGroups } from '@/core/schema/shapes/networkLoader'
 import { HistoryManager, applyCommand, reverseCommand, getPageFromCommand } from '@/core/editor/history'
 import { alignShapes, applyShapeTransform, distributeShapes, matchSize } from '@/core/editor/alignmentOps'
 import type { ActiveSwimlaneTarget } from '@/core/editor/swimlane'
@@ -67,7 +68,8 @@ interface EditorState {
   /** 连线创建草稿（锚点拖拽中） */
   linkerDraft: LinkerDraft | null
   /** 文字编辑状态：block 为图形 textBlock 下标；连线为 -1；fresh 标记刚创建未输入的自由文本 */
-  textEdit: { id: string; block: number; fresh?: boolean } | null
+  /** seg：连线的分段文字下标（block = -1 时有效） */
+  textEdit: { id: string; block: number; fresh?: boolean; seg?: number } | null
   /** 泳道图中当前填色目标（画布点击标题带/泳道设定；工具栏的颜色按钮直接作用于它） */
   activeTarget: ActiveSwimlaneTarget | null
   /** 面板拖拽创建中的图形预览（creating_from_panel；位置由 panelDrag 直操） */
@@ -119,7 +121,7 @@ interface EditorState {
   setLinkerDraft: (draft: LinkerDraft | null) => void
   copySelectedElements: () => void
   pasteElements: (offsetX?: number, offsetY?: number) => void
-  setTextEdit: (v: { id: string; block: number; fresh?: boolean } | null) => void
+  setTextEdit: (v: { id: string; block: number; fresh?: boolean; seg?: number } | null) => void
   updatePage: (patch: Partial<PageConfig>) => void
   setCreatingShape: (el: ElementInstance | null) => void
   setSeqDraft: (d: SeqMessageDraft | null) => void
@@ -194,6 +196,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   // - 复位全部编辑态（选区/草稿/剪贴板/工具/格式刷/悬停），避免指向旧文档元素
   loadDocument: (doc) => {
     historyManager.clear()
+    // 图标品类矢量数据定向预载，仅服务于左侧面板；渲染不依赖（元素自带 path）
+    void preloadNetworkGroups(doc.meta?.iconGroups ?? [])
     set({
       document: doc,
       selectedIds: new Set(),

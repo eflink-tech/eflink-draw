@@ -120,24 +120,30 @@ export function drawShapeThumb(canvas: HTMLCanvasElement, name: string, size: nu
     // 1. drawIcon + fillStyle='none'（泳道等）→ 用深色填充头部
     // 2. schema 有明确的 solid 填充（开始/同步等深色图形）→ 用 schema 的填充色；
     //    子路径显式指定 solid 色（如代码块顶栏）时优先用子路径色
-    // 3. 其余（有描边的普通图形）→ 填充白色，让描边可见
+    // 3. 多色图标（schema fill=none + 子路径 solid）→ 用子路径原色
+    // 4. 其余（有描边的普通图形）→ 填充白色，让描边可见
     const schemaFill = schema.fillStyle
     const hasSchemaSolidFill = schemaFill?.type === 'solid'
+    const isMultiColorIcon = !iconFill && !hasSchemaSolidFill && subFillStyle?.type === 'solid' && subFillStyle.color
 
     ctx.beginPath()
+    const fillRule: CanvasFillRule = segment.fillRule === 'evenodd' ? 'evenodd' : 'nonzero'
     for (const action of getPathActions(subPath)) {
       executePathAction(ctx, action, dims)
     }
     // 开放路径（如大括号）不做 fill，否则起终点直连会糊成实心条
     if (iconFill && getPathActions(subPath).some((a) => a.action === 'close')) {
       ctx.fillStyle = strokeStyle
-      ctx.fill()
+      ctx.fill(fillRule)
     } else if (hasSchemaSolidFill && subFillStyle?.type !== 'none') {
       ctx.fillStyle = `rgb(${subFillStyle?.type === 'solid' && subFillStyle.color ? subFillStyle.color : schemaFill.color})`
-      ctx.fill()
+      ctx.fill(fillRule)
+    } else if (isMultiColorIcon) {
+      ctx.fillStyle = `rgb(${subFillStyle.color})`
+      ctx.fill(fillRule)
     } else if (!iconFill && !hasSchemaSolidFill && subFillStyle?.type !== 'none') {
       ctx.fillStyle = 'rgb(255,255,255)'
-      ctx.fill()
+      ctx.fill(fillRule)
     }
     if (subLineWidth > 0) {
       ctx.strokeStyle = strokeStyle

@@ -287,6 +287,17 @@ export function strokeLinkerScene(ctx: Ctx, l: LinkerLike, opts: StrokeOptions):
  * - curve：贝塞尔 t=0.5（权重 0.125/0.375/0.375/0.125）
  * - 其余（line/broken）：沿 [from, ...points, to] 累计长度取半程点
  */
+/** 段中点：第 seg 段（pts[seg-1] → pts[seg]，与 hitLinkerSegment 同口径，1 起）；曲线退化为整条中点 */
+export function linkerSegmentMidpoint(l: LinkerLike, seg: number): Point {
+  const pts: Point[] = [l.from, ...l.points, l.to]
+  if (l.linkerType === 'curve' || seg < 1 || seg > pts.length - 1) {
+    return getLinkerMidpoint(l)
+  }
+  const a = pts[seg - 1]!
+  const b = pts[seg]!
+  return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }
+}
+
 export function getLinkerMidpoint(l: LinkerLike): Point {
   if (l.linkerType === 'curve' && l.points.length >= 2) {
     const p0 = l.from

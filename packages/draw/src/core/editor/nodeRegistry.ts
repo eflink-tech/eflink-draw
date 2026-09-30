@@ -8,8 +8,8 @@ import type { ShapeRect } from './linker'
 const elementNodes = new Map<string, Konva.Group>()
 /** id → 连线 Shape 节点 */
 const linkerNodes = new Map<string, Konva.Shape>()
-/** id → 连线文字标签 Group 节点 */
-const linkerLabelNodes = new Map<string, Konva.Group>()
+/** id → (key → 连线文字标签 Group 节点)：整线文字 key='main'，分段文字 key=段下标 */
+const linkerLabelNodes = new Map<string, Map<string, Konva.Group>>()
 
 export function registerElementNode(id: string, node: Konva.Group | null): void {
   if (node) elementNodes.set(id, node)
@@ -21,9 +21,22 @@ export function registerLinkerNode(id: string, node: Konva.Shape | null): void {
   else linkerNodes.delete(id)
 }
 
-export function registerLinkerLabelNode(id: string, node: Konva.Group | null): void {
-  if (node) linkerLabelNodes.set(id, node)
-  else linkerLabelNodes.delete(id)
+export function registerLinkerLabelNode(
+  id: string,
+  node: Konva.Group | null,
+  key = 'main',
+): void {
+  let nodes = linkerLabelNodes.get(id)
+  if (!node) {
+    nodes?.delete(key)
+    if (nodes && nodes.size === 0) linkerLabelNodes.delete(id)
+    return
+  }
+  if (!nodes) {
+    nodes = new Map()
+    linkerLabelNodes.set(id, nodes)
+  }
+  nodes.set(key, node)
 }
 
 export function getElementNode(id: string): Konva.Group | undefined {
@@ -35,7 +48,13 @@ export function getLinkerNode(id: string): Konva.Shape | undefined {
 }
 
 export function getLinkerLabelNode(id: string): Konva.Group | undefined {
-  return linkerLabelNodes.get(id)
+  return linkerLabelNodes.get(id)?.get('main')
+}
+
+/** 该连线的全部文字标签节点（拖拽实时跟随用） */
+export function getLinkerLabelNodes(id: string): Konva.Group[] {
+  const nodes = linkerLabelNodes.get(id)
+  return nodes ? [...nodes.values()] : []
 }
 
 export function forEachElementNode(fn: (id: string, node: Konva.Group) => void): void {

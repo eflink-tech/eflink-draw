@@ -54,7 +54,7 @@ export function makeShapeSceneFunc(element: ElementInstance) {
       }
       if (subFillStyle.type === 'solid' && subFillStyle.color) {
         ctx.fillStyle = rgbToCSS(subFillStyle.color)
-        ctx.fill()
+        ctx.fill(segment.fillRule === 'evenodd' ? 'evenodd' : 'nonzero')
       }
       if (subLineStyle.lineWidth && subLineStyle.lineWidth > 0) {
         ctx.strokeStyle = subLineStyle.lineColor ? rgbToCSS(subLineStyle.lineColor) : '#000'

@@ -3,6 +3,7 @@
 // 纯函数便于单测；浏览器 DOM 操作集中在 triggerDownload。
 import type { DocumentData } from '@/types'
 import { isDocumentData } from './persistence'
+import { networkGroupsOfShapes } from '@/core/schema/shapes/networkLoader'
 
 /** 解析导入文件文本为 DocumentData；坏 JSON / 结构不完整返回 null */
 export function parseDocumentFile(text: string): DocumentData | null {
@@ -38,5 +39,8 @@ export function buildExportFileNameEfd(title: string): string {
 
 /** 将 DocumentData 序列化为 .efd.json 文件内容（格式化便于阅读与版本对比） */
 export function serializeDocumentFile(doc: DocumentData): string {
-  return JSON.stringify(doc, null, 2)
+  const iconGroups = networkGroupsOfShapes(Object.values(doc.elements).map((el) => el.name))
+  if (iconGroups.length === 0) return JSON.stringify(doc, null, 2)
+  return JSON.stringify({ ...doc, meta: { ...doc.meta, iconGroups } }, null, 2)
 }
+

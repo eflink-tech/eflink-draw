@@ -72,3 +72,6 @@ for (const shape of umlDeploymentShapes) {
 for (const shape of umlComponentShapes) {
   shapeRegistry.addShape(shape)
 }
+
+// 网络拓扑图标（ProcessOn SVG → 原生矢量）体积大，不在此静态注册：
+// 由 networkLoader 在面板展开 / 文档导入时按需 import 并注册

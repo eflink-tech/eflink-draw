@@ -12,7 +12,7 @@ import { fontFamilyCSS } from '@/core/editor/fontMap'
 import { KONVA_TEXT_PROPS } from '@/core/editor/textRender'
 import { useEditorStore } from '@/store/editorStore'
 import { registerLinkerLabelNode, registerLinkerNode } from '@/core/editor/nodeRegistry'
-import { getLinkerMidpoint, strokeLinkerScene, traceLinkerPath } from '@/core/editor/linkerDraw'
+import { getLinkerMidpoint, linkerSegmentMidpoint, strokeLinkerScene, traceLinkerPath } from '@/core/editor/linkerDraw'
 import { LINKER_FONT_DEFAULTS } from '@/core/editor/linker'
 import { pointerWorld, shapeBorderWidth } from '@/core/editor/interaction'
 import { hitLinkerSegment, isSegmentDraggable, startSegmentDrag } from '@/core/editor/linkerSegment'
@@ -28,7 +28,6 @@ const LABEL_PAD = 2
 export const LinkerRenderer = memo(function LinkerRenderer({ linker }: LinkerRendererProps) {
   const selected = useEditorStore((s) => s.selectedIds.has(linker.id))
   const scale = useEditorStore((s) => s.viewport.scale)
-  const editingText = useEditorStore((s) => s.textEdit?.id === linker.id)
   const shapeRef = useRef<Konva.Shape>(null)
 
   useEffect(() => {
@@ -127,17 +126,34 @@ export const LinkerRenderer = memo(function LinkerRenderer({ linker }: LinkerRen
         }}
         onDblClick={(e) => {
           e.cancelBubble = true
-          const st = useEditorStore.getState()
-          // 文字锚点落到双击处（一条连线仅一个文字点；再次双击其他位置即移动该点）
+          // 每段直线独立文字：双击落在哪段就编辑哪段的文字（段下标随折线走）
           const stage = e.target.getStage()
           const pw = stage ? pointerWorld(stage) : null
-          if (pw && (linker.textPos == null || linker.textPos.x !== pw.x || linker.textPos.y !== pw.y)) {
-            st.updateLinker(linker.id, { textPos: { x: pw.x, y: pw.y } })
+          const scale = useEditorStore.getState().viewport.scale
+          let seg = 0
+          if (pw) {
+            const hit = hitLinkerSegment(linker, pw.x, pw.y, scale)
+            if (hit) seg = hit.segIndex
           }
-          st.setTextEdit({ id: linker.id, block: -1 })
+          useEditorStore.getState().setTextEdit({ id: linker.id, block: -1, seg })
         }}
       />
-      {!editingText && linker.text && <LinkerLabel linker={linker} />}
+      {linker.text && (
+        <LinkerLabel key="legacy" linker={linker} labelKey="legacy" text={linker.text}
+          pos={linker.textPos ?? getLinkerMidpoint(linker)} />
+      )}
+      {(linker.segTexts ?? [])
+        .filter((st) => st.text)
+        .map((st) => (
+          <LinkerLabel
+            key={`seg-${st.seg}`}
+            linker={linker}
+            labelKey={`seg-${st.seg}`}
+            seg={st.seg}
+            text={st.text}
+            pos={linkerSegmentMidpoint(linker, st.seg)}
+          />
+        ))}
     </Group>
   )
 })
@@ -175,8 +191,20 @@ function labelInkTopOffset(text: string, fontCSS: string, fontSize: number): num
   return v
 }
 
-/** 连线文字标签（textPos 锚点优先，缺省线中点；白底居中） */
-function LinkerLabel({ linker }: { linker: LinkerInstance }) {
+/** 连线文字标签（整线文字 / 分段文字通用；白底居中） */
+function LinkerLabel({
+  linker,
+  labelKey,
+  text,
+  pos,
+  seg,
+}: {
+  linker: LinkerInstance
+  labelKey: string
+  text: string
+  pos: { x: number; y: number }
+  seg?: number
+}) {
   const font = { ...LINKER_FONT_DEFAULTS, ...linker.fontStyle }
   // 背景尺寸：Text 挂载后测量回填（首次渲染 0×0，layout effect 后立即修正，无闪烁）
   const [box, setBox] = useState({ w: 0, h: 0 })
@@ -185,9 +213,9 @@ function LinkerLabel({ linker }: { linker: LinkerInstance }) {
   const groupRef = useRef<Konva.Group>(null)
 
   useEffect(() => {
-    registerLinkerLabelNode(linker.id, groupRef.current)
-    return () => registerLinkerLabelNode(linker.id, null)
-  }, [linker.id])
+    registerLinkerLabelNode(linker.id, groupRef.current, labelKey)
+    return () => registerLinkerLabelNode(linker.id, null, labelKey)
+  }, [linker.id, labelKey])
 
   useLayoutEffect(() => {
     const t = textRef.current
@@ -195,14 +223,20 @@ function LinkerLabel({ linker }: { linker: LinkerInstance }) {
     const w = t.textWidth
     const h = t.textHeight
     setBox((prev) => (prev.w === w && prev.h === h ? prev : { w, h }))
-  }, [linker.text, font.size, font.bold, font.italic, font.fontFamily])
+  }, [text, font.size, font.bold, font.italic, font.fontFamily])
 
-  const mid = linker.textPos ?? getLinkerMidpoint(linker)
+  // 本标签编辑中 → 隐藏（由 TextEditorOverlay 呈现编辑框）
+  const editingThis = useEditorStore(
+    (s) => s.textEdit?.id === linker.id && (s.textEdit.seg ?? undefined) === seg,
+  )
+  if (editingThis) return null
+
   return (
     <Group
       ref={groupRef}
-      x={mid.x}
-      y={mid.y}
+      x={pos.x}
+      y={pos.y}
+      name={seg != null ? 'seg' : undefined}
       onMouseDown={(e) => {
         e.cancelBubble = true
         useEditorStore
@@ -211,7 +245,7 @@ function LinkerLabel({ linker }: { linker: LinkerInstance }) {
       }}
       onDblClick={(e) => {
         e.cancelBubble = true
-        useEditorStore.getState().setTextEdit({ id: linker.id, block: -1 })
+        useEditorStore.getState().setTextEdit({ id: linker.id, block: -1, seg })
       }}
     >
       <Rect
@@ -225,7 +259,7 @@ function LinkerLabel({ linker }: { linker: LinkerInstance }) {
         ref={textRef}
         x={-box.w / 2}
         y={labelInkTopOffset(linker.text, fontFamilyCSS(font.fontFamily), font.size ?? 13)}
-        text={linker.text}
+        text={text}
         fontSize={font.size}
         fontFamily={fontFamilyCSS(font.fontFamily)}
         fontStyle={

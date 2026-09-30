@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { shapeRegistry } from '../registry'
+import { parsePathSegment } from '@/core/utils/pathActions'
 import { laneShapes } from '../shapes/lane'
 import '@/core/schema/shapes'
 
@@ -146,7 +147,7 @@ describe('泳池/泳道形状默认样式', () => {
       expect(el.textBlock, `${name}.textBlock`).toHaveLength(hasHeadRow ? 1 + lanes : 1)
       // 外框 + 标题带线 + 二级标题线（仅双向）+ (lanes-1) 泳道分隔线
       expect(el.path, `${name}.path`).toHaveLength((hasHeadRow ? 3 : 2) + lanes - 1)
-      const titleLine = el.path[1]!
+      const titleLine = parsePathSegment(el.path[1]!).actions
       const isHorizontal = ['horizontalPool', 'horizontalLane', 'bidirectionalPoolH'].includes(name)
       expect(titleLine[0], `${name}.标题带线起点`).toEqual({
         action: 'move',

@@ -14,6 +14,7 @@ A diagram & flowchart editor for the web. Run it standalone, or embed `<DrawEdit
 
 - 画布引擎：Konva + react-konva，无限画布、缩放平移、网格与分页参考
 - 图形库：内置常用图形与流程图/时序图形状，图形注册机制可扩展
+- 网络拓扑：738 个原生矢量图标（通用设备 / Cisco / AWS / Azure / 阿里云），面板按「分类 → 厂商 tab → 品类」三段导航，矢量数据按品类拆成 46 个 chunk 按需加载，支持中文搜索与「常驻」勾选（localStorage + 文档 `meta.iconGroups`）。生成与质量审计见 `scripts/gen-network-shapes.mjs`、`scripts/audit-network-icons.mjs`
 - 连线能力：锚点智能连线、折线路由、段中点句柄手动调整、连线随图形移动自动重路由
 - 编辑能力：多选/框选、对齐吸附、撤销重做、复制粘贴、组合层级、快捷键
 - AI 助手：对话式生成与修改图形（OpenAI 兼容接口，用户自备 API Key 与 BaseURL），支持图片转流程图、自动布局、主题配色、内置模板库

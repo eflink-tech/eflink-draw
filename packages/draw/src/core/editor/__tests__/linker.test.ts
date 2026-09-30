@@ -13,6 +13,7 @@ import {
 } from '../linker'
 import { shapeRegistry } from '@/core/schema/registry'
 import '@/core/schema/shapes'
+import { linkerSegmentMidpoint } from '../linkerDraw'
 import type { ElementInstance, LinkerInstance } from '@/types'
 
 function shape(x: number, y: number, w = 100, h = 60): ElementInstance {
@@ -700,5 +701,37 @@ describe('snapLinkerEndpoint（junction：吸附到另一条连线）', () => {
     expect(r.endpoint.id).toBeNull()
     expect(r.endpoint.junction).toBeUndefined()
     expect(r.snapAnchor).toBeNull()
+  })
+})
+
+
+describe('linkerSegmentMidpoint（分段文字锚点）', () => {
+  const l = createLinkerInstance(
+    { id: null, x: 100, y: 300, angle: 0 },
+    { id: null, x: 300, y: 100, angle: 0 },
+    1,
+  )
+  l.linkerType = 'broken'
+  l.points = [{ x: 100, y: 200 }, { x: 300, y: 200 }]
+
+  it('broken：返回对应段的几何中点', () => {
+    expect(linkerSegmentMidpoint(l, 1)).toEqual({ x: 100, y: 250 }) // 竖段
+    expect(linkerSegmentMidpoint(l, 2)).toEqual({ x: 200, y: 200 }) // 横段
+    expect(linkerSegmentMidpoint(l, 3)).toEqual({ x: 300, y: 150 }) // 竖段
+  })
+
+  it('段越界回落整线中点', () => {
+    expect(linkerSegmentMidpoint(l, 99)).toEqual({ x: 200, y: 200 })
+  })
+
+  it('curve：退化为整条贝塞尔中点', () => {
+    const c = createLinkerInstance(
+      { id: null, x: 0, y: 0, angle: 0 },
+      { id: null, x: 200, y: 0, angle: 0 },
+      1,
+    )
+    c.linkerType = 'curve'
+    c.points = [{ x: 100, y: -60 }, { x: 100, y: 60 }]
+    expect(linkerSegmentMidpoint(c, 0)).toEqual({ x: 100, y: 0 }) // 对称 S 曲线中点
   })
 })

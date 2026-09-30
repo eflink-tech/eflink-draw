@@ -1,7 +1,7 @@
 // liveLinker 直操统一通道
 // 连线拖拽（端点/线身/附着图形移动）期间不经 React 重绘：
 import type { LinkerInstance } from '@/types'
-import { getLinkerLabelNode, getLinkerNode } from './nodeRegistry'
+import { getLinkerLabelNodes, getLinkerNode } from './nodeRegistry'
 import { getLinkerMidpoint } from './linkerDraw'
 
 /**
@@ -16,10 +16,11 @@ export function applyLiveLinker(
   const node = getLinkerNode(id)
   node?.setAttr('liveLinker', live)
   if (live) {
-    const label = getLinkerLabelNode(id)
-    if (label) {
-      const mid = live.textPos ?? getLinkerMidpoint(live)
-      label.position(mid)
+    // 命名约定：name='seg' 的标签为分段文字（跟随所在段中点），
+    // 其余（整线文字）跟随 textPos/中点
+    const mid = live.textPos ?? getLinkerMidpoint(live)
+    for (const node of getLinkerLabelNodes(id)) {
+      node.position(node.name() === 'seg' ? getLinkerMidpoint(live) : mid)
     }
   }
   if (opts?.draw !== false) node?.getLayer()?.batchDraw()

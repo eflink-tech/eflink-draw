@@ -62,6 +62,16 @@ describe('serializeDocumentFile', () => {
     const text = serializeDocumentFile(doc as never)
     expect(JSON.parse(text)).toEqual(doc)
   })
+
+  it('含网络拓扑图标时写入 meta.iconGroups，供打开文档定向预载', () => {
+    const doc = {
+      page: { width: 1600, height: 1200 },
+      elements: { a: { id: 'a', name: 'router' }, b: { id: 'b', name: 'process' } },
+    }
+    const out = JSON.parse(serializeDocumentFile(doc as never))
+    expect(out.meta.iconGroups).toEqual(['network'])
+    expect(doc).not.toHaveProperty('meta') // 不改动入参
+  })
   it('与 parseDocumentFile 互逆（round-trip）', () => {
     const doc = { page: { width: 1600, height: 1200 }, elements: {} }
     expect(parseDocumentFile(serializeDocumentFile(doc as never))).toEqual(doc)

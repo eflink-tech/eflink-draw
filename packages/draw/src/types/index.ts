@@ -30,6 +30,8 @@ export interface StyledPathSegment {
   actions: PathAction[]
   lineStyle?: Partial<LineStyle>
   fillStyle?: Partial<FillStyle>
+  /** 填充绕序：SVG fill-rule="evenodd"（镂空字形/图标内孔），默认 nonzero */
+  fillRule?: 'nonzero' | 'evenodd'
 }
 
 /** 一条路径 = 纯动作数组，或带样式的对象 */
@@ -246,6 +248,8 @@ export interface LinkerInstance {
   textPos?: { x: number; y: number }
   /** UML 时序消息：两端附着激活条（fromDir/toDir = 条缘 1 右 / -1 左）或生命线/销毁符中轴（0）。y = 消息高度（恒水平）；loopW/H = 自消息回环尺寸（from.id === to.id 时有效） */
   seq?: SeqMessageData
+  /** 分段文字：seg = 段下标（pts[seg] → pts[seg+1]，1 起），每段直线可独立设置文字 */
+  segTexts?: Array<{ seg: number; text: string }>
   fontStyle?: FontStyle
   linkerType: 'curve' | 'broken' | 'line'
   lineStyle: LineStyle & {
@@ -298,6 +302,16 @@ export interface PageConfig {
 export interface DocumentData {
   page: PageConfig
   elements: Record<string, ElementInstance | LinkerInstance>
+  meta?: DocumentMeta
+}
+
+/**
+ * 文档元信息。iconGroups 记录用到的网络拓扑图标品类，打开文档时定向预载面板；
+ * 元素自带 path 快照，渲染不依赖它，缺失只影响面板显示。
+ */
+export interface DocumentMeta {
+  iconGroups?: string[]
+  [key: string]: unknown
 }
 
 // ═══════════════════════════════════════════

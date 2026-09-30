@@ -12,7 +12,7 @@ import {
   TEXT_LINE_HEIGHT,
   type FontStyle,
 } from '@/types'
-import { getLinkerMidpoint } from '@/core/editor/linkerDraw'
+import { getLinkerMidpoint, linkerSegmentMidpoint } from '@/core/editor/linkerDraw'
 import { LINKER_FONT_DEFAULTS } from '@/core/editor/linker'
 import { worldToScreen } from '@/core/editor/interaction'
 import { evalTextBlockRect } from '@/core/editor/textEdit'
@@ -24,11 +24,18 @@ const LINKER_PAD_W = 20
 export function TextEditorOverlay() {
   const textEdit = useEditorStore((s) => s.textEdit)
   if (!textEdit) return null
-  // key 重挂载：每次打开（元素/块变化）都是全新编辑会话
-  return <Editor key={`${textEdit.id}:${textEdit.block}`} id={textEdit.id} block={textEdit.block} />
+  // key 重挂载：每次打开（元素/块/段变化）都是全新编辑会话
+  return (
+    <Editor
+      key={`${textEdit.id}:${textEdit.block}:${textEdit.seg ?? ''}`}
+      id={textEdit.id}
+      block={textEdit.block}
+      seg={textEdit.seg}
+    />
+  )
 }
 
-function Editor({ id, block }: { id: string; block: number }) {
+function Editor({ id, block, seg }: { id: string; block: number; seg?: number }) {
   const el = useEditorStore((s) => s.document.elements[id])
   // 订阅整个 viewport 而非仅 scale（updateViewport 每次返回新对象，引用比较安全）：
   // 平移时 x/y 变化同样需要重算锚点屏幕坐标，使编辑器跟随锚点
@@ -50,7 +57,10 @@ function Editor({ id, block }: { id: string; block: number }) {
 
   const [value, setValue] = useState(() => {
     if (!el) return ''
-    return isLinker(el) ? el.text : el.textBlock[block]?.text ?? ''
+    if (isLinker(el)) {
+      return seg != null ? (el.segTexts ?? []).find((e) => e.seg === seg)?.text ?? '' : el.text
+    }
+    return el.textBlock[block]?.text ?? ''
   })
   // 内容实际尺寸：
   // - span 测最长行宽（不折行，用于连线编辑框宽度）
@@ -100,8 +110,8 @@ function Editor({ id, block }: { id: string; block: number }) {
   let taPadTop = 0 // textarea 内部垂直对齐偏移（px），模拟 Konva verticalAlign
   let taBg = 'transparent' // 图形有自身填充色 → 透明；连线无填充 → 白底，编辑态可见
   if (isLinker(el)) {
-    // 文字锚点优先（线身双击处），缺省回落线中点
-    const mid = el.textPos ?? getLinkerMidpoint(el)
+    // 分段文字锚点 = 段中点；整线文字锚点优先（textPos），缺省线中点
+    const mid = seg != null ? linkerSegmentMidpoint(el, seg) : el.textPos ?? getLinkerMidpoint(el)
     anchorX = mid.x
     anchorY = mid.y
     worldW = Math.max(LINKER_MIN_W, textW + LINKER_PAD_W)
@@ -146,7 +156,19 @@ function Editor({ id, block }: { id: string; block: number }) {
       return
     }
     if (cur && isLinker(cur)) {
-      if (value !== cur.text) st.updateLinker(cur.id, { text: value })
+      if (seg != null) {
+        // 分段文字：写回 segTexts（清空 = 移除该段条目）
+        const others = (cur.segTexts ?? []).filter((e) => e.seg !== seg)
+        if (value !== '') {
+          others.push({ seg, text: value })
+          others.sort((a, b) => a.seg - b.seg)
+          st.updateLinker(cur.id, { segTexts: others })
+        } else {
+          st.updateLinker(cur.id, { segTexts: others.length ? others : undefined })
+        }
+      } else if (value !== cur.text) {
+        st.updateLinker(cur.id, { text: value })
+      }
     } else if (cur && cur.textBlock[block] && value !== cur.textBlock[block]!.text) {
       const textBlock = cur.textBlock.map((tb, i) => (i === block ? { ...tb, text: value } : tb))
       st.updateElement(cur.id, { textBlock })

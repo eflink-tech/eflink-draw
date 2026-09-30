@@ -9,9 +9,6 @@ const SIZE = 30
 const TOL = 0.6 // 描边半径 + 量测采样容差
 
 describe('面板图标布局（全图形）', () => {
-  const names = shapeRegistry.getShapeNames ? [] : []
-  void names
-
   it('所有注册图形：墨迹完全落在画布内且水平垂直居中', () => {
     const problems: string[] = []
     const schemas = shapeRegistry
