@@ -9,6 +9,7 @@ import {
 } from '../documentOps'
 import { createLinkerInstance } from '../linker'
 import { cursorPointAt } from '../linkerCursor'
+import { nearestContourPoint } from '../shapeContour'
 import { shapeRegistry } from '@/core/schema/registry'
 import '@/core/schema/shapes'
 import {
@@ -175,6 +176,49 @@ describe('routeAttachedLinkers（live 直操）', () => {
     const linker = [...updated.values()][0]!
     // 移动 50：右锚点 (220,130) → (270,130)
     expect(linker.from).toMatchObject({ x: 270, y: 130 })
+  })
+
+  it('任意边点端点 resize 后按比例映射仍在顶边（顶边 30% 处）', () => {
+    const a = shape(100, 100, 'shape-a') // 120×60
+    // 顶边 30%：(100 + 0.3×120, 100) = (136, 100)
+    const linker = createLinkerInstance(
+      { id: a.id, x: 136, y: 100, angle: Math.PI / 2 },
+      { id: null, x: 400, y: 100, angle: 0 },
+      1,
+    )
+    const doc: DocumentData = {
+      ...createEmptyDocument(),
+      elements: { [a.id]: a, [linker.id]: linker },
+    }
+    const updated = routeAttachedLinkers(
+      doc.elements,
+      new Map([[a.id, { x: 100, y: 100, w: 200, h: 60 }]]),
+    )
+    const l = [...updated.values()][0]!
+    expect(l.from).toMatchObject({ id: a.id, x: 160, y: 100 }) // 100 + 0.3×200
+    expect(l.from.angle).toBe(Math.PI / 2)
+  })
+
+  it('圆边点等比放大后仍在圆周上（距轮廓 ≤1px）', () => {
+    const a = shape(0, 0, 'shape-c', 'round', 100, 100) // 圆 0..100
+    const linker = createLinkerInstance(
+      { id: a.id, x: 100, y: 50, angle: 0 }, // 圆右点
+      { id: null, x: 300, y: 50, angle: 0 },
+      1,
+    )
+    const doc: DocumentData = {
+      ...createEmptyDocument(),
+      elements: { [a.id]: a, [linker.id]: linker },
+    }
+    const updated = routeAttachedLinkers(
+      doc.elements,
+      new Map([[a.id, { x: 0, y: 0, w: 200, h: 200 }]]),
+    )
+    const l = [...updated.values()][0]!
+    const grown = { ...a, props: { ...a.props, w: 200, h: 200 } }
+    const c = nearestContourPoint(grown, l.from.x, l.from.y)
+    expect(c).not.toBeNull()
+    expect(c!.dist).toBeLessThanOrEqual(1)
   })
 })
 
