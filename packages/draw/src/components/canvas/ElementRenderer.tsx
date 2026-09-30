@@ -16,6 +16,8 @@ import {
   getLinkerPoints,
   getLocalAnchors,
   snapLinkerEndpoint,
+  LINKER_DEFAULTS,
+  type LinkerEndpoint,
 } from '@/core/editor/linker'
 import {
   attachedLinkerIds,
@@ -44,7 +46,7 @@ import {
   worldToLocalPoint,
   worldToScreen,
 } from '@/core/editor/interaction'
-import { LINKER_DEFAULTS } from '@/core/editor/linker'
+import { nearestContourPoint } from '@/core/editor/shapeContour'
 import { SEQ_LOOP_H, SEQ_LOOP_W, barEdgeX, resolveSeqDrop, selfLoopPoints } from '@/core/editor/seqMessage'
 import { hitTextBlock, evalTextBlockRect } from '@/core/editor/textEdit'
 import { fontFamilyCSS } from '@/core/editor/fontMap'
@@ -425,6 +427,10 @@ export const ElementRenderer = memo(function ElementRenderer({ element, textEngi
         const hit = n[`hit-${idx}`] as Konva.Rect | null
         if (hit) hit.position({ x: a.x - hit.width() / 2, y: a.y - hit.height() / 2 })
       })
+      // 边线命中带随 live 尺寸重排（resize 直操期间命中带不失准）
+      const edge = n['edge-hit']
+      edge?.width(w)
+      edge?.height(h)
     },
     [element],
   )
@@ -791,75 +797,75 @@ export const ElementRenderer = memo(function ElementRenderer({ element, textEngi
     return targetRectOf(swimlaneEl, resolveTarget(swimlaneEl, activeTarget))
   }, [swimlaneEl, selected, currentTool, activeTarget])
 
-  // ===== 锚点 → 连线创建 =====
-  const anchorStart = useRef<{ x: number; y: number } | null>(null)
+  // ===== 锚点/边线 → 连线创建（from 端点在 DragStart 捕获，两种起点共用管道） =====
+  const linkerDragFrom = useRef<(LinkerEndpoint & { angle: number }) | null>(null)
 
-  const handleAnchorDragStart = useCallback(
-    (e: Konva.KonvaEventObject<DragEvent>, idx: number) => {
-      e.cancelBubble = true
-      const anchors = getAnchorPoints(element)
-      const ap = anchors[idx]
-      if (!ap) return
-      anchorStart.current = { x: ap.x, y: ap.y }
-      useEditorStore.getState().setHoveredId(null)
+  const anchorEndpointOf = useCallback(
+    (idx: number): LinkerEndpoint | null => {
+      const ap = getAnchorPoints(element)[idx]
+      return ap ? { id: element.id, x: ap.x, y: ap.y, angle: ap.angle ?? 0 } : null
     },
     [element],
   )
 
-  const handleAnchorDragMove = useCallback(
-    (e: Konva.KonvaEventObject<DragEvent>, idx: number) => {
+  const handleLinkerDragStart = useCallback(
+    (e: Konva.KonvaEventObject<DragEvent>, from: LinkerEndpoint) => {
       e.cancelBubble = true
-      const stage = e.target.getStage()
-      const pw = pointerWorld(stage)
-      if (!pw || !stage) return
-      // 锚点吸附指针
-      e.target.setAbsolutePosition(stage.getPointerPosition()!)
-
-      const st = useEditorStore.getState()
-      const from = (() => {
-        const ap = getAnchorPoints(element)[idx]!
-        return { id: element.id, x: ap.x, y: ap.y, angle: ap.angle ?? 0 }
-      })()
-
-      // 吸附到"距另一端最近"的锚点（决定箭头驶入方向）
-      const hitId = hitElementId(stage)
-      const r = snapLinkerEndpoint({
-        shapes: allShapes(),
-        hitShapeId: hitId,
-        worldX: pw.x,
-        worldY: pw.y,
-        scale: st.viewport.scale,
-        otherEnd: { id: from.id, x: from.x, y: from.y },
-      })
-      // 悬停图形显示锚点 / 吸附锚点大圆预览（旧 showAnchors + showLinkPoint）
-      st.setHoveredId(hitId)
-      if (r.snapAnchor) {
-        showEndpointPreview(r.snapAnchor.x, r.snapAnchor.y, st.viewport.scale)
-      } else {
-        hideEndpointPreview()
-      }
-
-      // 自由端 angle 归 0（路由只用附着端角度，与 createLinkerInstance 一致）
-      const to = { ...r.endpoint, angle: r.endpoint.angle ?? 0 }
-      const draft = {
-        from,
-        to,
-        linkerType: 'broken' as const,
-        lineStyle: {
-          lineWidth: LINKER_DEFAULTS.lineWidth,
-          lineColor: LINKER_DEFAULTS.lineColor,
-          lineStyle: LINKER_DEFAULTS.lineStyle,
-          beginArrowStyle: LINKER_DEFAULTS.beginArrowStyle,
-          endArrowStyle: LINKER_DEFAULTS.endArrowStyle,
-        },
-        points: getLinkerPoints({ linkerType: 'broken', from, to }, makeStoreRectGetter()),
-      }
-      st.setLinkerDraft(draft)
+      // angle 归一为非空（LinkerDraft.from 要求 number；与 createLinkerInstance 端点口径一致）
+      linkerDragFrom.current = { ...from, angle: from.angle ?? 0 }
+      useEditorStore.getState().setHoveredId(null)
     },
-    [element, element.id],
+    [],
   )
 
-  const handleAnchorDragEnd = useCallback(
+  const handleLinkerDragMove = useCallback((e: Konva.KonvaEventObject<DragEvent>) => {
+    e.cancelBubble = true
+    const from = linkerDragFrom.current
+    if (!from) return
+    const stage = e.target.getStage()
+    const pw = pointerWorld(stage)
+    if (!pw || !stage) return
+    // 拖拽载体节点吸附指针
+    e.target.setAbsolutePosition(stage.getPointerPosition()!)
+
+    const st = useEditorStore.getState()
+    // 吸附到锚点/轮廓点（决定箭头驶入方向）
+    const hitId = hitElementId(stage)
+    const r = snapLinkerEndpoint({
+      shapes: allShapes(),
+      hitShapeId: hitId,
+      worldX: pw.x,
+      worldY: pw.y,
+      scale: st.viewport.scale,
+      otherEnd: { id: from.id, x: from.x, y: from.y },
+    })
+    // 悬停图形显示锚点 / 吸附点大圆预览（旧 showAnchors + showLinkPoint）
+    st.setHoveredId(hitId)
+    if (r.snapAnchor) {
+      showEndpointPreview(r.snapAnchor.x, r.snapAnchor.y, st.viewport.scale)
+    } else {
+      hideEndpointPreview()
+    }
+
+    // 自由端 angle 归 0（路由只用附着端角度，与 createLinkerInstance 一致）
+    const to = { ...r.endpoint, angle: r.endpoint.angle ?? 0 }
+    const draft = {
+      from,
+      to,
+      linkerType: 'broken' as const,
+      lineStyle: {
+        lineWidth: LINKER_DEFAULTS.lineWidth,
+        lineColor: LINKER_DEFAULTS.lineColor,
+        lineStyle: LINKER_DEFAULTS.lineStyle,
+        beginArrowStyle: LINKER_DEFAULTS.beginArrowStyle,
+        endArrowStyle: LINKER_DEFAULTS.endArrowStyle,
+      },
+      points: getLinkerPoints({ linkerType: 'broken', from, to }, makeStoreRectGetter()),
+    }
+    st.setLinkerDraft(draft)
+  }, [])
+
+  const handleLinkerDragEnd = useCallback(
     (e: Konva.KonvaEventObject<DragEvent>, home: { x: number; y: number }) => {
       e.cancelBubble = true
       const st = useEditorStore.getState()
@@ -868,8 +874,8 @@ export const ElementRenderer = memo(function ElementRenderer({ element, textEngi
       e.target.position(home)
       hideEndpointPreview()
       st.setHoveredId(null)
-      const start = anchorStart.current
-      anchorStart.current = null
+      const start = linkerDragFrom.current
+      linkerDragFrom.current = null
       if (!draft || !start) return
       if (Math.abs(draft.to.x - start.x) <= 20 && Math.abs(draft.to.y - start.y) <= 20) return
       const zmax = Math.max(
@@ -975,6 +981,58 @@ export const ElementRenderer = memo(function ElementRenderer({ element, textEngi
         id={element.id}
         name="element"
       />
+
+      {/* 边线命中带：选择模式压边 ±4px 拖出连线（起点=轮廓最近点）；
+          stroke 命中带跨轮廓内外各半，不拦截图形内部（按下=移动图形） */}
+      {currentTool === 'select' && !element.locked && element.attribute?.linkable !== false && (
+        <Shape
+          ref={setAnchorNodeRef('edge-hit')}
+          width={w}
+          height={h}
+          stroke="#000"
+          strokeWidth={8 / scale}
+          fillEnabled={false}
+          perfectDrawEnabled={false}
+          draggable
+          name="edge-linker-hit"
+          sceneFunc={() => {
+            /* 纯命中区：视觉层不绘制 */
+          }}
+          hitFunc={(context, shape) => {
+            const ctx = context as unknown as CanvasRenderingContext2D & {
+              strokeShape: (shape: Konva.Shape) => void
+            }
+            tracePath(ctx, shape.width(), shape.height())
+            ctx.strokeShape(shape)
+          }}
+          onMouseEnter={(e) => {
+            e.cancelBubble = true
+            const container = e.target.getStage()?.container()
+            if (container) container.style.cursor = 'crosshair'
+          }}
+          onMouseLeave={(e) => {
+            e.cancelBubble = true
+            // 指针可能移入图形本体（由 Group enter 设回 move），先恢复默认
+            const container = e.target.getStage()?.container()
+            if (container) container.style.cursor = 'default'
+          }}
+          onDragStart={(e) => {
+            const pw = pointerWorld(e.target.getStage())
+            const c = pw ? nearestContourPoint(element, pw.x, pw.y) : null
+            const from: LinkerEndpoint = c
+              ? { id: element.id, x: c.x, y: c.y, angle: c.angle }
+              : {
+                  id: element.id,
+                  x: props.x + w / 2,
+                  y: props.y + h / 2,
+                  angle: Math.PI / 2,
+                }
+            handleLinkerDragStart(e, from)
+          }}
+          onDragMove={handleLinkerDragMove}
+          onDragEnd={(e) => handleLinkerDragEnd(e, { x: 0, y: 0 })}
+        />
+      )}
 
       {/* 多块文本命中区：置于 Shape 之上，双击精确进入对应 textBlock（避免整图命中误开块 0） */}
       {textBlock && textBlock.length > 1 && (
@@ -1324,9 +1382,12 @@ export const ElementRenderer = memo(function ElementRenderer({ element, textEngi
               const container = e.target.getStage()?.container()
               if (container) container.style.cursor = 'default'
             }}
-            onDragStart={(e) => handleAnchorDragStart(e, idx)}
-            onDragMove={(e) => handleAnchorDragMove(e, idx)}
-            onDragEnd={(e) => handleAnchorDragEnd(e, { x: a.x - hitHalf, y: a.y - hitHalf })}
+            onDragStart={(e) => {
+              const f = anchorEndpointOf(idx)
+              if (f) handleLinkerDragStart(e, f)
+            }}
+            onDragMove={handleLinkerDragMove}
+            onDragEnd={(e) => handleLinkerDragEnd(e, { x: a.x - hitHalf, y: a.y - hitHalf })}
           />
         ))}
 
