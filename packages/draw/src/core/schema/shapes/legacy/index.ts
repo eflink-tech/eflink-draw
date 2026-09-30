@@ -14,6 +14,7 @@ import { andriodControlsLegacyShapes } from './andriodControls'
 import { andriodElementsLegacyShapes } from './andriodElements'
 import { andriodDevicesLegacyShapes } from './andriodDevices'
 import { iosIconsLegacyShapes } from './iosIcons'
+import { andriodIconsLegacyShapes } from './andriodIcons'
 
 /** 旧 Schema 分类移植过来的图形，由 shapes/index.ts 统一注册 */
 export const legacyShapes: ShapeDefinition[] = [
@@ -31,4 +32,5 @@ export const legacyShapes: ShapeDefinition[] = [
   ...andriodElementsLegacyShapes,
   ...andriodDevicesLegacyShapes,
   ...iosIconsLegacyShapes,
+  ...andriodIconsLegacyShapes,
 ]

@@ -15,7 +15,7 @@ const TEXT_ONLY_SHAPES = new Set(['ios7Heading1', 'ios7Heading2', 'ios7TextLabel
 
 describe('旧 Schema 移植图形', () => {
   it('全部注册进 shapeRegistry，名称不重复', () => {
-    expect(legacyShapes.length).toBe(251)
+    expect(legacyShapes.length).toBe(337)
     expect(new Set(legacyShapes.map((s) => s.name)).size).toBe(legacyShapes.length)
     for (const shape of legacyShapes) {
       expect(shapeRegistry.getShape(shape.name), shape.name).toBe(shape)
@@ -45,7 +45,7 @@ describe('旧 Schema 移植图形', () => {
   it('BPMN / 移动端图形带面板二级分组，其余分类不分组', () => {
     const byCat = (cat: string) => legacyShapes.filter((s) => s.category === cat)
     expect(byCat('bpmn').length).toBe(90)
-    expect(byCat('mobile').length).toBe(116)
+    expect(byCat('mobile').length).toBe(202)
     for (const shape of [...byCat('bpmn'), ...byCat('mobile')]) expect(shape.groupName, shape.name).toBeTruthy()
     for (const shape of byCat('bpmn')) expect(BPMN_GROUPS, `${shape.name} → ${shape.group}`).toContain(shape.group)
     for (const shape of byCat('mobile')) expect(MOBILE_GROUPS, `${shape.name} → ${shape.group}`).toContain(shape.group)
@@ -136,6 +136,27 @@ describe('旧 Schema 移植图形', () => {
     const hollowed = icons.filter((s) => s.path.some((p) => !Array.isArray(p) && p.fillRule === 'evenodd'))
     expect(hollowed.length).toBeGreaterThanOrEqual(20)
     for (const name of ['ios7AddBlack', 'ios7Check2', 'ios7Profile', 'ios7Close3']) {
+      expect(hollowed.map((s) => s.name), name).toContain(name)
+    }
+  })
+
+  it('Android 图标同样重画为单色墨迹（86 个位图图标全部转矢量，无一残留图片填充）', () => {
+    const icons = legacyShapes.filter((s) => s.group === 'mobile_and_icon')
+    expect(icons.length).toBe(86)
+    for (const shape of icons) {
+      expect(shape.fillStyle?.type, shape.name).toBe('solid')
+      expect(shape.fillStyle?.color, shape.name).toBeTruthy()
+      expect(shape.lineStyle?.lineWidth, `${shape.name} 墨迹图标不描边`).toBe(0)
+      for (const p of shape.path) {
+        expect(Array.isArray(p) ? undefined : p.fillStyle, `${shape.name} 子路径写死填充色`).toBeUndefined()
+        expect(Array.isArray(p) ? undefined : p.lineStyle, `${shape.name} 子路径写死线样式`).toBeUndefined()
+      }
+      // 旧素材是 40×40 透明框里摆 29×29 的字形，默认尺寸按字形本体给
+      expect(shape.props, shape.name).toEqual({ w: 29, h: 29 })
+    }
+    const hollowed = icons.filter((s) => s.path.some((p) => !Array.isArray(p) && p.fillRule === 'evenodd'))
+    expect(hollowed.length).toBeGreaterThanOrEqual(15)
+    for (const name of ['andriod_icons_alert1', 'andriod_icons_73', 'andriod_icons_27']) {
       expect(hollowed.map((s) => s.name), name).toContain(name)
     }
   })

@@ -16,6 +16,7 @@ import path from 'node:path'
 import vm from 'node:vm'
 import { MOBILE_GLYPHS } from './lib/mobile-glyphs.mjs'
 import { IOS_ICON_GLYPHS } from './lib/mobile-icon-glyphs.mjs'
+import { ANDROID_ICON_GLYPHS } from './lib/android-icon-glyphs.mjs'
 import { MOBILE_STYLES, MOBILE_SCALE } from './lib/mobile-styles.mjs'
 
 const ROOT = path.resolve(import.meta.dirname, '..')
@@ -115,6 +116,93 @@ const TITLE_CN = {
   ios7Phone: '电话',
   ios7Message: '消息',
   ios7Mail: '邮件',
+  // Android 图标：旧素材整分类标题都是空的，面板里全靠这里补
+  andriod_icons_alert1: '警告（黑底）',
+  andriod_icons_alert2: '警告（红底）',
+  andriod_icons_alert3: '警告（黄三角）',
+  andriod_icons_alert4: '警告（黑三角）',
+  andriod_icons_0: '柱状图',
+  andriod_icons_1: '加号',
+  andriod_icons_2: '心形',
+  andriod_icons_3: '安卓机器人',
+  andriod_icons_4: '铃铛',
+  andriod_icons_5: '回形针',
+  andriod_icons_6: '二维码',
+  andriod_icons_7: '信号强度',
+  andriod_icons_8: '蓝牙',
+  andriod_icons_9: '书本',
+  andriod_icons_10: '书签',
+  andriod_icons_11: '相机',
+  andriod_icons_12: '公文包',
+  andriod_icons_13: '日历',
+  andriod_icons_14: '叉号',
+  andriod_icons_15: '购物车',
+  andriod_icons_16: '时钟',
+  andriod_icons_17: '文档',
+  andriod_icons_18: '云',
+  andriod_icons_19: '下载',
+  andriod_icons_20: '退出登录',
+  andriod_icons_21: '脸书',
+  andriod_icons_22: 'RSS 订阅',
+  andriod_icons_23: '旗帜',
+  andriod_icons_24: '文件夹',
+  andriod_icons_25: '打开文件夹',
+  andriod_icons_26: '字号（Aa）',
+  andriod_icons_27: '设置（齿轮）',
+  andriod_icons_28: '批量完成',
+  andriod_icons_29: '下划线',
+  andriod_icons_30: '斜体',
+  andriod_icons_31: '粗体',
+  andriod_icons_32: '撤销',
+  andriod_icons_33: '重做',
+  andriod_icons_34: '禁止',
+  andriod_icons_35: '帮助',
+  andriod_icons_36: '首页',
+  andriod_icons_37: '电源',
+  andriod_icons_38: '好评',
+  andriod_icons_39: '趋势',
+  andriod_icons_40: '链接',
+  andriod_icons_41: '左对齐',
+  andriod_icons_42: '地图标记',
+  andriod_icons_43: '靶心',
+  andriod_icons_44: '锁定',
+  andriod_icons_45: '解锁',
+  andriod_icons_46: '邮件',
+  andriod_icons_47: '麦克风',
+  andriod_icons_48: '评论',
+  andriod_icons_49: '胶片',
+  andriod_icons_50: '音乐',
+  andriod_icons_51: '电话',
+  andriod_icons_52: '快进',
+  andriod_icons_53: '下一曲',
+  andriod_icons_54: '暂停',
+  andriod_icons_55: '播放',
+  andriod_icons_56: '快退',
+  andriod_icons_57: '循环播放',
+  andriod_icons_58: '上一曲',
+  andriod_icons_59: '停止',
+  andriod_icons_60: '保存',
+  andriod_icons_61: '搜索',
+  andriod_icons_62: '分享',
+  andriod_icons_63: '字母排序',
+  andriod_icons_64: '收藏（描边）',
+  andriod_icons_65: '收藏',
+  andriod_icons_66: '编辑',
+  andriod_icons_67: '对勾',
+  andriod_icons_68: '九宫格',
+  andriod_icons_69: '四宫格',
+  andriod_icons_70: 'T 恤',
+  andriod_icons_71: '刷新',
+  andriod_icons_72: '撤回',
+  andriod_icons_73: '用户',
+  andriod_icons_74: '用户组',
+  andriod_icons_75: '摄像机',
+  andriod_icons_76: '音量',
+  andriod_icons_77: '无线网络',
+  andriod_icons_78: '复选框（选中）',
+  andriod_icons_79: '方框',
+  andriod_icons_80: '圆框',
+  andriod_icons_81: '单选（选中）',
   andriodSearch: '搜索栏',
   andriodDialog: '对话框与确认',
   andriodConfirm: '确认对话框',
@@ -133,11 +221,11 @@ const MOBILE_TARGETS = [
   'andriod_controls:mobile_and_control:Android 控件',
   'andriod_elements:mobile_and_element:Android 元素',
   'andriod_devices:mobile_and_device:Android 设备背景',
-  // 状态/操作图标：整分类都是位图矩形填充，靠 mobile-icon-glyphs.mjs 重画为矢量
+  // 状态/操作图标：整分类都是「rectangle + PNG 图片填充」，靠 mobile-*-glyphs.mjs 重画为矢量
   'ios_icons:mobile_ios_icon:iOS 图标:icon',
-  'andriod_icons:mobile_and_icon:Android 图标:icon',
+  'andriod_icons:mobile_and_icon:Android 图标:icon:29',
 ].map((spec) => {
-  const [from, group, groupName, icon] = spec.split(':')
+  const [from, group, groupName, icon, iconDefault] = spec.split(':')
   return {
     file: `${from}.js`,
     out: from.replace(/_(\w)/g, (_, c) => c.toUpperCase()),
@@ -147,6 +235,9 @@ const MOBILE_TARGETS = [
     proportionalDefault: true,
     // 图标本就是 16~30px 的小图形，不再参与整族的尺寸收敛
     iconScale: !!icon,
+    // Android 图标旧素材是 40×40 透明框里摆 29×29 的字形：默认尺寸按字形本体给，
+    // 免得拖到画布上比 iOS 图标大一圈
+    iconDefault: iconDefault ? Number(iconDefault) : null,
   }
 })
 
@@ -464,7 +555,7 @@ function applyMobileSize(shape, explicit) {
 }
 
 function convertShape(s, cfg, refs, commands) {
-  const glyph = MOBILE_GLYPHS[s.name] ?? IOS_ICON_GLYPHS[s.name]
+  const glyph = MOBILE_GLYPHS[s.name] ?? IOS_ICON_GLYPHS[s.name] ?? ANDROID_ICON_GLYPHS[s.name]
   const shape = {
     name: s.name,
     title: TITLE_CN[s.name] || s.title || s.name,
@@ -531,6 +622,11 @@ function convertShape(s, cfg, refs, commands) {
     PROPORTIONAL_PATCH[s.name] ??
     (cfg.proportionalDefault && Number.isFinite(props.w) && Number.isFinite(props.h) ? props : null)
   if (patchDims) applyProportional(shape, patchDims)
+  // 几何按旧框子（40）比例化完毕，默认尺寸改按字形本体（29）给
+  if (cfg.iconDefault && shape.props) {
+    shape.props.w = cfg.iconDefault
+    shape.props.h = cfg.iconDefault
+  }
   if (cfg.category === 'mobile' && !cfg.iconScale) applyMobileSize(shape, style?.size)
   return { shape }
 }
@@ -615,7 +711,7 @@ if (!dryRun) {
 // 旧系统 ${cfg.file} 中尚未移植的 ${items.length} 个图形 → 原生矢量 ShapeDefinition
 // 自动生成: node scripts/gen-legacy-shapes.mjs --category ${cfg.out}（勿手改）
 // 几何与尺寸取自旧 Schema；actions:{ref} 原语已展开；样式仅保留与本项目默认值的差异
-${cfg.iconScale ? '// 旧素材整分类都是「rectangle + PNG 图片填充」，字形由 scripts/lib/mobile-icon-glyphs.mjs 重画为原生矢量\n' : cfg.from ? '// 位图细节（勾选/开关滑块/放大镜/电池/键盘按键）改由 scripts/lib/mobile-glyphs.mjs 重画为矢量，坐标已比例化\n// 旧素材「白底 + lineWidth:0」在白画布上等于隐形，表面描边/配色由 scripts/lib/mobile-styles.mjs 补齐\n' : ''}// ═══════════════════════════════════════════
+${cfg.iconScale ? `// 旧素材整分类都是「rectangle + PNG 图片填充」，字形由 scripts/lib/${cfg.from === 'andriod_icons' ? 'android' : 'mobile'}-icon-glyphs.mjs 重画为原生矢量\n` : cfg.from ? '// 位图细节（勾选/开关滑块/放大镜/电池/键盘按键）改由 scripts/lib/mobile-glyphs.mjs 重画为矢量，坐标已比例化\n// 旧素材「白底 + lineWidth:0」在白画布上等于隐形，表面描边/配色由 scripts/lib/mobile-styles.mjs 补齐\n' : ''}// ═══════════════════════════════════════════
 import type { ShapeDefinition } from '@/types'
 
 export const ${cfg.out}LegacyShapes: ShapeDefinition[] = [

@@ -1,137 +1,29 @@
 /**
- * iOS 状态/操作图标的手绘矢量库（旧 ios_icons 分类）。
+ * iOS 状态/操作图标的手绘矢量库（旧 ios_icons 分类，54 个位图图标）。
  *
  * 旧素材这 54 个图标是「rectangle + PNG 图片填充」（/images/designer/ios_icons/*.png），
  * 既不能改色也不能缩放保真，与本项目「全部可编辑矢量」的口径冲突，所以逐个重画。
- *
- * 单色墨迹模型：一枚图标只有一种墨色，墨色写在图形级 fillStyle 上，字形子路径一律
- * 不带自己的颜色 —— 面板改「填充色」即整体换色（若子路径各自写死颜色，改色就失效，
- * 这是上一版 GUI 探针实测出的问题）。为此：
- *   · 笔画不用描边，折线加粗成填充多边形（ribbon），渲染器也没有线端样式；
- *   · 圆环/空心体用同一子路径的 evenodd 内轮廓挖空（hollow）；
- *   · 徽标里的反白符号同样做成镂空，整枚图标仍是单色。
+ * 墨迹模型与矢量原语见 glyph-kit.mjs（Android 图标共用）；本文件只放 iOS 的字形设计。
  * 墨色差异（黑/蓝/绿/红）只体现在图形级 fillStyle，字形本身与颜色无关。
- *
- * 坐标一律写在图形的默认尺寸（w×h）里，生成器会统一比例化，缩放时细节跟随。
  */
+import { CLOSE, ellipsePath, line, move, quad, rectPath, roundRectPath, sub } from './mobile-glyphs.mjs'
 import {
-  CLOSE,
-  ellipsePath,
-  line,
-  move,
-  quad,
-  rectPath,
-  roundRectPath,
-  sub,
-} from './mobile-glyphs.mjs'
+  ST,
+  arcBand,
+  heartPath,
+  hollow,
+  icon,
+  personContours,
+  poly,
+  plusPoly,
+  ribbon,
+  ring,
+  starPath,
+  tipPoly,
+  waves,
+} from './glyph-kit.mjs'
 
-export const BLACK = '51,51,51'
-export const BLUE = '10,132,255'
-export const GREEN = '90,200,125'
-export const RED = '235,61,54'
-export const WHITE = '255,255,255'
-const INK = { black: BLACK, blue: BLUE, green: GREEN, red: RED, white: WHITE }
-
-const r2 = (v) => Math.round(v * 100) / 100
-/** 笔画厚度随图标尺寸走，下限 1.5px 免得缩略图上糊成一团 */
-const ST = (w, k = 0.13) => Math.max(1.5, w * k)
-
-/** 多边形（闭合） */
-const poly = (pts) =>
-  pts.map(([x, y], i) => (i ? line(r2(x), r2(y)) : move(r2(x), r2(y)))).concat(CLOSE)
-
-/** 折线加粗成填充多边形：逐点取相邻两段的平均法向，得到斜接轮廓 */
-const ribbon = (pts, t) => {
-  const left = [], right = []
-  for (let i = 0; i < pts.length; i++) {
-    const a = pts[Math.max(0, i - 1)]
-    const b = pts[Math.min(pts.length - 1, i + 1)]
-    const dx = b[0] - a[0], dy = b[1] - a[1]
-    const len = Math.hypot(dx, dy) || 1
-    const nx = (-dy / len) * (t / 2), ny = (dx / len) * (t / 2)
-    left.push([pts[i][0] + nx, pts[i][1] + ny])
-    right.push([pts[i][0] - nx, pts[i][1] - ny])
-  }
-  return poly([...left, ...right.reverse()])
-}
-
-/** 十字（rot=45° 即叉）：单轮廓，避免两根条在 evenodd 镂空里互相补实 */
-const plusPoly = (cx, cy, L, t, rot = 0) => {
-  const h = L / 2, q = t / 2
-  const pts = [
-    [-q, -h], [q, -h], [q, -q], [h, -q], [h, q], [q, q],
-    [q, h], [-q, h], [-q, q], [-h, q], [-h, -q], [-q, -q],
-  ]
-  const c = Math.cos(rot), s = Math.sin(rot)
-  return poly(pts.map(([x, y]) => [cx + x * c - y * s, cy + x * s + y * c]))
-}
-
-/** 以 (cx,cy) 为中心把轮廓缩 kx/ky 倍（curve/quadraticCurve 的控制点一起缩） */
-const scaleAbout = (actions, cx, cy, kx, ky = kx) =>
-  actions.map((a) => {
-    const X = (v) => r2(cx + (v - cx) * kx)
-    const Y = (v) => r2(cy + (v - cy) * ky)
-    switch (a.action) {
-      case 'move':
-      case 'line':
-        return { ...a, x: X(a.x), y: Y(a.y) }
-      case 'curve':
-        return { ...a, x1: X(a.x1), y1: Y(a.y1), x2: X(a.x2), y2: Y(a.y2), x: X(a.x), y: Y(a.y) }
-      case 'quadraticCurve':
-        return { ...a, x1: X(a.x1), y1: Y(a.y1), x: X(a.x), y: Y(a.y) }
-      default:
-        return a
-    }
-  })
-
-/**
- * 空心轮廓：外轮廓 + 内轮廓写进同一子路径，evenodd 挖空 → 单色的「描边」观感。
- * rx/ry 为外轮廓半宽半高，t 为壁厚（两轴各自等比，非正方形轮廓也均匀）。
- */
-const hollow = (actions, cx, cy, rx, ry, t) => ({
-  actions: [
-    ...actions,
-    ...scaleAbout(actions, cx, cy, Math.max(0.15, (rx - t) / rx), Math.max(0.15, (ry - t) / ry)),
-  ],
-  fillRule: 'evenodd',
-})
-const ring = (x, y, d, t) => hollow(ellipsePath(x, y, d, d), x + d / 2, y + d / 2, d / 2, d / 2, t)
-
-/** 圆弧带：a0→a1 的环段（canvas y 轴向下，角度递增即顺时针） */
-const arcBand = (cx, cy, rx, ry, t, a0, a1, n = 16) => {
-  const outer = [], inner = []
-  for (let i = 0; i <= n; i++) {
-    const a = a0 + ((a1 - a0) * i) / n
-    const c = Math.cos(a), s = Math.sin(a)
-    outer.push([cx + c * rx, cy + s * ry])
-    inner.push([cx + c * (rx - t), cy + s * (ry - t)])
-  }
-  return poly([...outer, ...inner.reverse()])
-}
-/** 弧端箭头：dir 为行进方向（单位切向），nrm 为法向（单位半径向），s 为箭头大小 */
-const tipPoly = (px, py, dirx, diry, nrmx, nrmy, s) =>
-  poly([
-    [px + dirx * s * 1.5, py + diry * s * 1.5],
-    [px - dirx * s * 0.2 + nrmx * s, py - diry * s * 0.2 + nrmy * s],
-    [px - dirx * s * 0.2 - nrmx * s, py - diry * s * 0.2 - nrmy * s],
-  ])
-
-/** 五角星轮廓 */
-export const starPath = (cx, cy, R, rot = -Math.PI / 2) => {
-  const pts = []
-  for (let i = 0; i < 10; i++) {
-    const a = rot + (Math.PI * i) / 5
-    const rr = i % 2 ? R * 0.42 : R
-    pts.push([cx + Math.cos(a) * rr, cy + Math.sin(a) * rr])
-  }
-  return poly(pts)
-}
-/** 折线近似圆弧（本项目渲染器没有 arc 动作，24 段在图标尺度足够光滑） */
-export const arcPoly = (cx, cy, rx, ry, a0, a1, n = 24) =>
-  Array.from({ length: n + 1 }, (_, i) => {
-    const a = a0 + ((a1 - a0) * i) / n
-    return (i ? line : move)(r2(cx + Math.cos(a) * rx), r2(cy + Math.sin(a) * ry))
-  })
+export { BLACK, BLUE, GREEN, RED, WHITE, arcPoly, starPath } from './glyph-kit.mjs'
 
 // ── 圆底徽标内的符号：一律返回「轮廓数组」，filled 变体把它们做成镂空 ──
 const mPlus = (w, h) => [plusPoly(w / 2, h / 2, w * 0.56, w * 0.16)]
@@ -196,16 +88,6 @@ const tag = (variant, color) =>
     return [hollow(body, w / 2, h / 2, w / 2 - 1, h / 2 - 1, ST(w, 0.07)), ...tagCross(w, h)]
   })
 
-/**
- * 图标条目工厂：墨色只出现在图形级 fillStyle / lineStyle 上，
- * 字形子路径保持无色（继承），面板改「填充色」即整体换色。
- */
-const icon = (color, subPaths) => ({
-  fill: { type: 'solid', color: INK[color] },
-  line: { lineWidth: 0, lineColor: INK[color] },
-  subPaths,
-})
-
 /** 环形箭头（刷新）：留 1 弧度的缺口，箭头在尾端沿切向 */
 const refresh = (w, h, t) => {
   const cx = w / 2, cy = h / 2, R = Math.min(w, h) * 0.4
@@ -214,39 +96,6 @@ const refresh = (w, h, t) => {
   return [
     arcBand(cx, cy, R, R, t, a0, a1, 20),
     tipPoly(cx + Math.cos(a1) * R, cy + Math.sin(a1) * R, dx, dy, Math.cos(a1), Math.sin(a1), R * 0.26),
-  ]
-}
-
-/** 声波/信号的同心弧带 */
-const waves = (cx, cy, r0, gap, n, t, span = 0.85, ry = 1.1) =>
-  Array.from({ length: n }, (_, i) =>
-    arcBand(cx, cy, r0 + i * gap, (r0 + i * gap) * ry, t, -Math.PI / 2 - span, -Math.PI / 2 + span, 10),
-  )
-
-/** 人形轮廓：头 + 肩（作为镂空或实心都用同一组轮廓） */
-const personContours = (w, h) => {
-  const cx = w / 2
-  return [
-    ellipsePath(cx - w * 0.13, h * 0.17, w * 0.26, w * 0.26),
-    poly([
-      [cx - w * 0.27, h * 0.85],
-      [cx - w * 0.24, h * 0.55],
-      [cx, h * 0.52],
-      [cx + w * 0.24, h * 0.55],
-      [cx + w * 0.27, h * 0.85],
-    ]),
-  ]
-}
-
-const heartPath = (w, h) => {
-  const cx = w / 2
-  return [
-    move(cx, h * 0.9),
-    quad(-w * 0.06, h * 0.5, w * 0.12, h * 0.2),
-    quad(w * 0.3, h * 0.0, cx, h * 0.28),
-    quad(w - w * 0.3, h * 0.0, w * 0.88, h * 0.2),
-    quad(w * 1.06, h * 0.5, cx, h * 0.9),
-    CLOSE,
   ]
 }
 
