@@ -15,6 +15,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import vm from 'node:vm'
 import { MOBILE_GLYPHS } from './lib/mobile-glyphs.mjs'
+import { IOS_ICON_GLYPHS } from './lib/mobile-icon-glyphs.mjs'
 import { MOBILE_STYLES, MOBILE_SCALE } from './lib/mobile-styles.mjs'
 
 const ROOT = path.resolve(import.meta.dirname, '..')
@@ -58,6 +59,62 @@ const TITLE_CN = {
   andriodRadio: '单选按钮',
   andriodSwitchOff: '开关：关',
   andriodSwitchOnf: '开关：开',
+  // iOS 图标：旧素材同一字形按配色/底形出了好几个图形，标题一律只写「添加」在面板里没法挑
+  ios7AddBlack: '添加（黑底）',
+  ios7AddBlackLight: '添加（描边）',
+  ios7AddGreen: '添加（绿底）',
+  ios7AddNormal: '添加（蓝描边）',
+  ios7RemoveBlack: '删除（黑底）',
+  ios7RemoveBlackLight: '删除（描边）',
+  ios7RemoveRed: '删除（红底）',
+  ios7AddSmall: '加号',
+  ios7Close1: '关闭',
+  ios7Close2: '关闭（蓝标签）',
+  ios7Close3: '关闭（黑标签）',
+  ios7Close4: '关闭（标签描边）',
+  ios7Refresh: '刷新',
+  ios7SearchIcon: '搜索',
+  ios7SearchBig: '搜索（大）',
+  ios7MenuIcon: '菜单',
+  ios7Info1: '信息（蓝描边）',
+  ios7Info2: '信息（描边）',
+  ios7Info3: '信息（黑底）',
+  ios7Check1: '选中（描边）',
+  ios7Check2: '选中（蓝底）',
+  ios7Check3: '选中（黑底）',
+  ios7Check4: '对勾（蓝）',
+  ios7Check5: '对勾',
+  ios7Play1: '播放（黑底）',
+  ios7Play2: '播放（描边）',
+  ios7Pause1: '暂停（黑底）',
+  ios7Pause2: '暂停（描边）',
+  ios7Stop1: '暂停（蓝描边）',
+  ios7Stop2: '停止（描边）',
+  ios7Stop3: '停止（黑底）',
+  ios7Favourite: '收藏（蓝）',
+  ios7Favourite1: '收藏（描边）',
+  ios7Heart: '喜欢',
+  ios7Bookmark: '书签',
+  ios7Profile: '个人信息',
+  ios7Copy: '复制',
+  ios7Upload: '上传',
+  ios7Download: '下载',
+  ios7Wifi: '无线网络',
+  ios7Bluetooth: '蓝牙',
+  ios7Battery: '电池',
+  ios7Lock: '锁定',
+  ios7Camera: '相机',
+  ios7Sound: '声音',
+  ios7Video: '视频',
+  ios7ListIcon: '列表',
+  ios7Locate: '定位',
+  ios7Trash: '垃圾箱',
+  ios7Help: '帮助',
+  ios7AlertIcon: '提醒',
+  ios7Clock: '时钟',
+  ios7Phone: '电话',
+  ios7Message: '消息',
+  ios7Mail: '邮件',
   andriodSearch: '搜索栏',
   andriodDialog: '对话框与确认',
   andriodConfirm: '确认对话框',
@@ -72,12 +129,15 @@ const TITLE_CN = {
 const MOBILE_TARGETS = [
   'ios_controls:mobile_ios_control:iOS 控件',
   'ios_elements:mobile_ios_element:iOS 元素',
-  'ios_devices:mobile_ios_device:iOS 设备',
+  'ios_devices:mobile_ios_device:iOS 设备背景',
   'andriod_controls:mobile_and_control:Android 控件',
   'andriod_elements:mobile_and_element:Android 元素',
-  'andriod_devices:mobile_and_device:Android 设备',
+  'andriod_devices:mobile_and_device:Android 设备背景',
+  // 状态/操作图标：整分类都是位图矩形填充，靠 mobile-icon-glyphs.mjs 重画为矢量
+  'ios_icons:mobile_ios_icon:iOS 图标:icon',
+  'andriod_icons:mobile_and_icon:Android 图标:icon',
 ].map((spec) => {
-  const [from, group, groupName] = spec.split(':')
+  const [from, group, groupName, icon] = spec.split(':')
   return {
     file: `${from}.js`,
     out: from.replace(/_(\w)/g, (_, c) => c.toUpperCase()),
@@ -85,6 +145,8 @@ const MOBILE_TARGETS = [
     from,
     group: [group, groupName],
     proportionalDefault: true,
+    // 图标本就是 16~30px 的小图形，不再参与整族的尺寸收敛
+    iconScale: !!icon,
   }
 })
 
@@ -402,7 +464,7 @@ function applyMobileSize(shape, explicit) {
 }
 
 function convertShape(s, cfg, refs, commands) {
-  const glyph = MOBILE_GLYPHS[s.name]
+  const glyph = MOBILE_GLYPHS[s.name] ?? IOS_ICON_GLYPHS[s.name]
   const shape = {
     name: s.name,
     title: TITLE_CN[s.name] || s.title || s.name,
@@ -422,6 +484,8 @@ function convertShape(s, cfg, refs, commands) {
   }
   if (JSON.stringify(s.path).includes('"image"') && !glyph) return { skip: '依赖位图填充' }
   const path = convertPath(s.path, refs, commands, !!glyph)
+  // 旧路径本身就是坏矢量（如菜单图标依赖 lineWidth 表达式，本项目求值为 0）时整条替换
+  if (glyph?.replace) path.length = 0
   // 位图细节整块替换的图形（iOS 开关等）：原路径可能一条矢量都不剩，几何全部来自补丁
   if (glyph) path.push(...glyph.subPaths(props.w ?? 100, props.h ?? 100))
   if (!path.length) return { skip: '无可用路径' }
@@ -449,7 +513,7 @@ function convertShape(s, cfg, refs, commands) {
   const fillStyle = glyph?.fill ?? normFill
   const alpha = glyph?.fill ? (glyph.alpha ?? null) : normAlpha
   const fontStyle = normalizeFont(s.fontStyle)
-  if (lineStyle) shape.lineStyle = lineStyle
+  if (lineStyle || glyph?.line) shape.lineStyle = { ...(lineStyle ?? {}), ...(glyph?.line ?? {}) }
   if (fillStyle) shape.fillStyle = fillStyle
   if (fontStyle) shape.fontStyle = fontStyle
   if (alpha != null) shape.shapeStyle = { alpha }
@@ -467,7 +531,7 @@ function convertShape(s, cfg, refs, commands) {
     PROPORTIONAL_PATCH[s.name] ??
     (cfg.proportionalDefault && Number.isFinite(props.w) && Number.isFinite(props.h) ? props : null)
   if (patchDims) applyProportional(shape, patchDims)
-  if (cfg.category === 'mobile') applyMobileSize(shape, style?.size)
+  if (cfg.category === 'mobile' && !cfg.iconScale) applyMobileSize(shape, style?.size)
   return { shape }
 }
 
@@ -541,12 +605,17 @@ for (const cfg of TARGETS) {
 if (!dryRun) {
   fs.mkdirSync(OUT_DIR, { recursive: true })
   for (const { cfg, items } of generated) {
+    // 一个都没转出来（整分类依赖位图）就别留空文件污染 index
+    if (!items.length) {
+      fs.rmSync(path.join(OUT_DIR, `${cfg.out}.ts`), { force: true })
+      continue
+    }
     const body = items.map((s) => `/** ${s.title}（${s.props?.w ?? '?'}×${s.props?.h ?? '?'}） */\n${ts(s)}`).join(',\n')
     const file = `// ═══════════════════════════════════════════
 // 旧系统 ${cfg.file} 中尚未移植的 ${items.length} 个图形 → 原生矢量 ShapeDefinition
 // 自动生成: node scripts/gen-legacy-shapes.mjs --category ${cfg.out}（勿手改）
 // 几何与尺寸取自旧 Schema；actions:{ref} 原语已展开；样式仅保留与本项目默认值的差异
-${cfg.from ? '// 位图细节（勾选/开关滑块/放大镜/电池/键盘按键）改由 scripts/lib/mobile-glyphs.mjs 重画为矢量，坐标已比例化\n// 旧素材「白底 + lineWidth:0」在白画布上等于隐形，表面描边/配色由 scripts/lib/mobile-styles.mjs 补齐\n' : ''}// ═══════════════════════════════════════════
+${cfg.iconScale ? '// 旧素材整分类都是「rectangle + PNG 图片填充」，字形由 scripts/lib/mobile-icon-glyphs.mjs 重画为原生矢量\n' : cfg.from ? '// 位图细节（勾选/开关滑块/放大镜/电池/键盘按键）改由 scripts/lib/mobile-glyphs.mjs 重画为矢量，坐标已比例化\n// 旧素材「白底 + lineWidth:0」在白画布上等于隐形，表面描边/配色由 scripts/lib/mobile-styles.mjs 补齐\n' : ''}// ═══════════════════════════════════════════
 import type { ShapeDefinition } from '@/types'
 
 export const ${cfg.out}LegacyShapes: ShapeDefinition[] = [
@@ -555,7 +624,8 @@ ${body.split('\n').map((l) => (l ? `  ${l}` : l)).join('\n')}
 `
     fs.writeFileSync(path.join(OUT_DIR, `${cfg.out}.ts`), file)
   }
-  const imports = generated.map((g) => `import { ${g.cfg.out}LegacyShapes } from './${g.cfg.out}'`).join('\n')
+  const nonEmpty = generated.filter((g) => g.items.length)
+  const imports = nonEmpty.map((g) => `import { ${g.cfg.out}LegacyShapes } from './${g.cfg.out}'`).join('\n')
   fs.writeFileSync(
     path.join(OUT_DIR, 'index.ts'),
     `// 自动生成: node scripts/gen-legacy-shapes.mjs（勿手改）
@@ -564,7 +634,7 @@ ${imports}
 
 /** 旧 Schema 分类移植过来的图形，由 shapes/index.ts 统一注册 */
 export const legacyShapes: ShapeDefinition[] = [
-${generated.map((g) => `  ...${g.cfg.out}LegacyShapes,`).join('\n')}
+${nonEmpty.map((g) => `  ...${g.cfg.out}LegacyShapes,`).join('\n')}
 ]
 `,
   )
@@ -573,6 +643,10 @@ ${generated.map((g) => `  ...${g.cfg.out}LegacyShapes,`).join('\n')}
 const total = generated.reduce((n, g) => n + g.items.length, 0)
 console.log(`${dryRun ? '[dry-run] ' : ''}生成 ${total} 个图形：`)
 for (const r of report) {
-  console.log(`  ${r.out.padEnd(10)} ${String(r.count).padStart(3)} 个${r.skipped.length ? `  跳过 ${r.skipped.length}: ${r.skipped.join('; ')}` : ''}`)
+  console.log(
+    `  ${r.out.padEnd(12)} ${String(r.count).padStart(3)} 个${
+      r.skipped.length ? `  跳过 ${r.skipped.length}: ${r.skipped.slice(0, 6).join('; ')}${r.skipped.length > 6 ? ' …' : ''}` : ''
+    }`,
+  )
 }
 if (!dryRun) console.log(`\n输出目录: ${path.relative(ROOT, OUT_DIR)}/`)

@@ -14,7 +14,7 @@ export const andriodDevicesLegacyShapes: ShapeDefinition[] = [
     title: 'Android 灰色背景',
     category: 'mobile',
     group: 'mobile_and_device',
-    groupName: 'Android 设备',
+    groupName: 'Android 设备背景',
     props: { w: 270, h: 452 },
     path: [
       {

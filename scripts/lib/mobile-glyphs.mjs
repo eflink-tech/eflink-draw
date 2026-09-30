@@ -15,12 +15,14 @@ const line = (x, y) => ({ action: 'line', x, y })
 const quad = (x1, y1, x, y) => ({ action: 'quadraticCurve', x1, y1, x, y })
 const cubic = (x1, y1, x2, y2, x, y) => ({ action: 'curve', x1, y1, x2, y2, x, y })
 const CLOSE = { action: 'close' }
+export { move, line, quad, cubic, CLOSE }
 
 /** 子路径：带样式时包成 {actions, lineStyle, fillStyle}，否则裸数组 */
 const sub = (actions, style) => (style ? { actions, ...style } : actions)
 const fill = (color) => ({ fillStyle: { type: 'solid', color }, lineStyle: { lineWidth: 0 } })
 const stroke = (lineColor, lineWidth = 1.5) => ({ fillStyle: { type: 'none' }, lineStyle: { lineWidth, lineColor } })
 const both = (color, lineColor, lineWidth = 1) => ({ fillStyle: { type: 'solid', color }, lineStyle: { lineWidth, lineColor } })
+export { sub, fill, stroke, both }
 
 const rectPath = (x, y, w, h) => [move(x, y), line(x + w, y), line(x + w, y + h), line(x, y + h), CLOSE]
 const ellipsePath = (x, y, w, h) => [
@@ -40,17 +42,18 @@ const roundRectPath = (x, y, w, h, r) => [
   quad(x, y + h, x, y + h - r),
   CLOSE,
 ]
+export { rectPath, ellipsePath, roundRectPath }
 
-const GREY = '120,120,120'
+export const GREY = '120,120,120'
 const TEAL = '0,150,136'
 
 /** 放大镜：圆环 + 手柄 */
-const magnifier = (x, y, d, color = GREY) => [
+export const magnifier = (x, y, d, color = GREY) => [
   sub(ellipsePath(x, y, d, d), stroke(color, 1.5)),
   sub([line(x + d * 0.78, y + d * 0.78), line(x + d, y + d)], stroke(color, 2)),
 ]
 /** 电池：外壳 + 电量 + 正极凸点 */
-const battery = (x, y, w, h, color) => [
+export const battery = (x, y, w, h, color) => [
   sub(roundRectPath(x, y, w, h, h / 4), stroke(color, 1)),
   sub(rectPath(x + h / 3, y + h / 3, w * 0.6, h / 3), fill(color)),
   sub(rectPath(x + w + 1, y + h / 3, 2, h / 3), fill(color)),

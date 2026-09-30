@@ -14,7 +14,7 @@ export const iosDevicesLegacyShapes: ShapeDefinition[] = [
     title: '灰色背景',
     category: 'mobile',
     group: 'mobile_ios_device',
-    groupName: 'iOS 设备',
+    groupName: 'iOS 设备背景',
     props: { w: 210, h: 371 },
     path: [
       {
@@ -40,7 +40,7 @@ export const iosDevicesLegacyShapes: ShapeDefinition[] = [
     title: '黑色背景',
     category: 'mobile',
     group: 'mobile_ios_device',
-    groupName: 'iOS 设备',
+    groupName: 'iOS 设备背景',
     props: { w: 210, h: 371 },
     path: [
       {
@@ -66,7 +66,7 @@ export const iosDevicesLegacyShapes: ShapeDefinition[] = [
     title: '白色背景',
     category: 'mobile',
     group: 'mobile_ios_device',
-    groupName: 'iOS 设备',
+    groupName: 'iOS 设备背景',
     props: { w: 210, h: 371 },
     path: [
       {

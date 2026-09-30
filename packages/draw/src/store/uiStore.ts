@@ -84,9 +84,11 @@ export const SHAPE_CATEGORIES: ShapeCategory[] = [
       { id: 'mobile_ios_control', name: 'iOS 控件' },
       { id: 'mobile_ios_element', name: 'iOS 元素' },
       { id: 'mobile_ios_device', name: 'iOS 设备背景' },
+      { id: 'mobile_ios_icon', name: 'iOS 图标' },
       { id: 'mobile_and_control', name: 'Android 控件' },
       { id: 'mobile_and_element', name: 'Android 元素' },
       { id: 'mobile_and_device', name: 'Android 设备背景' },
+      { id: 'mobile_and_icon', name: 'Android 图标' },
     ],
   },
   // 网络拓扑 / 云服务图标：ProcessOn SVG 转换的原生矢量图标（gen-network-shapes.mjs 自动生成）

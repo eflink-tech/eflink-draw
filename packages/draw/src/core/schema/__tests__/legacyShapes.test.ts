@@ -7,13 +7,15 @@ import { SHAPE_CATEGORIES } from '@/store/uiStore'
 import '@/core/schema/shapes'
 
 const BPMN_GROUPS = ['bpmn_start', 'bpmn_intermediate', 'bpmn_boundary', 'bpmn_end', 'bpmn_task', 'bpmn_sub', 'bpmn_gateway', 'bpmn_data', 'bpmn_collab', 'bpmn_misc']
-const MOBILE_GROUPS = ['mobile_ios_control', 'mobile_ios_element', 'mobile_ios_device', 'mobile_and_control', 'mobile_and_element', 'mobile_and_device']
+const MOBILE_GROUPS = ['mobile_ios_control', 'mobile_ios_element', 'mobile_ios_device', 'mobile_ios_icon', 'mobile_and_control', 'mobile_and_element', 'mobile_and_device', 'mobile_and_icon']
+/** 旧素材本就是矢量路径、沿用原样式的 iOS 图标（四个方向箭头） */
+const ICON_AS_IS = new Set(['ios7ArrowUp', 'ios7ArrowDown', 'ios7ArrowLeft', 'ios7ArrowRight'])
 /** 线框素材里的纯文字元素：本体是隐形矩形，只有文案 */
 const TEXT_ONLY_SHAPES = new Set(['ios7Heading1', 'ios7Heading2', 'ios7TextLabel', 'ios7Label', 'andriodHeading1', 'andriodHeading2', 'andriodTextLabel'])
 
 describe('旧 Schema 移植图形', () => {
   it('全部注册进 shapeRegistry，名称不重复', () => {
-    expect(legacyShapes.length).toBe(192)
+    expect(legacyShapes.length).toBe(251)
     expect(new Set(legacyShapes.map((s) => s.name)).size).toBe(legacyShapes.length)
     for (const shape of legacyShapes) {
       expect(shapeRegistry.getShape(shape.name), shape.name).toBe(shape)
@@ -43,7 +45,7 @@ describe('旧 Schema 移植图形', () => {
   it('BPMN / 移动端图形带面板二级分组，其余分类不分组', () => {
     const byCat = (cat: string) => legacyShapes.filter((s) => s.category === cat)
     expect(byCat('bpmn').length).toBe(90)
-    expect(byCat('mobile').length).toBe(57)
+    expect(byCat('mobile').length).toBe(116)
     for (const shape of [...byCat('bpmn'), ...byCat('mobile')]) expect(shape.groupName, shape.name).toBeTruthy()
     for (const shape of byCat('bpmn')) expect(BPMN_GROUPS, `${shape.name} → ${shape.group}`).toContain(shape.group)
     for (const shape of byCat('mobile')) expect(MOBILE_GROUPS, `${shape.name} → ${shape.group}`).toContain(shape.group)
@@ -89,9 +91,11 @@ describe('旧 Schema 移植图形', () => {
       mobile_ios_control: 210,
       mobile_ios_element: 210,
       mobile_ios_device: 210,
+      mobile_ios_icon: 40,
       mobile_and_control: 270,
       mobile_and_element: 270,
       mobile_and_device: 270,
+      mobile_and_icon: 40,
     }
     for (const shape of mobile) {
       const { w, h } = shape.props ?? {}
@@ -113,6 +117,27 @@ describe('旧 Schema 移植图形', () => {
     // 通栏元素与设备底图同宽，叠上去才对得齐
     expect(mobile.find((s) => s.name === 'ios7Nav')!.props!.w).toBe(210)
     expect(mobile.find((s) => s.name === 'andriodTitle1')!.props!.w).toBe(270)
+  })
+
+  it('iOS 图标重画为单色墨迹：颜色只写在图形级，子路径不写死（面板改填充色即整体换色）', () => {
+    const icons = legacyShapes.filter((s) => s.group === 'mobile_ios_icon')
+    expect(icons.length).toBe(59)
+    for (const shape of icons) {
+      if (ICON_AS_IS.has(shape.name)) continue
+      expect(shape.fillStyle?.type, shape.name).toBe('solid')
+      expect(shape.fillStyle?.color, shape.name).toBeTruthy()
+      expect(shape.lineStyle?.lineWidth, `${shape.name} 墨迹图标不描边`).toBe(0)
+      for (const p of shape.path) {
+        expect(Array.isArray(p) ? undefined : p.fillStyle, `${shape.name} 子路径写死填充色`).toBeUndefined()
+        expect(Array.isArray(p) ? undefined : p.lineStyle, `${shape.name} 子路径写死线样式`).toBeUndefined()
+      }
+    }
+    // 反白符号改成同子路径的 evenodd 镂空（旧观感靠 PNG 里的白像素）
+    const hollowed = icons.filter((s) => s.path.some((p) => !Array.isArray(p) && p.fillRule === 'evenodd'))
+    expect(hollowed.length).toBeGreaterThanOrEqual(20)
+    for (const name of ['ios7AddBlack', 'ios7Check2', 'ios7Profile', 'ios7Close3']) {
+      expect(hollowed.map((s) => s.name), name).toContain(name)
+    }
   })
 
   it('移动端残留的英文示例文案已中文化', () => {
