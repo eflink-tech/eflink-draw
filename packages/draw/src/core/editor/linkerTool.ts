@@ -1,7 +1,7 @@
 //
 // 模块级状态模式（同 panelDrag），与 Canvas 的 stage mousedown/mousemove/mouseup 联动：
-//   1. mousedown：resolveLinkerStart 解析起点（命中图形→最近锚点；空白/锁定→自由端点），
-//      置 linkerDraft（to 暂等于 from）
+//   1. mousedown：resolveLinkerStart 解析起点（命中图形→锚点 7px 优先，否则轮廓最近点；
+//      空白/锁定→自由端点），置 linkerDraft（to 暂等于 from）
 //   2. mousemove：snapLinkerEndpoint 计算 to 端（吸附锚点/图形边/与另一端对齐），实时重算 points
 //   3. mouseup：双轴位移 ≤20px 视为误触不创建；否则 createLinkerInstance + getLinkerPoints
 //      + addLinker + 选中
@@ -13,11 +13,12 @@ import { useEditorStore } from '@/store/editorStore'
 import {
   LINKER_DEFAULTS,
   createLinkerInstance,
-  findSnapAnchor,
+  getAnchorPoints,
   getLinkerPoints,
   snapLinkerEndpoint,
   type LinkerEndpoint,
 } from './linker'
+import { nearestContourPoint, pointInRotatedBBox } from './shapeContour'
 import { allShapes, makeStoreRectGetter } from './interaction'
 import { hideEndpointPreview, showEndpointPreview } from './uiOverlay'
 
@@ -40,18 +41,44 @@ export function isFreeLinkerDragging(): boolean {
 
 /**
  * 起点解析（纯函数，便于测试）：
- * 命中图形（含锁定排除）→ 最近锚点；空白/锁定图形 → 自由端点。
+ * 1. 包围盒（±10px）覆盖光标的可连线图形为候选
+ * 2. 候选中距轮廓最近的图形承载起点；其锚点 7px（屏幕像素）内锚点优先
+ * 3. 否则起点 = 轮廓最近点（任意边点）；空白/锁定 → 自由端点
  */
 export function resolveLinkerStart(
   shapes: ElementInstance[],
   worldX: number,
   worldY: number,
+  scale: number = 1,
 ): LinkerEndpoint {
-  const snapped = findSnapAnchor(shapes, worldX, worldY, null)
-  if (snapped) {
-    return { id: snapped.id, x: snapped.x, y: snapped.y, angle: snapped.angle ?? 0 }
+  const cands = shapes.filter(
+    (s) =>
+      !s.locked &&
+      s.attribute?.linkable !== false &&
+      pointInRotatedBBox(s, worldX, worldY, 10),
+  )
+  if (cands.length === 0) return { id: null, x: worldX, y: worldY, angle: 0 }
+
+  let host: ElementInstance | null = null
+  let hostDist = Infinity
+  for (const s of cands) {
+    const c = nearestContourPoint(s, worldX, worldY)
+    if (c && c.dist < hostDist) {
+      hostDist = c.dist
+      host = s
+    }
   }
-  return { id: null, x: worldX, y: worldY, angle: 0 }
+  if (!host) return { id: null, x: worldX, y: worldY, angle: 0 }
+
+  // 锚点 7px 优先（与端点吸附 ANCHOR_HIT_PX 同阈值）
+  const tol = 7 / scale
+  const ap = getAnchorPoints(host).find(
+    (a) => Math.abs(a.x - worldX) <= tol && Math.abs(a.y - worldY) <= tol,
+  )
+  if (ap) return { id: host.id, x: ap.x, y: ap.y, angle: ap.angle }
+
+  const c = nearestContourPoint(host, worldX, worldY)!
+  return { id: host.id, x: c.x, y: c.y, angle: c.angle }
 }
 
 /** 由 from/to 构造连线草稿（lineStyle 取 LINKER_DEFAULTS，linkerType 固定 broken；angle 归 0） */
@@ -80,7 +107,7 @@ function buildDraft(from: LinkerEndpoint, to: LinkerEndpoint): LinkerDraft {
 /** mousedown：开始拖拽，置初始草稿 */
 export function beginFreeLinker(worldX: number, worldY: number): void {
   const st = useEditorStore.getState()
-  const from = resolveLinkerStart(allShapes(), worldX, worldY)
+  const from = resolveLinkerStart(allShapes(), worldX, worldY, st.viewport.scale)
   drag = { from, start: { x: worldX, y: worldY } }
   st.setLinkerDraft(buildDraft(from, from))
 }

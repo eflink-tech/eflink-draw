@@ -46,6 +46,33 @@ describe('resolveLinkerStart（L 连线工具起点）', () => {
     expect(r.x).toBe(150)
     expect(r.y).toBe(200)
   })
+
+  it('命中图形内部非锚点 → 吸附最近轮廓点（顶边投影，非锚点）', () => {
+    const el = shape(100, 200, 100, 60)
+    // 点击 (130, 205)：距顶边 5px、距左边 30px → 轮廓点 (130,200)
+    const r = resolveLinkerStart([el], 130, 205, 1)
+    expect(r.id).toBe(el.id)
+    expect(r.x).toBe(130)
+    expect(r.y).toBe(200)
+    expect(r.angle).toBeCloseTo(Math.PI / 2, 6)
+  })
+
+  it('锚点 7px 内仍优先锚点（scale 换算）', () => {
+    const el = shape(100, 200, 100, 60)
+    // 距顶锚 (150,200) 3px
+    const r = resolveLinkerStart([el], 150, 203, 1)
+    expect(r.x).toBe(150)
+    expect(r.y).toBe(200)
+    expect(r.angle).toBeCloseTo(Math.PI / 2, 6)
+  })
+
+  it('锚点容差随 scale 缩小（scale=4 时 3 世界px 超容差走轮廓点）', () => {
+    const el = shape(100, 200, 100, 60)
+    const r = resolveLinkerStart([el], 150, 203, 4) // tol = 7/4 = 1.75 < 3 → 轮廓
+    expect(r.id).toBe(el.id)
+    expect(r.x).toBe(150)
+    expect(r.y).toBe(200)
+  })
 })
 
 describe('自由连线工具（junction 吸附集成）', () => {
