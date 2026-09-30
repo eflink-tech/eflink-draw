@@ -499,17 +499,20 @@ describe('snapLinkerEndpoint', () => {
     expect(at(0.25, 20)).toBe(200)
   })
 
-  it('空白处自由端靠近图形边（远离锚点 >20px）时吸附边（2px）', () => {
+  it('自由端靠近普通图形边（远离锚点 >20px）→ 12px 轮廓带吸附边上最近点', () => {
     const el = shape(100, 200, 100, 60)
     const r = snapLinkerEndpoint({
       shapes: [el],
       hitShapeId: null,
-      worldX: 120, // 距顶部锚点 (150,200) 30px，不触发邻近吸附
-      worldY: 201, // 距顶边 1px
+      worldX: 120, // 距顶部锚点 (150,200) 30px，不触发邻近锚点吸附
+      worldY: 201, // 距顶边 1px：轮廓带（≤12px）内，原 2px 边吸附被轮廓带取代
       scale: 1,
       otherEnd: { id: null, x: 400, y: 500 },
     })
-    expect(r.endpoint).toEqual({ id: null, x: 120, y: 200, angle: null })
+    // 轮廓带吸附：端点附着到图形（id 非空），x 跟随光标、y 贴边
+    expect(r.endpoint).toMatchObject({ id: el.id, x: 120, y: 200 })
+    expect(r.endpoint.angle).toBeCloseTo(Math.PI / 2, 6)
+    expect(r.snapAnchor).toEqual({ x: 120, y: 200 })
   })
 
   it('未命中图形但光标 20px 内有锚点：邻近吸附（左侧接近时提前附着，箭头向右驶入）', () => {
@@ -585,6 +588,93 @@ describe('snapLinkerEndpoint', () => {
     expect(r.endpoint.id).toBe(target.id)
     expect(r.endpoint.x).toBeCloseTo(150, 5)
     expect(r.endpoint.y).toBeCloseTo(280, 5)
+  })
+
+  it('轮廓带吸附：光标在目标顶边带内 → 吸附轮廓最近点（非锚点，x 跟随光标）', () => {
+    const target = shape(100, 300, 100, 60)
+    const other = shape(100, 100, 100, 60)
+    const r = snapLinkerEndpoint({
+      shapes: [other, target],
+      hitShapeId: target.id,
+      worldX: 130, // 顶边 30% 处（非锚点）
+      worldY: 308, // 距顶边 8px：带内（≤12px）、锚点区外（>7px）
+      scale: 1,
+      otherEnd: { id: other.id, x: 150, y: 160 },
+    })
+    expect(r.endpoint).toMatchObject({ id: target.id, x: 130, y: 300 })
+    expect(r.endpoint.angle).toBeCloseTo(Math.PI / 2, 6) // 顶边内向朝下
+    expect(r.snapAnchor).toEqual({ x: 130, y: 300 })
+  })
+
+  it('轮廓带吸附：光标在图形外侧近边（hitShapeId 为空）也吸附', () => {
+    const target = shape(100, 300, 100, 60)
+    const other = shape(100, 100, 100, 60)
+    const r = snapLinkerEndpoint({
+      shapes: [other, target],
+      hitShapeId: null,
+      worldX: 130,
+      worldY: 292, // 顶边上方 8px
+      scale: 1,
+      otherEnd: { id: other.id, x: 150, y: 160 },
+    })
+    expect(r.endpoint).toMatchObject({ id: target.id, x: 130, y: 300 })
+  })
+
+  it('轮廓带外（图形内部深处）→ 仍走面向另一端最近锚点（旧行为不变）', () => {
+    const target = shape(100, 300, 100, 60)
+    const other = shape(100, 100, 100, 60)
+    const r = snapLinkerEndpoint({
+      shapes: [other, target],
+      hitShapeId: target.id,
+      worldX: 150,
+      worldY: 340, // 距底边 20px、距顶边 40px：均在带外
+      scale: 1,
+      otherEnd: { id: other.id, x: 150, y: 160 },
+    })
+    expect(r.endpoint).toMatchObject({ id: target.id, x: 150, y: 300 }) // 顶部锚点
+  })
+
+  it('轮廓带不吸另一端宿主图形（避免自连）', () => {
+    const el = shape(100, 100, 100, 60)
+    const r = snapLinkerEndpoint({
+      shapes: [el],
+      hitShapeId: null,
+      worldX: 130,
+      worldY: 105, // 自身边线带内
+      scale: 1,
+      otherEnd: { id: el.id, x: 150, y: 100 },
+    })
+    expect(r.endpoint.id).toBeNull()
+  })
+
+  it('锁定图形轮廓不吸附', () => {
+    const target = shape(100, 300, 100, 60)
+    target.locked = true
+    const other = shape(100, 100, 100, 60)
+    const r = snapLinkerEndpoint({
+      shapes: [other, target],
+      hitShapeId: null,
+      worldX: 130,
+      worldY: 305, // 锁定图形顶边带内
+      scale: 1,
+      otherEnd: { id: other.id, x: 150, y: 160 },
+    })
+    expect(r.endpoint.id).toBeNull()
+  })
+
+  it('轮廓带容差按屏幕像素换算（scale=2 时 8 世界 px = 16 屏幕px 超带不吸附）', () => {
+    const target = shape(100, 300, 100, 60)
+    const other = shape(100, 100, 100, 60)
+    const r = snapLinkerEndpoint({
+      shapes: [other, target],
+      hitShapeId: null,
+      worldX: 130,
+      worldY: 308, // 世界 8px；scale=2 → 屏幕 16px > 12px
+      scale: 2,
+      otherEnd: { id: other.id, x: 150, y: 160 },
+    })
+    // 不吸轮廓；也无锚点命中 → 自由点
+    expect(r.endpoint.id).toBeNull()
   })
 })
 

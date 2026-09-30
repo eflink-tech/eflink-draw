@@ -12,6 +12,7 @@ import { snapLinkerLine } from './alignment'
 import { findJunctionSnap } from './linkerJunction'
 import { DEFAULT_FONT_VALUE } from './fontMap'
 import { normAngle, type Point } from '@/core/utils/geometry'
+import { nearestContourPoint, pointInRotatedBBox } from './shapeContour'
 
 // Point/normAngle 已迁至基础几何模块（@/core/utils/geometry），此处再导出保持既有
 // 消费方（linkerDraw/linkerJunction/linkerSegment/linkerCursor/manualRoute/actionExecutor 等）零改动
@@ -827,6 +828,8 @@ export function findSnapAnchor(
 
 const ANCHOR_HIT_PX = 7
 const ANCHOR_PROX_PX = 20
+/** 轮廓带吸附半径（屏幕像素）：光标距图形轮廓 ≤ 此值 → 吸附轮廓最近点 */
+const CONTOUR_BAND_PX = 12
 /** 自由端与另一端对齐拉直的容差（屏幕像素，须 /scale 换算，与其余阈值同口径） */
 const ENDPOINT_ALIGN_PX = 6
 
@@ -857,13 +860,15 @@ export interface EndpointSnapResult {
  * 计算连线端点拖动/创建时的目标端点
  *
  * 1. 鼠标 7px 内命中悬停图形的具体锚点 → 直接选中该锚点
- * 2. 悬停图形 == 另一端所属图形 → 脱附为自由点（不允许两端连同一图形）
- * 3. 悬停图形内部 → 吸附到距另一端最近的锚点
- * 4. 未命中图形但光标 20px 内有其他图形的锚点 → 邻近吸附该锚点
+ * 2. 光标距任一图形轮廓 ≤12px（屏幕像素）→ 吸附轮廓最近点（任意边点，
+ *    含图形内浅层与外侧近边，蓝点随光标沿边滑动）
+ * 3. 悬停图形 == 另一端所属图形 → 脱附为自由点（不允许两端连同一图形）
+ * 4. 悬停图形内部深处 → 吸附到距另一端最近的锚点
+ * 5. 未命中图形但光标 20px 内有其他图形的锚点 → 邻近吸附该锚点
  *    （从外侧接近目标左/右侧时提前附着，箭头按锚点法向驶入而非保持朝下）
- * 5. 传入 linkers 且光标 10px 内落在其他连线的渲染路径上 → junction 附着
+ * 6. 传入 linkers 且光标 10px 内落在其他连线的渲染路径上 → junction 附着
  *    （端点 id 为 null、带 junction { linkerId, t }；跳过锁定/自身/成环宿主）
- * 6. 空白 → 自由点：图形边吸附（2px）后，±6px（屏幕像素）与另一端对齐拉直
+ * 7. 空白 → 自由点：图形边吸附（2px）后，±6px（屏幕像素）与另一端对齐拉直
  */
 export function snapLinkerEndpoint(input: EndpointSnapInput): EndpointSnapResult {
   const { shapes, hitShapeId, worldX, worldY, scale, otherEnd } = input
@@ -875,6 +880,7 @@ export function snapLinkerEndpoint(input: EndpointSnapInput): EndpointSnapResult
         )
       : undefined
 
+  // 1. 锚点直中：鼠标 7px（屏幕像素）内命中悬停图形的具体锚点 → 直接选中
   if (hit) {
     const anchors = getAnchorPoints(hit)
 
@@ -888,11 +894,37 @@ export function snapLinkerEndpoint(input: EndpointSnapInput): EndpointSnapResult
         snapAnchor: { x: direct.x, y: direct.y },
       }
     }
+  }
 
+  // 2. 轮廓带吸附：光标距任一图形轮廓 ≤12px（屏幕像素）→ 吸附轮廓最近点（任意边点）。
+  // 含图形内浅层与外侧近边，蓝点随光标沿边滑动；跳过锁定/不可连线/另一端宿主（防自连）
+  const bandTol = CONTOUR_BAND_PX / scale
+  let contourBest: {
+    id: string
+    c: NonNullable<ReturnType<typeof nearestContourPoint>>
+  } | null = null
+  for (const s of shapes) {
+    if (s.locked || s.id === otherEnd.id || s.attribute?.linkable === false) continue
+    // 粗筛：旋转外接盒 ±(带宽容差+2)，最近轮廓点必落在其内
+    if (!pointInRotatedBBox(s, worldX, worldY, bandTol + 2)) continue
+    const c = nearestContourPoint(s, worldX, worldY)
+    if (!c || c.dist > bandTol) continue
+    if (!contourBest || c.dist < contourBest.c.dist) contourBest = { id: s.id, c }
+  }
+  if (contourBest) {
+    const { id, c } = contourBest
+    return {
+      endpoint: { id, x: c.x, y: c.y, angle: c.angle },
+      snapAnchor: { x: c.x, y: c.y },
+    }
+  }
+
+  if (hit) {
     if (hit.id === otherEnd.id) {
       return { endpoint: { id: null, x: worldX, y: worldY, angle: null }, snapAnchor: null }
     }
 
+    const anchors = getAnchorPoints(hit)
     let best = anchors[0]
     let bestDist = Infinity
     for (const a of anchors) {
@@ -914,27 +946,10 @@ export function snapLinkerEndpoint(input: EndpointSnapInput): EndpointSnapResult
   let proxDist = Infinity
   for (const s of shapes) {
     if (s.locked || s.id === otherEnd.id || s.attribute?.linkable === false) continue
-    const { x, y, w, h, angle: rot } = s.props
     // 预过滤框需覆盖旋转后的锚点（getAnchorPoints 返回旋转后世界坐标）：
-    // 旋转图形用绕中心的旋转外接矩形，否则锚点可能落在未旋转框外被漏吸附
-    let bx = x
-    let by = y
-    let bw = w
-    let bh = h
-    if (rot) {
-      const cos = Math.abs(Math.cos(rot))
-      const sin = Math.abs(Math.sin(rot))
-      bw = w * cos + h * sin
-      bh = w * sin + h * cos
-      bx = x + (w - bw) / 2
-      by = y + (h - bh) / 2
-    }
-    if (
-      worldX < bx - proxTol || worldX > bx + bw + proxTol ||
-      worldY < by - proxTol || worldY > by + bh + proxTol
-    ) {
-      continue
-    }
+    // 用绕中心的旋转外接矩形（pointInRotatedBBox 同口径），
+    // 否则锚点可能落在未旋转框外被漏吸附
+    if (!pointInRotatedBBox(s, worldX, worldY, proxTol)) continue
     for (const a of getAnchorPoints(s)) {
       const dist = measureDistance({ x: worldX, y: worldY }, a)
       if (dist <= proxTol && dist < proxDist) {
