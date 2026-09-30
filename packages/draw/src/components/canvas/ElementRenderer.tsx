@@ -41,6 +41,7 @@ import {
 } from '@/core/editor/uiOverlay'
 import {
   allShapes,
+  hitElementAtPoint,
   hitElementId,
   makeStoreRectGetter,
   pointerWorld,
@@ -1009,13 +1010,45 @@ export const ElementRenderer = memo(function ElementRenderer({ element, textEngi
             const container = e.target.getStage()?.container()
             if (container) container.style.cursor = 'crosshair'
           }}
+          onMouseDown={(e) => {
+            // 边带盖住本体时（小图形全图、大图形贴边内侧）舞台 mousedown 认不到
+            // name='element' 会漏选中——本体覆盖区内补选中（与 dragstart 让位同口径）；
+            // 外侧贴边保持拉线优先，不选中
+            const stage = e.target.getStage()
+            const pw = pointerWorld(stage)
+            if (pw && hitElementAtPoint([element], pw.x, pw.y) === element.id) {
+              e.cancelBubble = true
+              useEditorStore
+                .getState()
+                .selectElement(element.id, e.evt.ctrlKey || e.evt.metaKey || e.evt.shiftKey)
+            }
+          }}
+          onMouseMove={(e) => {
+            // 边带覆盖图形本体区域（表格内部格线、小图形内侧）实际行为是移动，
+            // cursor 跟随内外区分，避免 crosshair 误导可拉线
+            const stage = e.target.getStage()
+            const container = stage?.container()
+            const pw = pointerWorld(stage)
+            if (!container) return
+            const inside = pw != null && hitElementAtPoint([element], pw.x, pw.y) === element.id
+            const cursor = inside ? 'move' : 'crosshair'
+            if (container.style.cursor !== cursor) container.style.cursor = cursor
+          }}
           onMouseLeave={(e) => {
             // 边带→本体时 Group enter 被祖先链截断，cursor 停留 default 至离开；→ 空白时 Group leave 接管清理
             const container = e.target.getStage()?.container()
             if (container) container.style.cursor = 'default'
           }}
           onDragStart={(e) => {
-            const pw = pointerWorld(e.target.getStage())
+            // 指针在图形本体路径内（表格内部格线 / 小图形内侧贴边）→ 让位给图形移动：
+            // 这类区域也在 8px 边带命中覆盖内，若直接拖线，小图形几乎无法拖动
+            const stage = e.target.getStage()
+            const pw = pointerWorld(stage)
+            if (pw && hitElementAtPoint([element], pw.x, pw.y) === element.id) {
+              e.target.stopDrag()
+              groupRef.current?.startDrag()
+              return
+            }
             const c = pw ? nearestContourPoint(element, pw.x, pw.y) : null
             const from: LinkerEndpoint = c
               ? { id: element.id, x: c.x, y: c.y, angle: c.angle }
@@ -1380,6 +1413,13 @@ export const ElementRenderer = memo(function ElementRenderer({ element, textEngi
               // 指针可能移入图形本体（由 Group enter 设回 move），先恢复默认
               const container = e.target.getStage()?.container()
               if (container) container.style.cursor = 'default'
+            }}
+            onMouseDown={(e) => {
+              // 锚点命中区盖在本体之上，舞台 mousedown 认不到 name='element'——补选中
+              e.cancelBubble = true
+              useEditorStore
+                .getState()
+                .selectElement(element.id, e.evt.ctrlKey || e.evt.metaKey || e.evt.shiftKey)
             }}
             onDragStart={(e) => {
               e.cancelBubble = true
