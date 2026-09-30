@@ -87,6 +87,40 @@ describe('nearestContourPoint - 边界', () => {
   })
 })
 
+describe('nearestContourPoint - 二次曲线与闭合段', () => {
+  it('圆角矩形：二次曲线圆角上最近点（quadraticCurve 细分精度）', () => {
+    const el = shape('roundRectangle', 100, 100, 100, 60) // 圆角半径 4
+    // 左上圆角：quadraticCurve (0,4)→控制(0,0)→(4,0)，曲线中点在局部 (1,1)
+    const c = nearestContourPoint(el, 95, 95)! // 左上角 (100,100) 外 5,5
+    expect(c.x).toBeCloseTo(101, 1)
+    expect(c.y).toBeCloseTo(101, 1)
+    expect(c.dist).toBeCloseTo(Math.SQRT2 * 6, 1)
+  })
+
+  it('closePath 闭合段：矩形左边由 close 段补出，投影落在 x=100', () => {
+    const el = shape('rectangle', 100, 100, 100, 60)
+    // path 仅 move/line 到 (0,h)，左边 (0,60)→(0,0) 完全依赖 close 补段
+    const c = nearestContourPoint(el, 85, 130)! // 左侧外 15px
+    expect(c.x).toBe(100)
+    expect(c.y).toBe(130)
+    expect(c.dist).toBeCloseTo(15, 6)
+  })
+})
+
+describe('nearestContourPoint - 缓存失效', () => {
+  it('同一对象原地改 props.x 后按新位置重算（几何 key 双保险）', () => {
+    const el = shape('rectangle', 100, 100, 100, 60)
+    const first = nearestContourPoint(el, 130, 95)! // 先建立旧缓存
+    expect(first.x).toBe(130) // 旧顶边 100..200 上的投影
+    el.props.x += 50 // 原地改位置：store 正常流程外的异常调用方
+    const second = nearestContourPoint(el, 130, 95)!
+    // 新顶边 150..250：查询点已越出左侧，钳制到左上角 (150,100)
+    expect(second.x).toBe(150)
+    expect(second.y).toBe(100)
+    expect(second.dist).toBeCloseTo(Math.hypot(20, 5), 6)
+  })
+})
+
 describe('pointInRotatedBBox', () => {
   it('未旋转：含 pad 判定', () => {
     const el = shape('rectangle', 100, 100, 100, 60)

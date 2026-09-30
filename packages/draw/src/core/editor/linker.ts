@@ -11,12 +11,12 @@ import { evaluateExpression } from '@/core/utils/expression'
 import { snapLinkerLine } from './alignment'
 import { findJunctionSnap } from './linkerJunction'
 import { DEFAULT_FONT_VALUE } from './fontMap'
+import { normAngle, type Point } from '@/core/utils/geometry'
 
-/** 世界坐标点 */
-export interface Point {
-  x: number
-  y: number
-}
+// Point/normAngle 已迁至基础几何模块（@/core/utils/geometry），此处再导出保持既有
+// 消费方（linkerDraw/linkerJunction/linkerSegment/linkerCursor/manualRoute/actionExecutor 等）零改动
+export { normAngle }
+export type { Point }
 
 /** 图形矩形（世界坐标） */
 export interface ShapeRect {
@@ -83,10 +83,6 @@ export function getAnchorPoints(el: ElementInstance): Array<Point & { angle: num
     // 世界内向角：旋转后的锚点指向中心（归一化到 [0, 2π)）
     return { x: rx, y: ry, angle: normAngle(Math.atan2(cy - ry, cx - rx)) }
   })
-}
-
-export function normAngle(a: number): number {
-  return (a + Math.PI * 2) % (Math.PI * 2)
 }
 
 /** 两点距离 */

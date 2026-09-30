@@ -7,13 +7,16 @@
 // 缓存挂 WeakMap<ElementInstance>：store 不可变更新产生新对象引用即自动失效。
 import type { ElementInstance, PathDefinition } from '@/types'
 import { traceActions } from '@/core/utils/pathActions'
-import { normAngle, type Point } from './linker'
+import { normAngle, type Point } from '@/core/utils/geometry'
 
 /** 轮廓最近点（世界坐标） */
 export interface ContourHit {
   x: number
   y: number
-  /** 内向法线角：段法线取指向图形中心一侧；退化段回落"指向中心" */
+  /**
+   * 内向法线角：段法线取指向图形中心一侧；退化段回落"指向中心"。
+   * 凸形精确；凹边（如箭头图形凹口）可能指向中空区——指向中心侧口径的固有限制。
+   */
   angle: number
   /** 查询点到该点的距离（世界坐标） */
   dist: number
@@ -32,6 +35,8 @@ const CURVE_STEP_PX = 3
 /** 单条曲线细分区间数上限（防畸形控制点组合爆炸） */
 const CURVE_MAX_SPLIT = 200
 
+// 假设 path 仅随对象引用或 props 变化而变；key 不含 path 内容，
+// 若出现原地重建 path 且尺寸不变的调用方需扩 key。
 const segCache = new WeakMap<ElementInstance, { key: string; segs: Seg[] }>()
 
 const dist = (ax: number, ay: number, bx: number, by: number): number =>
