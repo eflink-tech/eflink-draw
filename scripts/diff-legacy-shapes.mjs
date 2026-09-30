@@ -42,14 +42,19 @@ function decode(s) {
   return s.replace(/\\u([0-9a-f]{4})/gi, (_, h) => String.fromCharCode(parseInt(h, 16))).replace(/\\"/g, '"')
 }
 
-/** 当前注册表里的图形 name：静态 shapes/*.ts + 网络图标名表 */
+/** 当前注册表里的图形 name：静态 shapes/**\/*.ts（含 legacy/ 生成产物）+ 网络图标名表 */
 const current = new Map()
-for (const f of fs.readdirSync(SHAPES)) {
-  const p = path.join(SHAPES, f)
-  if (fs.statSync(p).isDirectory() || !f.endsWith('.ts') || /netIcon|iconShape|networkLoader/.test(f)) continue
-  const src = fs.readFileSync(p, 'utf8')
-  for (const m of src.matchAll(/name: '([^']+)'/g)) current.set(m[1], path.basename(f, '.ts'))
+function walk(dir) {
+  for (const f of fs.readdirSync(dir)) {
+    const p = path.join(dir, f)
+    if (fs.statSync(p).isDirectory()) walk(p)
+    else if (f.endsWith('.ts') && !/netIcon|iconShape|networkLoader|index/.test(f)) {
+      const src = fs.readFileSync(p, 'utf8')
+      for (const m of src.matchAll(/name: '([^']+)'/g)) current.set(m[1], path.basename(f, '.ts'))
+    }
+  }
 }
+walk(SHAPES)
 const names = JSON.parse(/= (\{[\s\S]*?\})\n/.exec(fs.readFileSync(path.join(SHAPES, 'netIconNames.ts'), 'utf8'))[1])
 for (const list of Object.values(names)) for (const n of list) current.set(n, 'network')
 

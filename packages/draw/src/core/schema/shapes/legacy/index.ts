@@ -7,6 +7,12 @@ import { evcLegacyShapes } from './evc'
 import { vennLegacyShapes } from './venn'
 import { orgLegacyShapes } from './org'
 import { weizhuBmLegacyShapes } from './weizhuBm'
+import { iosControlsLegacyShapes } from './iosControls'
+import { iosElementsLegacyShapes } from './iosElements'
+import { iosDevicesLegacyShapes } from './iosDevices'
+import { andriodControlsLegacyShapes } from './andriodControls'
+import { andriodElementsLegacyShapes } from './andriodElements'
+import { andriodDevicesLegacyShapes } from './andriodDevices'
 
 /** 旧 Schema 分类移植过来的图形，由 shapes/index.ts 统一注册 */
 export const legacyShapes: ShapeDefinition[] = [
@@ -17,4 +23,10 @@ export const legacyShapes: ShapeDefinition[] = [
   ...vennLegacyShapes,
   ...orgLegacyShapes,
   ...weizhuBmLegacyShapes,
+  ...iosControlsLegacyShapes,
+  ...iosElementsLegacyShapes,
+  ...iosDevicesLegacyShapes,
+  ...andriodControlsLegacyShapes,
+  ...andriodElementsLegacyShapes,
+  ...andriodDevicesLegacyShapes,
 ]

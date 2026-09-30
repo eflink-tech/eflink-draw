@@ -37,7 +37,7 @@ import {
   SquareStack, SquareDashed,
   // UML 图形扩展
   Folder, Server, X, Hourglass,
-  Network, Waypoints, Link, Boxes,
+  Network, Waypoints, Link, Boxes, Smartphone,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
@@ -63,6 +63,7 @@ const CATEGORY_ICONS: Record<string, LucideIcon> = {
   epc: Waypoints,
   evc: Link,
   weizhu_bm: Boxes,
+  mobile: Smartphone,
   // 网络拓扑 / 云服务图标（懒加载矢量图标）
   net_topo: Network,
   cloud_icons: Cloud,

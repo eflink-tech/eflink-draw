@@ -110,6 +110,13 @@ export function drawShapeThumb(canvas: HTMLCanvasElement, name: string, size: nu
   const dims = { w, h }
   const paths = schema.drawIcon?.(w, h) ?? schema.path ?? []
   const iconFill = schema.drawIcon != null && schema.fillStyle?.type === 'none'
+
+  // 纯文字图形（标题 / 文本 / 标签：既无描边也无填充）在格子里画默认文案，
+  // 否则面板里是一格空白，看不出这是什么
+  if (!hasThumbInk(schema, paths)) return drawThumbText(ctx, schema, size)
+
+  const alpha = schema.shapeStyle?.alpha ?? 1
+  ctx.globalAlpha = alpha
   for (const subPath of paths) {
     const segment = parsePathSegment(subPath)
     const subLineWidth = segment.lineStyle?.lineWidth ?? lineWidth
@@ -146,7 +153,7 @@ export function drawShapeThumb(canvas: HTMLCanvasElement, name: string, size: nu
       ctx.fill(fillRule)
     }
     if (subLineWidth > 0) {
-      ctx.strokeStyle = strokeStyle
+      ctx.strokeStyle = `rgb(${segment.lineStyle?.lineColor ?? schema.lineStyle?.lineColor ?? '50,50,50'})`
       ctx.lineWidth = subLineWidth
       const dash = segment.lineStyle?.lineStyle
       if (dash === 'dashed') ctx.setLineDash([6, 4])
@@ -156,6 +163,43 @@ export function drawShapeThumb(canvas: HTMLCanvasElement, name: string, size: nu
       ctx.setLineDash([])
     }
   }
+  return true
+}
+
+/** 图形在格子里是否画得出东西：有描边或有非白填充 */
+function hasThumbInk(schema: ShapeDefinition, paths: PathDefinition[]): boolean {
+  return paths.some((p) => {
+    const seg = Array.isArray(p) ? undefined : p
+    const lineWidth = seg?.lineStyle?.lineWidth ?? schema.lineStyle?.lineWidth ?? DEFAULT_LINE_WIDTH
+    if (lineWidth > 0) return true
+    const fill = seg?.fillStyle ?? schema.fillStyle
+    return fill?.type === 'solid' && !!fill.color && fill.color !== '255,255,255'
+  })
+}
+
+/** 无墨迹图形的兜底：按图形自身字色绘制默认文案，超长时缩字号、再截断 */
+function drawThumbText(ctx: CanvasRenderingContext2D, schema: ShapeDefinition, size: number): boolean {
+  const full = (schema.textBlock ?? []).map((b) => b.text).find((t) => t && t.trim())
+  if (!full) return false
+  const font = schema.fontStyle
+  let px = Math.max(8, Math.round(size * 0.38))
+  const setFont = (): void => {
+    ctx.font = `${font?.bold ? '700 ' : ''}${px}px -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif`
+  }
+  setFont()
+  let label = full
+  while (px > 8 && ctx.measureText(label).width > size - 3) {
+    px -= 1
+    setFont()
+  }
+  if (ctx.measureText(label).width > size - 3) {
+    while (label.length > 1 && ctx.measureText(`${label}…`).width > size - 3) label = label.slice(0, -1)
+    label += '…'
+  }
+  ctx.fillStyle = `rgb(${font?.color ?? '50,50,50'})`
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillText(label, size / 2, size / 2 + 0.5)
   return true
 }
 

@@ -14,6 +14,8 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import vm from 'node:vm'
+import { MOBILE_GLYPHS } from './lib/mobile-glyphs.mjs'
+import { MOBILE_STYLES, MOBILE_SCALE } from './lib/mobile-styles.mjs'
 
 const ROOT = path.resolve(import.meta.dirname, '..')
 const ASSETS = path.join(ROOT, 'processon_files')
@@ -39,7 +41,7 @@ const BPMN_GROUPS = {
   choreographyTask: ['bpmn_collab', '对话与编排'],
 }
 
-/** 旧素材里标题本就是英文的（维恩图一族），补中文 */
+/** 旧素材里标题本就是英文的（维恩图一族、Android 控件），补中文 */
 const TITLE_CN = {
   greenGradientVennCircle: '绿色渐变维恩圆',
   redGradientVennCircle: '红色渐变维恩圆',
@@ -51,7 +53,40 @@ const TITLE_CN = {
   redVennCircle: '红色维恩圆',
   blueVennCircle: '蓝色维恩圆',
   blackVennCircle: '黑色维恩圆',
+  andriodButton1: '按钮',
+  andriodCheck: '复选框',
+  andriodRadio: '单选按钮',
+  andriodSwitchOff: '开关：关',
+  andriodSwitchOnf: '开关：开',
+  andriodSearch: '搜索栏',
+  andriodDialog: '对话框与确认',
+  andriodConfirm: '确认对话框',
 }
+
+/**
+ * 移动端原型（iOS / Android 线框素材）。
+ * from = 旧 Schema 分类名；category 统一为 mobile，平台/形态作面板二级分组。
+ * proportionalDefault：旧素材把键盘按键、状态栏图标等写成绝对像素，统一比例化后
+ * 缩放图形细节跟随，缩略图自适应也不会把墨迹挤出画布。
+ */
+const MOBILE_TARGETS = [
+  'ios_controls:mobile_ios_control:iOS 控件',
+  'ios_elements:mobile_ios_element:iOS 元素',
+  'ios_devices:mobile_ios_device:iOS 设备',
+  'andriod_controls:mobile_and_control:Android 控件',
+  'andriod_elements:mobile_and_element:Android 元素',
+  'andriod_devices:mobile_and_device:Android 设备',
+].map((spec) => {
+  const [from, group, groupName] = spec.split(':')
+  return {
+    file: `${from}.js`,
+    out: from.replace(/_(\w)/g, (_, c) => c.toUpperCase()),
+    category: 'mobile',
+    from,
+    group: [group, groupName],
+    proportionalDefault: true,
+  }
+})
 
 const TARGETS = [
   { file: 'bpmn.js', out: 'bpmn', category: 'bpmn', groups: BPMN_GROUPS, fallbackGroup: ['bpmn_misc', '其他'] },
@@ -61,6 +96,8 @@ const TARGETS = [
   { file: 'venn.js', out: 'venn', category: 'venn' },
   { file: 'org.js', out: 'org', category: 'org' },
   { file: 'weizhu_bm.js', out: 'weizhuBm', category: 'weizhu_bm' },
+  // 移动端原型：旧素材按平台散在 6 个分类里，这里并入单一面板分类，平台/形态作二级分组
+  ...MOBILE_TARGETS,
 ]
 
 // ═══════════════════════════════════════════
@@ -142,8 +179,18 @@ function portedNames() {
 // ═══════════════════════════════════════════
 
 const NUMERIC = /^-?\d+(?:\.\d+)?$/
+/**
+ * 旧素材为了 1px 对齐把分隔线写成 'Math.round(h-40) + 0.5'：取整与半像素在图形被
+ * 缩放（含面板缩略图自适应）后会算出越界坐标，这里剥掉，只留纯表达式。
+ */
+const CRISP = /^\s*Math\.round\(\s*([^()]*?)\s*\)\s*(?:[+-]\s*0\.5\s*)?$/
 /** Dimension：纯数字归一为 number，表达式字符串原样保留 */
-const dim = (v) => (typeof v === 'string' && NUMERIC.test(v.trim()) ? Number(v.trim()) : v)
+function dim(v) {
+  if (typeof v !== 'string') return v
+  const crisp = CRISP.exec(v)
+  if (crisp) v = crisp[1]
+  return NUMERIC.test(v.trim()) ? Number(v.trim()) : v
+}
 
 /**
  * 旧素材的颜色支持 'r-35,g-35,b-35' 这类相对写法：r/g/b 在旧引擎里绑定元素当前填充色，
@@ -261,7 +308,8 @@ function expandActions(actions, refs, commands, seen = new Set()) {
       if (refs[ref]) {
         flush()
         for (const sp of refs[ref]) {
-          subPaths.push(Array.isArray(sp) ? sp : sp.actions)
+          // 拷贝：原语被多个图形共享，后续比例化/改写不能污染其它图形
+          subPaths.push((Array.isArray(sp) ? sp : sp.actions).map((a) => ({ ...a })))
         }
         continue
       }
@@ -280,9 +328,11 @@ function dimAction(a) {
   return out
 }
 
-function convertPath(legacyPath, refs, commands) {
+function convertPath(legacyPath, refs, commands, dropImage = false) {
   const out = []
   for (const seg of legacyPath ?? []) {
+    // 位图子路径（旧素材的图标细节）：整体丢弃，由手绘矢量补丁补回
+    if (dropImage && !Array.isArray(seg) && seg.fillStyle?.type === 'image') continue
     const actions = Array.isArray(seg) ? seg : seg.actions
     const style = !Array.isArray(seg) ? normalizeStyle(seg.lineStyle) : null
     const fill = !Array.isArray(seg) ? normalizeFill(seg.fillStyle)?.fill : null
@@ -300,7 +350,59 @@ const DEFAULT_ANCHORS = [
   { x: 'w', y: 'h/2' },
 ]
 
+/** 子路径样式补丁：裸数组要包成 {actions} 才能挂样式（移动端「白底隐形」问题见 mobile-styles.mjs） */
+function styleSeg(shape, idx, patch) {
+  const raw = shape.path[idx]
+  if (!raw) return
+  const seg = Array.isArray(raw) ? { actions: raw } : { ...raw }
+  if (patch.line) Object.assign((seg.lineStyle ??= {}), patch.line)
+  if (patch.fill) {
+    const prev = seg.fillStyle
+    seg.fillStyle = prev?.type === 'none' ? { type: 'none' } : { type: 'solid', color: patch.fill }
+  }
+  shape.path[idx] = seg
+}
+
+function applyMobileStyle(shape, st) {
+  if (st.fill != null) shape.fillStyle = st.fill === 'none' ? { type: 'none' } : { type: 'solid', color: st.fill }
+  if (st.line) shape.lineStyle = { ...(shape.lineStyle ?? {}), ...st.line }
+  if (st.body) {
+    if (st.body === 'inherit') {
+      const raw = shape.path[0]
+      if (raw && !Array.isArray(raw) && raw.lineStyle) delete raw.lineStyle.lineWidth
+    } else styleSeg(shape, 0, { line: st.body })
+  }
+  for (const [i, p] of Object.entries(st.subs ?? {})) styleSeg(shape, Number(i), p)
+  if (st.font) shape.fontStyle = { ...(shape.fontStyle ?? {}), ...st.font }
+  if (st.text) for (const b of shape.textBlock ?? []) if (st.text[b.text]) b.text = st.text[b.text]
+}
+
+/**
+ * 移动端默认尺寸收敛。旧素材按真机截图的像素量给定（按钮 240×40，通栏元素 280/360 宽），
+ * 拖到画布上比常规矩形还大；整族等比缩到 k，独立控件另有 size 档（见 mobile-styles.mjs）。
+ * 几何已是 w/h 比例式，只需改 props；文字不会自适应缩小，同比例压字号，下限 10px。
+ */
+const LEGACY_DEFAULT_FONT = 13 // 与 types/index.ts 的 DEFAULT_FONT_SIZE 一致
+function applyMobileSize(shape, explicit) {
+  const w = Number(shape.props?.w)
+  const h = Number(shape.props?.h)
+  if (!Number.isFinite(w) || !Number.isFinite(h)) return
+  const [nw, nh] = explicit ?? [Math.round(w * MOBILE_SCALE), Math.round(h * MOBILE_SCALE)]
+  // 以高度方向为准：框子矮了文字就挤，宽度一般还留有富余
+  const scale = Math.min(1, Math.max(0.6, nh / h))
+  const shrink = (size) => Math.max(10, Math.round(size * scale))
+  shape.props.w = nw
+  shape.props.h = nh
+  if (shape.fontStyle?.size || (shape.textBlock ?? []).some((b) => b.text)) {
+    shape.fontStyle = { ...(shape.fontStyle ?? {}), size: shrink(shape.fontStyle?.size ?? LEGACY_DEFAULT_FONT) }
+  }
+  for (const b of shape.textBlock ?? []) {
+    if (b.fontStyle?.size) b.fontStyle = { ...b.fontStyle, size: shrink(b.fontStyle.size) }
+  }
+}
+
 function convertShape(s, cfg, refs, commands) {
+  const glyph = MOBILE_GLYPHS[s.name]
   const shape = {
     name: s.name,
     title: TITLE_CN[s.name] || s.title || s.name,
@@ -309,6 +411,8 @@ function convertShape(s, cfg, refs, commands) {
   if (cfg.groups) {
     const g = cfg.groups[s.groupName] ?? cfg.fallbackGroup
     if (g) Object.assign(shape, { group: g[0], groupName: g[1] })
+  } else if (cfg.group) {
+    Object.assign(shape, { group: cfg.group[0], groupName: cfg.group[1] })
   }
   const props = { w: dim(s.props?.w), h: dim(s.props?.h) }
   if (props.w != null || props.h != null) {
@@ -316,25 +420,34 @@ function convertShape(s, cfg, refs, commands) {
     if (props.w != null) shape.props.w = props.w
     if (props.h != null) shape.props.h = props.h
   }
-  const path = convertPath(s.path, refs, commands)
+  if (JSON.stringify(s.path).includes('"image"') && !glyph) return { skip: '依赖位图填充' }
+  const path = convertPath(s.path, refs, commands, !!glyph)
+  // 位图细节整块替换的图形（iOS 开关等）：原路径可能一条矢量都不剩，几何全部来自补丁
+  if (glyph) path.push(...glyph.subPaths(props.w ?? 100, props.h ?? 100))
   if (!path.length) return { skip: '无可用路径' }
-  if (JSON.stringify(s.path).includes('"image"')) return { skip: '依赖位图填充' }
   shape.path = path
   if (s.anchors && JSON.stringify(s.anchors.map(dim2)) !== JSON.stringify(DEFAULT_ANCHORS)) {
     shape.anchors = s.anchors ?? []
   }
-  const blocks = (s.textBlock ?? []).map((b) => ({ position: dimPos(b.position), text: b.text ?? '' }))
+  const blocks = (glyph?.textBlocks ? glyph.textBlocks() : s.textBlock ?? []).map((b) => ({
+    position: dimPos(b.position),
+    text: b.text ?? '',
+    ...(glyph?.textColor && { fontStyle: { ...(b.fontStyle ?? {}), color: glyph.textColor } }),
+  }))
   const legacyDefaultBlock = { x: 10, y: 0, w: 'w-20', h: 'h' }
   if (
-    s.textBlock &&
-    (blocks.length !== 1 ||
-      JSON.stringify(blocks[0].position) !== JSON.stringify(legacyDefaultBlock) ||
-      blocks[0].text !== '')
+    glyph?.textBlocks ||
+    (s.textBlock &&
+      (blocks.length !== 1 ||
+        JSON.stringify(blocks[0].position) !== JSON.stringify(legacyDefaultBlock) ||
+        blocks[0].text !== ''))
   ) {
     shape.textBlock = blocks
   }
   const lineStyle = normalizeStyle(s.lineStyle)
-  const { fill: fillStyle, alpha } = normalizeFill(s.fillStyle) ?? {}
+  const { fill: normFill, alpha: normAlpha } = normalizeFill(s.fillStyle) ?? {}
+  const fillStyle = glyph?.fill ?? normFill
+  const alpha = glyph?.fill ? (glyph.alpha ?? null) : normAlpha
   const fontStyle = normalizeFont(s.fontStyle)
   if (lineStyle) shape.lineStyle = lineStyle
   if (fillStyle) shape.fillStyle = fillStyle
@@ -348,7 +461,13 @@ function convertShape(s, cfg, refs, commands) {
     if (Object.keys(attr).length) shape.attribute = attr
   }
   if (s.resizeDir) shape.resizeDir = s.resizeDir
-  if (PROPORTIONAL_PATCH[s.name]) applyProportional(shape, PROPORTIONAL_PATCH[s.name])
+  const style = cfg.category === 'mobile' ? MOBILE_STYLES[s.name] : null
+  if (style) applyMobileStyle(shape, style)
+  const patchDims =
+    PROPORTIONAL_PATCH[s.name] ??
+    (cfg.proportionalDefault && Number.isFinite(props.w) && Number.isFinite(props.h) ? props : null)
+  if (patchDims) applyProportional(shape, patchDims)
+  if (cfg.category === 'mobile') applyMobileSize(shape, style?.size)
   return { shape }
 }
 
@@ -409,7 +528,7 @@ for (const cfg of TARGETS) {
   if (only && !only.includes(cfg.out) && !only.includes(cfg.category)) continue
   const items = []
   const skipped = []
-  for (const s of legacy.filter((x) => x.category === cfg.category)) {
+  for (const s of legacy.filter((x) => x.category === (cfg.from ?? cfg.category))) {
     if (done.has(s.name)) continue
     const r = convertShape(s, cfg, refs, commands)
     if (r.skip) skipped.push(`${s.name}(${s.title}) ${r.skip}`)
@@ -427,7 +546,7 @@ if (!dryRun) {
 // 旧系统 ${cfg.file} 中尚未移植的 ${items.length} 个图形 → 原生矢量 ShapeDefinition
 // 自动生成: node scripts/gen-legacy-shapes.mjs --category ${cfg.out}（勿手改）
 // 几何与尺寸取自旧 Schema；actions:{ref} 原语已展开；样式仅保留与本项目默认值的差异
-// ═══════════════════════════════════════════
+${cfg.from ? '// 位图细节（勾选/开关滑块/放大镜/电池/键盘按键）改由 scripts/lib/mobile-glyphs.mjs 重画为矢量，坐标已比例化\n// 旧素材「白底 + lineWidth:0」在白画布上等于隐形，表面描边/配色由 scripts/lib/mobile-styles.mjs 补齐\n' : ''}// ═══════════════════════════════════════════
 import type { ShapeDefinition } from '@/types'
 
 export const ${cfg.out}LegacyShapes: ShapeDefinition[] = [

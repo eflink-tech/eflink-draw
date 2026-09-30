@@ -75,6 +75,20 @@ export const SHAPE_CATEGORIES: ShapeCategory[] = [
   { id: 'epc', name: 'EPC 事件过程链', icon: 'Waypoints' },
   { id: 'evc', name: 'EVC 企业价值链', icon: 'Link' },
   { id: 'weizhu_bm', name: '魏朱商业模式', icon: 'Boxes' },
+  // 移动端线框原型：iOS / Android 控件与元素（旧 Schema 的位图细节已重画为矢量）
+  {
+    id: 'mobile',
+    name: '移动端原型',
+    icon: 'Smartphone',
+    children: [
+      { id: 'mobile_ios_control', name: 'iOS 控件' },
+      { id: 'mobile_ios_element', name: 'iOS 元素' },
+      { id: 'mobile_ios_device', name: 'iOS 设备背景' },
+      { id: 'mobile_and_control', name: 'Android 控件' },
+      { id: 'mobile_and_element', name: 'Android 元素' },
+      { id: 'mobile_and_device', name: 'Android 设备背景' },
+    ],
+  },
   // 网络拓扑 / 云服务图标：ProcessOn SVG 转换的原生矢量图标（gen-network-shapes.mjs 自动生成）
   // 品类清单与厂商归属来自 netIconManifest，矢量数据按品类 chunk 按需加载
   {
