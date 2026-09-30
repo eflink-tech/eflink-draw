@@ -12,7 +12,8 @@ import { fontFamilyCSS } from '@/core/editor/fontMap'
 import { KONVA_TEXT_PROPS } from '@/core/editor/textRender'
 import { useEditorStore } from '@/store/editorStore'
 import { registerLinkerLabelNode, registerLinkerNode } from '@/core/editor/nodeRegistry'
-import { getLinkerMidpoint, linkerSegmentMidpoint, strokeLinkerScene, traceLinkerPath } from '@/core/editor/linkerDraw'
+import { strokeLinkerScene, traceLinkerPath } from '@/core/editor/linkerDraw'
+import { linkerPathPoints, linkerTextAnchor, locateOnPath, pointOnPathAt } from '@/core/editor/linkerText'
 import { LINKER_FONT_DEFAULTS } from '@/core/editor/linker'
 import { pointerWorld, shapeBorderWidth } from '@/core/editor/interaction'
 import { hitLinkerSegment, isSegmentDraggable, startSegmentDrag } from '@/core/editor/linkerSegment'
@@ -140,7 +141,7 @@ export const LinkerRenderer = memo(function LinkerRenderer({ linker }: LinkerRen
       />
       {linker.text && (
         <LinkerLabel key="legacy" linker={linker} labelKey="legacy" text={linker.text}
-          pos={linker.textPos ?? getLinkerMidpoint(linker)} />
+          pos={linkerTextAnchor(linker)} />
       )}
       {(linker.segTexts ?? [])
         .filter((st) => st.text)
@@ -151,7 +152,7 @@ export const LinkerRenderer = memo(function LinkerRenderer({ linker }: LinkerRen
             labelKey={`seg-${st.seg}`}
             seg={st.seg}
             text={st.text}
-            pos={linkerSegmentMidpoint(linker, st.seg)}
+            pos={linkerTextAnchor(linker, st.seg)}
           />
         ))}
     </Group>
@@ -208,14 +209,25 @@ function LinkerLabel({
   const font = { ...LINKER_FONT_DEFAULTS, ...linker.fontStyle }
   // 背景尺寸：Text 挂载后测量回填（首次渲染 0×0，layout effect 后立即修正，无闪烁）
   const [box, setBox] = useState({ w: 0, h: 0 })
+  // 拖拽中高亮（浅蓝底 + 蓝描边）
+  const [dragging, setDragging] = useState(false)
   const textRef = useRef<Konva.Text>(null)
   // 注册标签 Group：拖拽期间 applyLiveLinker 直操同步位置（不经 React 重渲染）
   const groupRef = useRef<Konva.Group>(null)
+  // 贴线拖拽约束缓存：dragstart 时算一次（拖拽期间连线几何不变）
+  const dragCtxRef = useRef<{ pts: { x: number; y: number }[] } | null>(null)
 
   useEffect(() => {
     registerLinkerLabelNode(linker.id, groupRef.current, labelKey)
     return () => registerLinkerLabelNode(linker.id, null, labelKey)
   }, [linker.id, labelKey])
+
+  // 直操通道（applyLiveLinker）在拖线期间直接改节点位置，而 react-konva 仅在
+  // props 值变化时才写节点：若锚点值恰好不变（如移动图形但文字所在段未动），
+  // 节点会停留在直操期间的近似位置。linker 引用每次 store 更新都变化，借它强制回位。
+  useEffect(() => {
+    groupRef.current?.position({ x: pos.x, y: pos.y })
+  }, [linker, pos.x, pos.y])
 
   useLayoutEffect(() => {
     const t = textRef.current
@@ -236,7 +248,60 @@ function LinkerLabel({
       ref={groupRef}
       x={pos.x}
       y={pos.y}
-      name={seg != null ? 'seg' : undefined}
+      name={seg != null ? `seg-${seg}` : undefined}
+      draggable={!linker.locked}
+      onDragStart={(e) => {
+        e.cancelBubble = true
+        // 缓存折线点列：拖拽期间连线几何不变，避免每帧重复采样
+        dragCtxRef.current = { pts: linkerPathPoints(linker) }
+        setDragging(true)
+      }}
+      // 贴线约束：拖到的位置（父坐标 = 世界坐标，与 dragEnd 同口径）投影回线身
+      // 最近点，标签只能沿线来回滑动（不可拖离线条）
+      onDragMove={(e) => {
+        e.cancelBubble = true
+        const ctx = dragCtxRef.current
+        if (!ctx) return
+        const g = e.target
+        const p = pointOnPathAt(ctx.pts, locateOnPath(ctx.pts, g.x(), g.y()).t)
+        g.position(p)
+      }}
+      onDragEnd={(e) => {
+        e.cancelBubble = true
+        setDragging(false)
+        dragCtxRef.current = null
+        // Group 位置（父链无 transform = 世界坐标）反解为沿线弧长参数落库；
+        // 图形移动 / 路由重算后文字按参数自动跟随。updateLinker 自带撤销历史。
+        // 拖拽已被约束贴线，法向不再变化（保持原 normal，首次拖动 = 0）——只改 t
+        const off = locateOnPath(linkerPathPoints(linker), e.target.x(), e.target.y())
+        const prev =
+          seg != null
+            ? linker.segTexts?.find((s) => s.seg === seg)?.offset
+            : linker.textOffset
+        const next = { t: off.t, normal: prev?.normal ?? 0 }
+        const st = useEditorStore.getState()
+        if (seg != null) {
+          st.updateLinker(linker.id, {
+            segTexts: (linker.segTexts ?? []).map((s) =>
+              s.seg === seg ? { ...s, offset: next } : s,
+            ),
+          })
+        } else {
+          // 同时清掉旧绝对坐标字段，锚点统一走 textOffset
+          st.updateLinker(linker.id, { textOffset: next, textPos: undefined })
+        }
+      }}
+      onMouseEnter={(e) => {
+        if (linker.locked) return
+        e.cancelBubble = true
+        const container = e.target.getStage()?.container()
+        if (container) container.style.cursor = 'move'
+      }}
+      onMouseLeave={(e) => {
+        e.cancelBubble = true
+        const container = e.target.getStage()?.container()
+        if (container) container.style.cursor = 'default'
+      }}
       onMouseDown={(e) => {
         e.cancelBubble = true
         useEditorStore
@@ -253,7 +318,9 @@ function LinkerLabel({
         y={-box.h / 2 - LABEL_PAD}
         width={box.w + LABEL_PAD * 2}
         height={box.h + LABEL_PAD * 2}
-        fill="#ffffff"
+        fill={dragging ? '#e6f7ff' : '#ffffff'}
+        stroke={dragging ? '#1890ff' : undefined}
+        strokeWidth={dragging ? 1 : 0}
       />
       <Text
         ref={textRef}

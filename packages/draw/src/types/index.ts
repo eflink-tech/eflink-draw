@@ -237,6 +237,12 @@ export interface LinkerJunction {
   t: number
 }
 
+/** 连线文字相对位置：t = 沿线弧长参数（0 起点 → 1 终点），normal = 该点法向偏移（世界坐标，切向 (dx,dy) 的 (dy,-dx) 方向为正） */
+export interface LinkerTextOffset {
+  t: number
+  normal: number
+}
+
 export interface LinkerInstance {
   id: string
   name: 'linker'
@@ -246,10 +252,12 @@ export interface LinkerInstance {
   text: string
   /** 连线文字锚点（世界坐标）：线身双击处；缺省回落到线中点。一条连线仅此一个文字点 */
   textPos?: { x: number; y: number }
+  /** 文字拖拽后的相对位置（与 textPos 互斥，优先级更高；沿线参数化，图形移动/路由重算后自动跟随） */
+  textOffset?: LinkerTextOffset
   /** UML 时序消息：两端附着激活条（fromDir/toDir = 条缘 1 右 / -1 左）或生命线/销毁符中轴（0）。y = 消息高度（恒水平）；loopW/H = 自消息回环尺寸（from.id === to.id 时有效） */
   seq?: SeqMessageData
   /** 分段文字：seg = 段下标（pts[seg] → pts[seg+1]，1 起），每段直线可独立设置文字 */
-  segTexts?: Array<{ seg: number; text: string }>
+  segTexts?: Array<{ seg: number; text: string; offset?: LinkerTextOffset }>
   fontStyle?: FontStyle
   linkerType: 'curve' | 'broken' | 'line'
   lineStyle: LineStyle & {

@@ -12,7 +12,7 @@ import {
   TEXT_LINE_HEIGHT,
   type FontStyle,
 } from '@/types'
-import { getLinkerMidpoint, linkerSegmentMidpoint } from '@/core/editor/linkerDraw'
+import { linkerTextAnchor } from '@/core/editor/linkerText'
 import { LINKER_FONT_DEFAULTS } from '@/core/editor/linker'
 import { worldToScreen } from '@/core/editor/interaction'
 import { evalTextBlockRect } from '@/core/editor/textEdit'
@@ -110,8 +110,8 @@ function Editor({ id, block, seg }: { id: string; block: number; seg?: number })
   let taPadTop = 0 // textarea 内部垂直对齐偏移（px），模拟 Konva verticalAlign
   let taBg = 'transparent' // 图形有自身填充色 → 透明；连线无填充 → 白底，编辑态可见
   if (isLinker(el)) {
-    // 分段文字锚点 = 段中点；整线文字锚点优先（textPos），缺省线中点
-    const mid = seg != null ? linkerSegmentMidpoint(el, seg) : el.textPos ?? getLinkerMidpoint(el)
+    // 锚点与渲染口径统一（linkerTextAnchor）：分段 = 段 offset/段中点；整线 = textOffset/textPos/线中点
+    const mid = linkerTextAnchor(el, seg ?? undefined)
     anchorX = mid.x
     anchorY = mid.y
     worldW = Math.max(LINKER_MIN_W, textW + LINKER_PAD_W)
@@ -157,10 +157,11 @@ function Editor({ id, block, seg }: { id: string; block: number; seg?: number })
     }
     if (cur && isLinker(cur)) {
       if (seg != null) {
-        // 分段文字：写回 segTexts（清空 = 移除该段条目）
+        // 分段文字：写回 segTexts（清空 = 移除该段条目）；保留拖拽调位存的 offset
+        const prev = (cur.segTexts ?? []).find((e) => e.seg === seg)
         const others = (cur.segTexts ?? []).filter((e) => e.seg !== seg)
         if (value !== '') {
-          others.push({ seg, text: value })
+          others.push({ seg, text: value, offset: prev?.offset })
           others.sort((a, b) => a.seg - b.seg)
           st.updateLinker(cur.id, { segTexts: others })
         } else {
