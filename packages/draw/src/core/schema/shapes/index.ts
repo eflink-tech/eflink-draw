@@ -12,6 +12,8 @@ import { umlClassShapes } from './umlClass'
 import { umlStateShapes } from './umlState'
 import { umlDeploymentShapes } from './umlDeployment'
 import { umlComponentShapes } from './umlComponent'
+// 旧 Schema 其余分类（BPMN 补全 / ER / EPC / EVC / 维恩图 / 组织架构 / 魏朱商业模式）
+import { legacyShapes } from './legacy'
 
 // 注册所有基础图形
 for (const shape of basicShapes) {
@@ -70,6 +72,11 @@ for (const shape of umlDeploymentShapes) {
 
 // 注册 UML 组件图图形
 for (const shape of umlComponentShapes) {
+  shapeRegistry.addShape(shape)
+}
+
+// 注册旧 Schema 分类移植过来的图形（scripts/gen-legacy-shapes.mjs 自动生成）
+for (const shape of legacyShapes) {
   shapeRegistry.addShape(shape)
 }
 

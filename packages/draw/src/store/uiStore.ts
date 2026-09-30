@@ -34,7 +34,25 @@ const netChildrenOf = (panel: string) =>
 export const SHAPE_CATEGORIES: ShapeCategory[] = [
   { id: 'basic', name: '基础图形', icon: 'Square' },
   { id: 'flow', name: '流程图', icon: 'GitBranch' },
-  { id: 'bpmn', name: 'BPMN', icon: 'Workflow' },
+  {
+    id: 'bpmn',
+    name: 'BPMN',
+    icon: 'Workflow',
+    // 核心图形为手写移植（CATEGORY_SHAPES.bpmn），其余按旧 groupName 自动派生二级分组
+    children: [
+      { id: 'bpmn', name: '核心' },
+      { id: 'bpmn_start', name: '开始事件' },
+      { id: 'bpmn_intermediate', name: '中间事件' },
+      { id: 'bpmn_boundary', name: '边界事件' },
+      { id: 'bpmn_end', name: '结束事件' },
+      { id: 'bpmn_task', name: '任务' },
+      { id: 'bpmn_sub', name: '子流程与调用活动' },
+      { id: 'bpmn_gateway', name: '网关' },
+      { id: 'bpmn_data', name: '数据对象' },
+      { id: 'bpmn_collab', name: '对话与编排' },
+      { id: 'bpmn_misc', name: '其他' },
+    ],
+  },
   { id: 'lane', name: '泳池/泳道', icon: 'Columns' },
   // UML：单一主分组，子分类作为二级标题（折叠/展开仅作用于主分组）
   {
@@ -50,6 +68,13 @@ export const SHAPE_CATEGORIES: ShapeCategory[] = [
       { id: 'uml_deployment', name: '部署图/组件图' },
     ],
   },
+  // 旧 Schema 移植的建模图种（scripts/gen-legacy-shapes.mjs 自动生成，静态注册）
+  { id: 'er', name: '实体关系图', icon: 'Database' },
+  { id: 'org', name: '组织结构图', icon: 'Network' },
+  { id: 'venn', name: '维恩图', icon: 'Circle' },
+  { id: 'epc', name: 'EPC 事件过程链', icon: 'Waypoints' },
+  { id: 'evc', name: 'EVC 企业价值链', icon: 'Link' },
+  { id: 'weizhu_bm', name: '魏朱商业模式', icon: 'Boxes' },
   // 网络拓扑 / 云服务图标：ProcessOn SVG 转换的原生矢量图标（gen-network-shapes.mjs 自动生成）
   // 品类清单与厂商归属来自 netIconManifest，矢量数据按品类 chunk 按需加载
   {

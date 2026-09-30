@@ -37,7 +37,7 @@ import {
   SquareStack, SquareDashed,
   // UML 图形扩展
   Folder, Server, X, Hourglass,
-  Network,
+  Network, Waypoints, Link, Boxes,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
@@ -56,6 +56,13 @@ const CATEGORY_ICONS: Record<string, LucideIcon> = {
   uml_stateactivity: CircleDot,
   uml_deployment: Server,
   uml_component: Box,
+  // 旧 Schema 移植的建模图种
+  er: Database,
+  org: Network,
+  venn: Circle,
+  epc: Waypoints,
+  evc: Link,
+  weizhu_bm: Boxes,
   // 网络拓扑 / 云服务图标（懒加载矢量图标）
   net_topo: Network,
   cloud_icons: Cloud,
@@ -250,8 +257,21 @@ const CATEGORY_SHAPES: Record<string, Array<{ name: string; title: string; icon?
   ],
 }
 
-/** 图标懒加载辅助：品类矢量数据由 networkLoader 按需 import（见 netIconChunks） */
+/**
+ * 面板分组图形：手写清单在前，注册表派生补齐在后（旧 Schema 移植的图种只注册不手写清单）。
+ * 派生规则：子分组按 shape.group 匹配，主分类取无 group 的图形，两边都不会重复。
+ */
+function registryShapesFor(catId: string, childId?: string): Array<{ name: string; title: string }> {
+  const curated = CATEGORY_SHAPES[childId ?? catId] ?? []
+  const seen = new Set(curated.map((s) => s.name))
+  const derived = shapeRegistry
+    .getShapesByCategory(catId)
+    .filter((s) => (s.group ? s.group === childId : !childId) && !seen.has(s.name))
+    .map((s) => ({ name: s.name, title: s.title }))
+  return [...curated, ...derived]
+}
 
+/** 图标懒加载辅助：品类矢量数据由 networkLoader 按需 import（见 netIconChunks） */
 /** 一级分类 id → 厂商列表（网络拓扑 / 云服务图标） */
 const VENDORS_OF_PANEL: Record<string, typeof NET_VENDORS> = {}
 for (const vendor of NET_VENDORS) (VENDORS_OF_PANEL[vendor.panel] ??= []).push(vendor)
@@ -367,8 +387,11 @@ export function LeftPanel() {
     if (!netIconPrefs.includes(groupId)) void loadNetworkGroup(groupId).catch(() => {})
   }
 
+  /** 加载全部：矢量数据与该厂商所有品类一次性铺开，不必再逐个点开 */
   const loadVendor = (vendorId: string) => {
     setActiveVendor((prev) => ({ ...prev, [vendorPanelOf(vendorId)]: vendorId }))
+    const groupIds = NET_GROUPS.filter((g) => g.vendor === vendorId).map((g) => g.id)
+    setExpandedChildren((prev) => new Set([...prev, ...groupIds]))
     void loadNetworkVendor(vendorId).catch(() => {})
   }
 
@@ -494,9 +517,9 @@ export function LeftPanel() {
           // 二级分组（UML 子分类 / 网络图标品类）：折叠作用于主分组，品类可单独展开并按需拉数据
           if (cat.children) {
             const countOf = (ch: (typeof cat.children)[number]) =>
-              ch.lazy ? (NET_GROUPS.find((g) => g.id === ch.id)?.count ?? 0) : (CATEGORY_SHAPES[ch.id]?.length ?? 0)
+              ch.lazy ? (NET_GROUPS.find((g) => g.id === ch.id)?.count ?? 0) : registryShapesFor(cat.id, ch.id).length
             const childShapesOf = (ch: (typeof cat.children)[number]) =>
-              ch.lazy ? (loadedGroupShapes(ch.id) ?? []) : (CATEGORY_SHAPES[ch.id] || [])
+              ch.lazy ? (loadedGroupShapes(ch.id) ?? []) : registryShapesFor(cat.id, ch.id)
             const total = cat.children.reduce((n, ch) => n + countOf(ch), 0)
             const vendors = cat.vendorTabs ? (VENDORS_OF_PANEL[cat.id] ?? []) : []
             const vendor = vendors.find((v) => v.id === activeVendor[cat.id]) ?? vendors[0]
@@ -614,10 +637,10 @@ export function LeftPanel() {
             )
           }
 
-          const catShapes = CATEGORY_SHAPES[cat.id] || []
+          const catShapes = registryShapesFor(cat.id)
 
           return (
-            <div key={cat.id}>
+            <div key={cat.id} data-panel={cat.id}>
               {/* 分类头 */}
               <button
                 className={[
