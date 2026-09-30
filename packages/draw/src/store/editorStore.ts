@@ -8,6 +8,7 @@ import {
   resizeElementInDoc,
 } from '@/core/editor/documentOps'
 import { LINKER_FONT_DEFAULTS } from '@/core/editor/linker'
+import { writeLinkerStyleMemory } from '@/core/editor/linkerStyleMemory'
 import { resolveJunctionLinkers } from '@/core/editor/linkerJunction'
 import { applyJunctionResolution, rectGetterOf } from '@/core/editor/documentOps'
 import { resetManualRoute } from '@/core/editor/manualRoute'
@@ -469,8 +470,21 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       }
     }),
 
-  updateLinker: (id, updates) =>
-    set((state) => {
+  updateLinker: (id, updates) => {
+    // 连线样式记忆：修改线型/样式的操作同步作为新建连线的默认
+    // （面板 / 顶部工具栏 / AI 代用户改样式都收口于此；端点/路由类更新不带这些字段，不触发）
+    if (updates.lineStyle || updates.linkerType) {
+      const ls = updates.lineStyle
+      writeLinkerStyleMemory({
+        linkerType: updates.linkerType,
+        lineWidth: ls?.lineWidth,
+        lineColor: ls?.lineColor,
+        lineStyle: ls?.lineStyle,
+        beginArrowStyle: ls?.beginArrowStyle,
+        endArrowStyle: ls?.endArrowStyle,
+      })
+    }
+    return set((state) => {
       const el = state.document.elements[id]
       if (!el || !isLinker(el)) return state
       const oldEl = JSON.parse(JSON.stringify(el))
@@ -496,7 +510,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         },
         isDirty: true,
       }
-    }),
+    })
+  },
 
   resetLinkerRoute: (id) => {
     const state = get()

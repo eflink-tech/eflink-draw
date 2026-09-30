@@ -13,6 +13,7 @@ import { findJunctionSnap } from './linkerJunction'
 import { DEFAULT_FONT_VALUE } from './fontMap'
 import { normAngle, type Point } from '@/core/utils/geometry'
 import { nearestContourPoint, pointInRotatedBBox, type ContourHit } from './shapeContour'
+import { readLinkerStyleMemory } from './linkerStyleMemory'
 
 // Point/normAngle 已迁至基础几何模块（@/core/utils/geometry），此处再导出保持既有
 // 消费方（linkerDraw/linkerJunction/linkerSegment/linkerCursor/manualRoute/actionExecutor 等）零改动
@@ -704,6 +705,32 @@ export const LINKER_DEFAULTS = {
   lineStyle: 'solid' as const,
   beginArrowStyle: 'none' as const,
   endArrowStyle: 'solidArrow' as const,
+}
+
+/**
+ * 记忆合并：出厂默认 + 用户最近设置的线型/样式（见 linkerStyleMemory）。
+ * 供用户手动拖线（连线工具 / 锚点 / 边线）的新建路径取默认——
+ * 时序图消息与 AI 建图不跟随（各自有固定的出厂口径）。
+ */
+export function memorizedLinkerStyle(): Pick<LinkerInstance, 'linkerType' | 'lineStyle'> {
+  const mem = readLinkerStyleMemory()
+  return {
+    linkerType: mem?.linkerType ?? 'broken',
+    lineStyle: {
+      lineWidth: mem?.lineWidth ?? LINKER_DEFAULTS.lineWidth,
+      lineColor: mem?.lineColor ?? LINKER_DEFAULTS.lineColor,
+      lineStyle: mem?.lineStyle ?? LINKER_DEFAULTS.lineStyle,
+      beginArrowStyle: mem?.beginArrowStyle ?? LINKER_DEFAULTS.beginArrowStyle,
+      endArrowStyle: mem?.endArrowStyle ?? LINKER_DEFAULTS.endArrowStyle,
+    },
+  }
+}
+
+/** 就地应用记忆样式（创建实例后、计算 points 之前调用——路由依赖 linkerType） */
+export function applyMemorizedLinkerStyle(inst: LinkerInstance): void {
+  const next = memorizedLinkerStyle()
+  inst.linkerType = next.linkerType
+  inst.lineStyle = next.lineStyle
 }
 
 export interface LinkerStylePreset {

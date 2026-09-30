@@ -12,10 +12,11 @@ import { isLinker } from '@/types'
 import { useEditorStore } from '@/store/editorStore'
 import {
   ANCHOR_HIT_PX,
-  LINKER_DEFAULTS,
+  applyMemorizedLinkerStyle,
   createLinkerInstance,
   getAnchorPoints,
   getLinkerPoints,
+  memorizedLinkerStyle,
   snapLinkerEndpoint,
   type LinkerEndpoint,
 } from './linker'
@@ -84,7 +85,7 @@ export function resolveLinkerStart(
   return { id: host.id, x: hostHit.x, y: hostHit.y, angle: hostHit.angle }
 }
 
-/** 由 from/to 构造连线草稿（lineStyle 取 LINKER_DEFAULTS，linkerType 固定 broken；angle 归 0） */
+/** 由 from/to 构造连线草稿（线型/样式取连线样式记忆；angle 归 0） */
 function buildDraft(from: LinkerEndpoint, to: LinkerEndpoint): LinkerDraft {
   const norm = (ep: LinkerEndpoint): LinkerInstance['from'] => ({
     ...ep,
@@ -92,18 +93,13 @@ function buildDraft(from: LinkerEndpoint, to: LinkerEndpoint): LinkerDraft {
   })
   const nFrom = norm(from)
   const nTo = norm(to)
+  const style = memorizedLinkerStyle()
   return {
     from: nFrom,
     to: nTo,
-    linkerType: 'broken',
-    lineStyle: {
-      lineWidth: LINKER_DEFAULTS.lineWidth,
-      lineColor: LINKER_DEFAULTS.lineColor,
-      lineStyle: LINKER_DEFAULTS.lineStyle,
-      beginArrowStyle: LINKER_DEFAULTS.beginArrowStyle,
-      endArrowStyle: LINKER_DEFAULTS.endArrowStyle,
-    },
-    points: getLinkerPoints({ linkerType: 'broken', from: nFrom, to: nTo }, makeStoreRectGetter()),
+    linkerType: style.linkerType,
+    lineStyle: { ...style.lineStyle },
+    points: getLinkerPoints({ linkerType: style.linkerType, from: nFrom, to: nTo }, makeStoreRectGetter()),
   }
 }
 
@@ -178,6 +174,8 @@ export function endFreeLinker(): void {
     ...Object.values(st.document.elements).map((el) => el.props.zindex),
   )
   const inst = createLinkerInstance(draft.from, draft.to, zmax + 1)
+  // 先应用记忆样式再算路由（路由依赖 linkerType）
+  applyMemorizedLinkerStyle(inst)
   inst.points = getLinkerPoints(inst, makeStoreRectGetter())
   st.addLinker(inst)
   st.selectElement(inst.id)

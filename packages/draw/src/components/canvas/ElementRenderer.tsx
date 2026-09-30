@@ -11,12 +11,13 @@ import { useEditorStore } from '@/store/editorStore'
 import { snapLine, type SnapResult } from '@/core/editor/alignment'
 import { makeShapeSceneFunc } from '@/core/editor/shapePaint'
 import {
+  applyMemorizedLinkerStyle,
   createLinkerInstance,
   getAnchorPoints,
   getLinkerPoints,
   getLocalAnchors,
+  memorizedLinkerStyle,
   snapLinkerEndpoint,
-  LINKER_DEFAULTS,
   type LinkerEndpoint,
 } from '@/core/editor/linker'
 import {
@@ -849,18 +850,14 @@ export const ElementRenderer = memo(function ElementRenderer({ element, textEngi
 
     // 自由端 angle 归 0（路由只用附着端角度，与 createLinkerInstance 一致）
     const to = { ...r.endpoint, angle: r.endpoint.angle ?? 0 }
+    // 线型/样式取连线样式记忆——拖动预览与松手后创建的连线一致（不会先直线后变曲线）
+    const style = memorizedLinkerStyle()
     const draft = {
       from,
       to,
-      linkerType: 'broken' as const,
-      lineStyle: {
-        lineWidth: LINKER_DEFAULTS.lineWidth,
-        lineColor: LINKER_DEFAULTS.lineColor,
-        lineStyle: LINKER_DEFAULTS.lineStyle,
-        beginArrowStyle: LINKER_DEFAULTS.beginArrowStyle,
-        endArrowStyle: LINKER_DEFAULTS.endArrowStyle,
-      },
-      points: getLinkerPoints({ linkerType: 'broken', from, to }, makeStoreRectGetter()),
+      linkerType: style.linkerType,
+      lineStyle: { ...style.lineStyle },
+      points: getLinkerPoints({ linkerType: style.linkerType, from, to }, makeStoreRectGetter()),
     }
     st.setLinkerDraft(draft)
   }, [])
@@ -883,6 +880,8 @@ export const ElementRenderer = memo(function ElementRenderer({ element, textEngi
         ...Object.values(st.document.elements).map((el) => el.props.zindex),
       )
       const inst = createLinkerInstance(draft.from, draft.to, zmax + 1)
+      // 先应用连线样式记忆再算路由（路由依赖 linkerType）
+      applyMemorizedLinkerStyle(inst)
       inst.points = getLinkerPoints(inst, makeStoreRectGetter())
       st.addLinker(inst)
       st.selectElement(inst.id)
