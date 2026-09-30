@@ -197,28 +197,37 @@ describe('routeAttachedLinkers（live 直操）', () => {
     const l = [...updated.values()][0]!
     expect(l.from).toMatchObject({ id: a.id, x: 160, y: 100 }) // 100 + 0.3×200
     expect(l.from.angle).toBe(Math.PI / 2)
+    expect(l.points.length).toBeGreaterThan(0)
   })
 
   it('圆边点等比放大后仍在圆周上（距轮廓 ≤1px）', () => {
-    const a = shape(0, 0, 'shape-c', 'round', 100, 100) // 圆 0..100
+    const c = shape(0, 0, 'shape-c', 'round', 100, 100) // 圆 0..100
     const linker = createLinkerInstance(
-      { id: a.id, x: 100, y: 50, angle: 0 }, // 圆右点
+      { id: c.id, x: 100, y: 50, angle: 0 }, // 圆右点
       { id: null, x: 300, y: 50, angle: 0 },
       1,
     )
     const doc: DocumentData = {
       ...createEmptyDocument(),
-      elements: { [a.id]: a, [linker.id]: linker },
+      elements: { [c.id]: c, [linker.id]: linker },
     }
     const updated = routeAttachedLinkers(
       doc.elements,
-      new Map([[a.id, { x: 0, y: 0, w: 200, h: 200 }]]),
+      new Map([[c.id, { x: 0, y: 0, w: 200, h: 200 }]]),
     )
     const l = [...updated.values()][0]!
-    const grown = { ...a, props: { ...a.props, w: 200, h: 200 } }
-    const c = nearestContourPoint(grown, l.from.x, l.from.y)
-    expect(c).not.toBeNull()
-    expect(c!.dist).toBeLessThanOrEqual(1)
+    // rx = (100-0)/100 = 1，ry = (50-0)/100 = 0.5 → (0+200×1, 0+200×0.5) = (200,100)。
+    // 精确坐标先行：若比例映射发生 rx/ry 交换类错误会得到 (100,200)——也恰在圆周上，
+    // 仅靠下方 dist 断言无法察觉（对称盲区），故必须先锁坐标。
+    expect(l.from).toMatchObject({ id: c.id, x: 200, y: 100 })
+    expect(l.points.length).toBeGreaterThan(0)
+    // routeAttachedLinkers 直操不更新 elements，测试侧手动构造 resize 后的图形供轮廓查询
+    const grown = { ...c, props: { ...c.props, w: 200, h: 200 } }
+    const hit = nearestContourPoint(grown, l.from.x, l.from.y)
+    expect(hit).not.toBeNull()
+    // 容差 1px 来自曲线按 CURVE_STEP_PX=3 细分为折线的离散误差；
+    // 映射点 (200,100) 恰为贝塞尔段端点 (w, h/2)，实际 dist≈0
+    expect(hit!.dist).toBeLessThanOrEqual(1)
   })
 })
 
