@@ -54,7 +54,7 @@ export const SHAPE_CATEGORIES: ShapeCategory[] = [
     ],
   },
   { id: 'lane', name: '泳池/泳道', icon: 'Columns' },
-  // UML：单一主分组，子分类作为二级标题（折叠/展开仅作用于主分组）
+  // UML：子分类作为二级标题，各自可折叠展开（默认展开）
   {
     id: 'uml',
     name: 'UML',

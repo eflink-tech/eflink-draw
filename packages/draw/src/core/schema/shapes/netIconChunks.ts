@@ -1,11 +1,15 @@
 // ═══════════════════════════════════════════
 // 网络拓扑图标品类 → 动态 import 映射（自动生成，勿手改）
-// 生成: node scripts/gen-network-shapes.mjs --category network,network_cisco,network_aws,network_azure,network_aliyun
+// 生成: node scripts/gen-network-shapes.mjs --category network_topo
 // 必须保持静态可分析（每个 value 一条字面量 import），vite 据此切成 46 个独立 chunk
 // ═══════════════════════════════════════════
 import type { ShapeDefinition } from '@/types'
 
 export const NET_ICON_LOADERS: Record<string, () => Promise<ShapeDefinition[]>> = {
+  "topo_devices": () => import('./groups/topo_devices').then((m) => m.shapes),
+  "topo_endpoints": () => import('./groups/topo_endpoints').then((m) => m.shapes),
+  "topo_cloud": () => import('./groups/topo_cloud').then((m) => m.shapes),
+  "topo_zones": () => import('./groups/topo_zones').then((m) => m.shapes),
   "network": () => import('./groups/network').then((m) => m.shapes),
   "cisco_bulidings": () => import('./groups/cisco_bulidings').then((m) => m.shapes),
   "cisco_computers_peripherals": () => import('./groups/cisco_computers_peripherals').then((m) => m.shapes),

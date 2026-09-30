@@ -279,6 +279,8 @@ for (const vendor of NET_VENDORS) (VENDORS_OF_PANEL[vendor.panel] ??= []).push(v
 
 const vendorPanelOf = (vendorId: string) => NET_VENDORS.find((v) => v.id === vendorId)?.panel ?? ''
 
+type PanelChild = NonNullable<(typeof SHAPE_CATEGORIES)[number]['children']>[number]
+
 /** 品类标题在厂商 tab 下省略厂商前缀（Cisco tab 里的「Cisco 路由器」→「路由器」） */
 function shortGroupName(name: string, vendorName: string): string {
   const short = name.startsWith(vendorName) ? name.slice(vendorName.length).trim() : name
@@ -303,8 +305,8 @@ export function LeftPanel() {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
     new Set(['basic']),
   )
-  // 懒加载子分组（网络图标品类）单独折叠，避免一次展开数百个图形
-  const [expandedChildren, setExpandedChildren] = useState<Set<string>>(new Set())
+  // 二级分组折叠状态：未记录的按「懒加载品类收起、其余展开」，避免一次展开数百个图形
+  const [childOpen, setChildOpen] = useState<Record<string, boolean>>({})
   /** 一级分类 → 当前厂商 tab */
   const [activeVendor, setActiveVendor] = useState<Record<string, string>>({})
   const [query, setQuery] = useState('')
@@ -368,15 +370,11 @@ export function LeftPanel() {
   }
 
   /** 品类单独折叠：展开时才拉对应 chunk */
-  const toggleLazyChild = (childId: string) => {
-    const willExpand = !expandedChildren.has(childId)
-    setExpandedChildren((prev) => {
-      const next = new Set(prev)
-      if (next.has(childId)) next.delete(childId)
-      else next.add(childId)
-      return next
-    })
-    if (willExpand) void loadNetworkGroup(childId).catch(() => {})
+  const isOpenChild = (child: PanelChild) => childOpen[child.id] ?? !child.lazy
+  const toggleChild = (child: PanelChild) => {
+    const willExpand = !isOpenChild(child)
+    setChildOpen((prev) => ({ ...prev, [child.id]: willExpand }))
+    if (willExpand && child.lazy) void loadNetworkGroup(child.id).catch(() => {})
   }
 
   /** 常驻偏好：勾选后进入编辑器即预载，不必每次点开 */
@@ -392,7 +390,7 @@ export function LeftPanel() {
   const loadVendor = (vendorId: string) => {
     setActiveVendor((prev) => ({ ...prev, [vendorPanelOf(vendorId)]: vendorId }))
     const groupIds = NET_GROUPS.filter((g) => g.vendor === vendorId).map((g) => g.id)
-    setExpandedChildren((prev) => new Set([...prev, ...groupIds]))
+    setChildOpen((prev) => ({ ...prev, ...Object.fromEntries(groupIds.map((id) => [id, true])) }))
     void loadNetworkVendor(vendorId).catch(() => {})
   }
 
@@ -515,7 +513,7 @@ export function LeftPanel() {
           const isExpanded = expandedCategories.has(cat.id)
           const isActive = activeCategory === cat.id
 
-          // 二级分组（UML 子分类 / 网络图标品类）：折叠作用于主分组，品类可单独展开并按需拉数据
+          // 二级分组：统一支持折叠/展开；懒加载品类默认收起，展开时才拉对应 chunk
           if (cat.children) {
             const countOf = (ch: (typeof cat.children)[number]) =>
               ch.lazy ? (NET_GROUPS.find((g) => g.id === ch.id)?.count ?? 0) : registryShapesFor(cat.id, ch.id).length
@@ -580,7 +578,7 @@ export function LeftPanel() {
 
                     {children.map((child) => {
                       const loaded = !child.lazy || isNetworkGroupLoaded(child.id)
-                      const open = !child.lazy || expandedChildren.has(child.id)
+                      const open = isOpenChild(child)
                       const vendorName = vendors.find((v) => v.id === child.vendor)?.name ?? ''
                       const pinned = netIconPrefs.includes(child.id)
                       return (
@@ -590,13 +588,12 @@ export function LeftPanel() {
                               data-group={child.id}
                               className={[
                                 'flex items-center flex-1 min-w-0 px-3 py-1 pl-8 text-[11px] transition-colors text-left',
-                                child.lazy ? 'cursor-pointer hover:bg-[#f0f0f0]' : 'cursor-default',
+                                'cursor-pointer hover:bg-[#f0f0f0]',
                                 loaded ? 'text-gray-500' : 'text-gray-400',
                               ].join(' ')}
-                              onClick={() => child.lazy && toggleLazyChild(child.id)}
+                              onClick={() => toggleChild(child)}
                             >
-                              {child.lazy &&
-                                (open ? <ChevronDown size={12} className="mr-1 shrink-0" /> : <ChevronRight size={12} className="mr-1 shrink-0" />)}
+                              {open ? <ChevronDown size={12} className="mr-1 shrink-0" /> : <ChevronRight size={12} className="mr-1 shrink-0" />}
                               <span className="truncate">
                                 {child.lazy ? shortGroupName(child.name, vendorName) : child.name}
                               </span>

@@ -26,6 +26,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
+import { TOPO_RAW } from './lib/topo-glyphs.mjs'
 
 const ROOT = path.resolve(import.meta.dirname, '..')
 const ASSETS = path.join(ROOT, 'processon_files')
@@ -594,10 +595,15 @@ function readGroupFile(groupId) {
 
 let total = 0, failed = 0
 fs.mkdirSync(GROUPS_DIR, { recursive: true })
+
+/** 手绘批次：不经 schema/SVG，直接产出 IconRaw（拓扑符号，scripts/lib/topo-glyphs.mjs） */
+const HAND_AUTHORED = { network_topo: TOPO_RAW }
+
 for (const category of categories) {
-  const defs = parseSchema(category)
-  const raws = []
-  console.log(`\n══ ${category}: ${defs.length} 个定义 ══`)
+  const hand = HAND_AUTHORED[category]
+  const defs = hand ? [] : parseSchema(category)
+  const raws = hand ? [...hand] : []
+  console.log(`\n══ ${category}: ${hand ? `手绘 ${raws.length} 个符号` : `${defs.length} 个定义`} ══`)
   for (const def of defs) {
     const svgPath = path.join(ASSETS, def.svg)
     if (!fs.existsSync(svgPath)) { console.warn(`✗ ${def.name}: 缺少 ${def.svg}`); failed++; continue }
@@ -611,6 +617,7 @@ for (const category of categories) {
       failed++
     }
   }
+  if (hand) total += raws.length
   // 每个 schema 子分类 → 一个独立数据文件（vite 各自切成 chunk）
   const groups = new Map()
   for (const r of raws) {

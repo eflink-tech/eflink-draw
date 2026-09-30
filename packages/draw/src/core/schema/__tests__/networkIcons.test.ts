@@ -12,29 +12,29 @@ import { NET_GROUP_SHAPE_NAMES } from '../shapes/netIconNames'
 import { SHAPE_CATEGORIES, useUIStore } from '@/store/uiStore'
 
 describe('网络拓扑图标品类级懒加载', () => {
-  it('manifest 覆盖 46 个品类 / 738 个图标，图形名全局唯一', () => {
-    expect(NET_VENDORS.map((v) => v.id)).toEqual(['generic', 'cisco', 'aws', 'azure', 'aliyun'])
-    expect(NET_GROUPS.length).toBe(46)
+  it('manifest 覆盖 50 个品类 / 812 个图标，图形名全局唯一', () => {
+    expect(NET_VENDORS.map((v) => v.id)).toEqual(['topo', 'generic', 'cisco', 'aws', 'azure', 'aliyun'])
+    expect(NET_GROUPS.length).toBe(50)
     const names = Object.values(NET_GROUP_SHAPE_NAMES).flat()
-    expect(names.length).toBe(738)
+    expect(names.length).toBe(812)
     expect(new Set(names).size).toBe(names.length)
     for (const group of NET_GROUPS) {
       expect(NET_GROUP_SHAPE_NAMES[group.id]?.length).toBe(group.count)
     }
   })
 
-  it('面板分类由 manifest 派生：网络拓扑 2 厂商、云服务图标 3 厂商', () => {
+  it('面板分类由 manifest 派生：网络拓扑 3 厂商、云服务图标 3 厂商', () => {
     const net = SHAPE_CATEGORIES.find((c) => c.id === 'net_topo')
     const cloud = SHAPE_CATEGORIES.find((c) => c.id === 'cloud_icons')
     expect(net?.vendorTabs).toBe(true)
-    expect([...new Set(net?.children?.map((c) => c.vendor))]).toEqual(['generic', 'cisco'])
-    expect(net?.children?.length).toBe(15)
+    expect([...new Set(net?.children?.map((c) => c.vendor))]).toEqual(['topo', 'generic', 'cisco'])
+    expect(net?.children?.length).toBe(19)
     expect(cloud?.children?.length).toBe(31)
     const total = [...net!.children!, ...cloud!.children!].reduce(
       (n, c) => n + (NET_GROUPS.find((g) => g.id === c.id)?.count ?? 0),
       0,
     )
-    expect(total).toBe(738)
+    expect(total).toBe(812)
   })
 
   it('展开品类才注册矢量数据；品类间互不牵连；重复调用幂等', async () => {
@@ -85,7 +85,7 @@ describe('网络拓扑图标品类级懒加载', () => {
 
   it('搜索索引按需拉取并与图形名对齐', async () => {
     const entries = await loadNetworkSearchIndex()
-    expect(entries.length).toBe(738)
+    expect(entries.length).toBe(812)
     const router = entries.find((e) => e.name === 'router')
     expect(router?.groupId).toBe('network')
     expect(router?.title).toBeTruthy()

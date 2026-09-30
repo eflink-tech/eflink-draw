@@ -27,6 +27,12 @@ export interface IconRaw {
   lc?: string
   lw?: number
   segs: IconSegmentRaw[]
+  /** 区域/分组框：描边走虚线（配合 m='stroke'） */
+  ds?: 1
+  /** 区域/分组框：可容纳其他图形 */
+  ct?: 1
+  /** 标题位置：缺省图形下方居中，'top' 为框内左上角 */
+  tb?: 'top'
 }
 
 function decodeCmds(str: string): PathAction[] {
@@ -93,5 +99,12 @@ export function buildIconShape(def: IconRaw): ShapeDefinition {
       })),
     }
   }
+  if (def.tb === 'top') {
+    // 区域框的标题预填图形名：左上角对齐，落图即可见「安全域」「VPC」，双击可改
+    shape.textBlock = [{ position: { x: 12, y: 8, w: 'w-24', h: 24 }, text: def.t }]
+    shape.fontStyle = { textAlign: 'left', vAlign: 'top', size: 14, bold: true }
+  }
+  if (def.ds && shape.lineStyle) shape.lineStyle = { ...shape.lineStyle, lineStyle: 'dashed' }
+  if (def.ct) shape.attribute = { container: true, rotatable: false }
   return shape
 }

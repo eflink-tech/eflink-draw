@@ -1,6 +1,12 @@
 {
   "vendors": [
     {
+      "id": "topo",
+      "name": "拓扑符号",
+      "schemaCategory": "network_topo",
+      "panel": "net_topo"
+    },
+    {
       "id": "generic",
       "name": "通用设备",
       "schemaCategory": "network",
@@ -32,6 +38,30 @@
     }
   ],
   "groups": [
+    {
+      "id": "topo_devices",
+      "vendor": "topo",
+      "name": "网络与安全设备",
+      "count": 0
+    },
+    {
+      "id": "topo_endpoints",
+      "vendor": "topo",
+      "name": "终端与办公",
+      "count": 0
+    },
+    {
+      "id": "topo_cloud",
+      "vendor": "topo",
+      "name": "网络与云",
+      "count": 0
+    },
+    {
+      "id": "topo_zones",
+      "vendor": "topo",
+      "name": "区域与分组框",
+      "count": 0
+    },
     {
       "id": "network",
       "vendor": "generic",
