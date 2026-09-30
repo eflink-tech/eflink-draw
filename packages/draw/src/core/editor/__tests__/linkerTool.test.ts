@@ -57,7 +57,7 @@ describe('resolveLinkerStart（L 连线工具起点）', () => {
     expect(r.angle).toBeCloseTo(Math.PI / 2, 6)
   })
 
-  it('锚点 7px 内仍优先锚点（scale 换算）', () => {
+  it('锚点 7px 内仍优先锚点', () => {
     const el = shape(100, 200, 100, 60)
     // 距顶锚 (150,200) 3px
     const r = resolveLinkerStart([el], 150, 203, 1)
@@ -72,6 +72,14 @@ describe('resolveLinkerStart（L 连线工具起点）', () => {
     expect(r.id).toBe(el.id)
     expect(r.x).toBe(150)
     expect(r.y).toBe(200)
+  })
+
+  it('锚点优先层与轮廓投影可区分（点击偏离锚点法线方向）', () => {
+    const el = shape(100, 200, 100, 60)
+    // (154,203)：|dx|=4≤7、|dy|=3≤7 → 锚点命中 x 吸回 150（禁用锚点层则投影为 154）
+    expect(resolveLinkerStart([el], 154, 203, 1).x).toBe(150)
+    // scale=4：tol=1.75 < |dx|=4 → 投影 (154,200)（tol 误为 7*scale=28 则吸回 150）
+    expect(resolveLinkerStart([el], 154, 203, 4).x).toBe(154)
   })
 })
 

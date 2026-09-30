@@ -826,7 +826,7 @@ export function findSnapAnchor(
 // 而非距离鼠标最近的锚点。
 // ═══════════════════════════════════════════
 
-const ANCHOR_HIT_PX = 7
+export const ANCHOR_HIT_PX = 7
 const ANCHOR_PROX_PX = 20
 /** 轮廓带吸附半径（屏幕像素）：光标距图形轮廓 ≤ 此值 → 吸附轮廓最近点 */
 const CONTOUR_BAND_PX = 12

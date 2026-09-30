@@ -11,6 +11,7 @@ import type { ElementInstance, LinkerDraft, LinkerInstance } from '@/types'
 import { isLinker } from '@/types'
 import { useEditorStore } from '@/store/editorStore'
 import {
+  ANCHOR_HIT_PX,
   LINKER_DEFAULTS,
   createLinkerInstance,
   getAnchorPoints,
@@ -18,7 +19,7 @@ import {
   snapLinkerEndpoint,
   type LinkerEndpoint,
 } from './linker'
-import { nearestContourPoint, pointInRotatedBBox } from './shapeContour'
+import { nearestContourPoint, pointInRotatedBBox, type ContourHit } from './shapeContour'
 import { allShapes, makeStoreRectGetter } from './interaction'
 import { hideEndpointPreview, showEndpointPreview } from './uiOverlay'
 
@@ -41,7 +42,7 @@ export function isFreeLinkerDragging(): boolean {
 
 /**
  * 起点解析（纯函数，便于测试）：
- * 1. 包围盒（±10px）覆盖光标的可连线图形为候选
+ * 1. 包围盒（±10px，屏幕像素）覆盖光标的可连线图形为候选
  * 2. 候选中距轮廓最近的图形承载起点；其锚点 7px（屏幕像素）内锚点优先
  * 3. 否则起点 = 轮廓最近点（任意边点）；空白/锁定 → 自由端点
  */
@@ -51,34 +52,36 @@ export function resolveLinkerStart(
   worldY: number,
   scale: number = 1,
 ): LinkerEndpoint {
+  // 粗筛与锚点容差同为屏幕像素口径（scale<1 时粗筛随 tol 同步放大，消除锚点漏检窗口）
   const cands = shapes.filter(
     (s) =>
       !s.locked &&
       s.attribute?.linkable !== false &&
-      pointInRotatedBBox(s, worldX, worldY, 10),
+      pointInRotatedBBox(s, worldX, worldY, 10 / scale),
   )
   if (cands.length === 0) return { id: null, x: worldX, y: worldY, angle: 0 }
 
   let host: ElementInstance | null = null
+  let hostHit: ContourHit | null = null
   let hostDist = Infinity
   for (const s of cands) {
     const c = nearestContourPoint(s, worldX, worldY)
     if (c && c.dist < hostDist) {
       hostDist = c.dist
       host = s
+      hostHit = c
     }
   }
-  if (!host) return { id: null, x: worldX, y: worldY, angle: 0 }
+  if (!host || !hostHit) return { id: null, x: worldX, y: worldY, angle: 0 }
 
-  // 锚点 7px 优先（与端点吸附 ANCHOR_HIT_PX 同阈值）
-  const tol = 7 / scale
+  // 锚点优先（直接复用端点吸附阈值）
+  const tol = ANCHOR_HIT_PX / scale
   const ap = getAnchorPoints(host).find(
     (a) => Math.abs(a.x - worldX) <= tol && Math.abs(a.y - worldY) <= tol,
   )
   if (ap) return { id: host.id, x: ap.x, y: ap.y, angle: ap.angle }
 
-  const c = nearestContourPoint(host, worldX, worldY)!
-  return { id: host.id, x: c.x, y: c.y, angle: c.angle }
+  return { id: host.id, x: hostHit.x, y: hostHit.y, angle: hostHit.angle }
 }
 
 /** 由 from/to 构造连线草稿（lineStyle 取 LINKER_DEFAULTS，linkerType 固定 broken；angle 归 0） */
