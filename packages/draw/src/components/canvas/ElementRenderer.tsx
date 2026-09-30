@@ -1011,8 +1011,7 @@ export const ElementRenderer = memo(function ElementRenderer({ element, textEngi
             if (container) container.style.cursor = 'crosshair'
           }}
           onMouseLeave={(e) => {
-            e.cancelBubble = true
-            // 指针可能移入图形本体（由 Group enter 设回 move），先恢复默认
+            // 边带→本体时 Group enter 被祖先链截断，cursor 停留 default 至离开；→ 空白时 Group leave 接管清理
             const container = e.target.getStage()?.container()
             if (container) container.style.cursor = 'default'
           }}
