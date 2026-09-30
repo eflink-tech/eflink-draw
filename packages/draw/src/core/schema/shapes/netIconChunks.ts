@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════
 // 网络拓扑图标品类 → 动态 import 映射（自动生成，勿手改）
-// 生成: node scripts/gen-network-shapes.mjs --category network_topo
+// 生成: node scripts/gen-network-shapes.mjs --category network,network_cisco,network_aws,network_azure,network_aliyun
 // 必须保持静态可分析（每个 value 一条字面量 import），vite 据此切成 46 个独立 chunk
 // ═══════════════════════════════════════════
 import type { ShapeDefinition } from '@/types'

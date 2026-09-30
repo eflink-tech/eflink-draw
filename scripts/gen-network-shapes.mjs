@@ -408,8 +408,49 @@ function parsePoints(str) {
 
 const SHAPE_TAGS = new Set(['path', 'rect', 'circle', 'ellipse', 'line', 'polyline', 'polygon'])
 
+/** 收集全树渐变 id → stops 平均色（ProcessOn 图标渐变多为同色系深浅，纯色近似观感足够；
+ *  linearGradient 可能挂在 <defs> 或 <g> 下，任意嵌套都要找到） */
+function collectGradients(svgRoot) {
+  const grads = new Map()
+  const walk = (node) => {
+    for (const child of node.children) {
+      if (child.tag === 'linearGradient' || child.tag === 'radialGradient') {
+        const id = child.attrs.id
+        const stops = []
+        for (const st of child.children) {
+          if (st.tag !== 'stop') continue
+          const decl = st.attrs.style ? styleFromDecl(st.attrs.style) : {}
+          const raw = st.attrs['stop-color'] ?? decl['stop-color']
+          const c = parseColor(raw)
+          if (c && c !== 'GRADIENT') stops.push(c)
+        }
+        if (id && stops.length) {
+          const avg = {
+            r: Math.round(stops.reduce((s, c) => s + c.r, 0) / stops.length),
+            g: Math.round(stops.reduce((s, c) => s + c.g, 0) / stops.length),
+            b: Math.round(stops.reduce((s, c) => s + c.b, 0) / stops.length),
+            a: 1,
+          }
+          grads.set(id, avg)
+        }
+      } else {
+        walk(child)
+      }
+    }
+  }
+  walk(svgRoot)
+  return grads
+}
+
+/** url(#id) 引用 → 渐变平均色；查不到返回 undefined */
+function gradientRef(raw, grads) {
+  const m = /^url\(#([^)]+)\)/.exec(String(raw ?? '').trim())
+  if (!m) return undefined
+  return grads.get(m[1])
+}
+
 /** → {segments:[{contours, fill, stroke, strokeWidth}], warnings[]} */
-function extractSegments(svgRoot) {
+function extractSegments(svgRoot, grads = new Map()) {
   const segments = []
   const warnings = []
   const walk = (node, parentTm, style, groupOpacity) => {
@@ -439,8 +480,8 @@ function extractSegments(svgRoot) {
       const evenOdd = st.fillRule === 'evenodd'
       if (!SHAPE_TAGS.has(child.tag)) continue
 
-      const fillColor = parseColor(st.fill)
-      const strokeColor = parseColor(st.stroke)
+      const fillColor = parseColor(st.fill) === 'GRADIENT' ? gradientRef(st.fill, grads) ?? 'GRADIENT' : parseColor(st.fill)
+      const strokeColor = parseColor(st.stroke) === 'GRADIENT' ? gradientRef(st.stroke, grads) ?? 'GRADIENT' : parseColor(st.stroke)
       if (fillColor === 'GRADIENT' || strokeColor === 'GRADIENT') {
         warnings.push('渐变填充不支持')
         continue
@@ -507,8 +548,44 @@ function buildShape(def, svgSrc) {
     vh = parseFloat(svgEl.attrs.height) || def.h
   }
 
-  const { segments, warnings } = extractSegments(svgEl)
+  const { segments, warnings } = extractSegments(svgEl, collectGradients(svgEl))
   if (!segments.length) throw new Error(`无可转换路径 (${warnings.join('; ')})`)
+
+  // 内容 bbox 归一化（含贝塞尔控制点）：源图标控制点超界 >3% 时（墨迹会画出选中框），
+  // 等比缩放回 96% 视口并居中；轻微压边（≤3%）保留原样避免大范围 diff
+  {
+    let bx0 = Infinity, by0 = Infinity, bx1 = -Infinity, by1 = -Infinity
+    for (const s of segments) {
+      for (const c of s.contours) {
+        const pts = [c.from, ...c.segs.flatMap((g) => [g.p1, g.p2, g.p].filter(Boolean))]
+        for (const [x, y] of pts) {
+          if (x < bx0) bx0 = x
+          if (x > bx1) bx1 = x
+          if (y < by0) by0 = y
+          if (y > by1) by1 = y
+        }
+      }
+    }
+    const tolX = vw * 0.03, tolY = vh * 0.03
+    if (bx0 < -tolX || bx1 > vw + tolX || by0 < -tolY || by1 > vh + tolY) {
+      const bw = bx1 - bx0 || 1, bh = by1 - by0 || 1
+      const k = Math.min((vw * 0.96) / bw, (vh * 0.96) / bh)
+      const cx = (bx0 + bx1) / 2, cy = (by0 + by1) / 2
+      const tx = vw / 2 - cx * k, ty = vh / 2 - cy * k
+      for (const s of segments) {
+        for (const c of s.contours) {
+          c.from = [c.from[0] * k + tx, c.from[1] * k + ty]
+          for (const g of c.segs) {
+            if (g.p1) g.p1 = [g.p1[0] * k + tx, g.p1[1] * k + ty]
+            if (g.p2) g.p2 = [g.p2[0] * k + tx, g.p2[1] * k + ty]
+            if (g.p) g.p = [g.p[0] * k + tx, g.p[1] * k + ty]
+          }
+        }
+        s.strokeWidth = round2(s.strokeWidth * k)
+      }
+      warnings.push(`内容归一化(bbox x${round2(bx0)}..${round2(bx1)} y${round2(by0)}..${round2(by1)}, k=${round2(k)})`)
+    }
+  }
 
   const filled = segments.filter((s) => s.fill)
   const stroked = segments.filter((s) => s.stroke && s.strokeWidth > 0)

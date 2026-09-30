@@ -1,6 +1,6 @@
 // 二级分组折叠：所有子分组（含非懒加载的 UML / BPMN / 移动端）都要能展开与收起
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { render, screen, fireEvent, cleanup } from '@testing-library/react'
+import { render, fireEvent, cleanup } from '@testing-library/react'
 import { LeftPanel } from '../LeftPanel'
 import { useUIStore } from '@/store/uiStore'
 

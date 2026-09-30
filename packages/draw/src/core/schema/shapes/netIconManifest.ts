@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════
 // 网络拓扑图标面板元数据（自动生成，勿手改）
-// 生成: node scripts/gen-network-shapes.mjs --category network_topo
+// 生成: node scripts/gen-network-shapes.mjs --category network,network_cisco,network_aws,network_azure,network_aliyun
 // 只含厂商/品类名与数量（约 2KB），供左侧面板画骨架与 tab 数字
 // 矢量数据在 groups/ 下按品类动态 import；标题搜索索引在 netIconIndex.ts 按需加载
 // ═══════════════════════════════════════════

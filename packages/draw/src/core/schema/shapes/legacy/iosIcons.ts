@@ -625,8 +625,8 @@ export const iosIconsLegacyShapes: ShapeDefinition[] = [
       },
       [
         { action: 'move', x: 'w*0.493125', y: 'h*0.59875' },
-        { action: 'line', x: 'w*0.896875', y: 'h*1.003125' },
-        { action: 'line', x: 'w*1.003125', y: 'h*0.896875' },
+        { action: 'line', x: 'w*0.846875', y: 'h*0.953125' },
+        { action: 'line', x: 'w*0.953125', y: 'h*0.846875' },
         { action: 'line', x: 'w*0.59875', y: 'h*0.493125' },
         { action: 'close' }
       ]

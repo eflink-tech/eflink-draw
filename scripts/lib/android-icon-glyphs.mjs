@@ -76,7 +76,7 @@ G.andriod_icons_1 = icon('black', (w, h) => [plusPoly(w / 2, h / 2, w * 0.88, w 
 G.andriod_icons_14 = icon('black', (w, h) => [plusPoly(w / 2, h / 2, w * 0.86, w * 0.19, Math.PI / 4)])
 G.andriod_icons_2 = icon('black', (w, h) => [heartPath(w * 0.98, h * 0.98)])
 G.andriod_icons_67 = icon('black', (w, h) => [
-  ribbon([[w * 0.08, h * 0.56], [w * 0.36, h * 0.86], [w * 0.94, h * 0.14]], w * 0.16),
+  ribbon([[w * 0.08, h * 0.56], [w * 0.36, h * 0.86], [w * 0.9, h * 0.14]], w * 0.16),
 ])
 G.andriod_icons_64 = icon('black', (w, h) => {
   const R = Math.min(w, h) * 0.48
@@ -273,7 +273,7 @@ G.andriod_icons_5 = icon('black', (w, h) => {
   ]
 })
 G.andriod_icons_6 = icon('black', (w, h) => {
-  const s = Math.min(w, h), g = s / 13
+  const s = Math.min(w, h), g = s / 13.5
   const out = []
   const finder = (x, y) => [
     hollowRect(x * g, y * g, g * 5, g * 5, g * 0.8, g * 1.1),
@@ -449,8 +449,8 @@ G.andriod_icons_54 = icon('black', (w, h) => {
   return [rectPath(w * 0.26, h * 0.14, bw, h * 0.72), rectPath(w * 0.54, h * 0.14, bw, h * 0.72)]
 })
 G.andriod_icons_59 = icon('black', (w, h) => [rectPath(w * 0.22, h * 0.22, w * 0.56, h * 0.56)])
-G.andriod_icons_52 = icon('black', (w, h) => [triR(w * 0.12, h * 0.18, h * 0.64), triR(w * 0.52, h * 0.18, h * 0.64)])
-G.andriod_icons_56 = icon('black', (w, h) => [triL(w * 0.88, h * 0.18, h * 0.64), triL(w * 0.48, h * 0.18, h * 0.64)])
+G.andriod_icons_52 = icon('black', (w, h) => [triR(w * 0.11, h * 0.18, h * 0.59), triR(w * 0.48, h * 0.18, h * 0.59)])
+G.andriod_icons_56 = icon('black', (w, h) => [triL(w * 0.89, h * 0.18, h * 0.59), triL(w * 0.52, h * 0.18, h * 0.59)])
 G.andriod_icons_53 = icon('black', (w, h) => [
   triR(w * 0.14, h * 0.18, h * 0.64),
   triR(w * 0.46, h * 0.18, h * 0.64),
@@ -494,7 +494,7 @@ G.andriod_icons_28 = icon('black', (w, h) => {
   const t = w * 0.13
   return [
     ribbon([[w * 0.1, h * 0.5], [w * 0.34, h * 0.76], [w * 0.86, h * 0.2]], t),
-    ribbon([[w * 0.3, h * 0.66], [w * 0.5, h * 0.88], [w * 0.96, h * 0.36]], t),
+    ribbon([[w * 0.3, h * 0.66], [w * 0.5, h * 0.88], [w * 0.9, h * 0.36]], t),
   ]
 })
 G.andriod_icons_41 = icon('black', (w, h) => {
@@ -508,13 +508,13 @@ const glyphA = (x, y, gw, gh, t) => [
   rectPath(x + gw * 0.2, y + gh * 0.56, gw * 0.6, t * 0.8),
 ]
 G.andriod_icons_26 = icon('black', (w, h) => [
-  ...glyphA(w * 0.02, h * 0.08, w * 0.6, h * 0.84, w * 0.1),
-  ...glyphA(w * 0.62, h * 0.36, w * 0.36, h * 0.56, w * 0.08),
+  ...glyphA(w * 0.07, h * 0.08, w * 0.54, h * 0.84, w * 0.1),
+  ...glyphA(w * 0.62, h * 0.36, w * 0.32, h * 0.56, w * 0.08),
 ])
 G.andriod_icons_63 = icon('black', (w, h) => {
   const t = w * 0.07
   return [
-    ...glyphA(w * 0.02, h * 0.26, w * 0.3, h * 0.48, t),
+    ...glyphA(w * 0.05, h * 0.26, w * 0.3, h * 0.48, t),
     ribbon([[w * 0.38, h * 0.5], [w * 0.54, h * 0.5]], t),
     poly([[w * 0.52, h * 0.36], [w * 0.64, h * 0.5], [w * 0.52, h * 0.64]]),
     rectPath(w * 0.7, h * 0.26, w * 0.28, t),
@@ -698,7 +698,7 @@ G.andriod_icons_61 = icon('black', (w, h) => {
   const d = Math.min(w, h) * 0.62, t = ST(w, 0.1)
   return [
     ring(w * 0.05, h * 0.05, d, t),
-    ribbon([[w * 0.05 + d * 0.8, h * 0.05 + d * 0.8], [w * 0.95, h * 0.95]], t * 1.5),
+    ribbon([[w * 0.05 + d * 0.8, h * 0.05 + d * 0.8], [w * 0.9, h * 0.9]], t * 1.5),
   ]
 })
 G.andriod_icons_62 = icon('black', (w, h) => {

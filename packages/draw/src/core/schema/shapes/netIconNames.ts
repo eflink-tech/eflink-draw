@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════
 // 网络拓扑图标「品类 → 图形名」清单（自动生成，勿手改）
-// 生成: node scripts/gen-network-shapes.mjs --category network_topo
+// 生成: node scripts/gen-network-shapes.mjs --category network,network_cisco,network_aws,network_azure,network_aliyun
 // 体积小（ASCII 图形名），常驻主包：文档保存反查 iconGroups、搜索命中定位品类都依赖它
 // 中文标题见 netIconTitles.ts（按需加载）
 // ═══════════════════════════════════════════

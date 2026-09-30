@@ -118,7 +118,7 @@ export const IOS_ICON_GLYPHS = {
   ios7Refresh: icon('black', (w, h) => refresh(w, h, ST(w, 0.16))),
   ios7SearchIcon: icon('black', (w, h) => {
     const d = Math.min(w, h) * 0.62, t = ST(w, 0.1)
-    return [ring(w * 0.05, h * 0.05, d, t), ribbon([[w * 0.05 + d * 0.8, h * 0.05 + d * 0.8], [w * 0.95, h * 0.95]], t * 1.5)]
+    return [ring(w * 0.05, h * 0.05, d, t), ribbon([[w * 0.05 + d * 0.8, h * 0.05 + d * 0.8], [w * 0.9, h * 0.9]], t * 1.5)]
   }),
   ios7SearchBig: icon('black', (w, h) => {
     const d = Math.min(w, h) * 0.6, t = ST(w, 0.08)
