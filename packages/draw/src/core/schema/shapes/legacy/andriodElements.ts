@@ -201,7 +201,7 @@ export const andriodElementsLegacyShapes: ShapeDefinition[] = [
     ],
     anchors: [],
     textBlock: [{ position: { x: 'w*0.013889', y: 'h/4', w: 'w*0.972222', h: 'h/2' }, text: '标题' }],
-    lineStyle: { lineWidth: 1, lineColor: '212,214,217' },
+    lineStyle: { lineWidth: 1, lineColor: '203,205,208' },
     fillStyle: { type: 'solid', color: '250,250,250' },
     attribute: { linkable: false },
     fontStyle: { size: 10 }
@@ -225,7 +225,7 @@ export const andriodElementsLegacyShapes: ShapeDefinition[] = [
     ],
     anchors: [],
     textBlock: [{ position: { x: 'w*0.033333', y: 'h/4', w: 'w*0.972222', h: 'h/2' }, text: '标题' }],
-    lineStyle: { lineWidth: 1, lineColor: '212,214,217' },
+    lineStyle: { lineWidth: 1, lineColor: '203,205,208' },
     fillStyle: { type: 'solid', color: '250,250,250' },
     attribute: { linkable: false },
     fontStyle: { size: 10 }
@@ -247,7 +247,7 @@ export const andriodElementsLegacyShapes: ShapeDefinition[] = [
           { action: 'line', x: 0, y: 'h' },
           { action: 'close' }
         ],
-        lineStyle: { lineWidth: 1, lineColor: '212,214,217' }
+        lineStyle: { lineWidth: 1, lineColor: '203,205,208' }
       },
       {
         actions: [{ action: 'line', x: 'w*0.05', y: 'h*0.377778' }, { action: 'line', x: 'w*0.1', y: 'h*0.377778' }],
@@ -323,7 +323,7 @@ export const andriodElementsLegacyShapes: ShapeDefinition[] = [
           { action: 'line', x: 0, y: 'h' },
           { action: 'close' }
         ],
-        lineStyle: { lineWidth: 1, lineColor: '212,214,217' }
+        lineStyle: { lineWidth: 1, lineColor: '203,205,208' }
       },
       {
         actions: [{ action: 'line', x: 'w*0.05', y: 'h*0.488889' }, { action: 'line', x: 'w*0.1', y: 'h*0.488889' }],
@@ -398,7 +398,7 @@ export const andriodElementsLegacyShapes: ShapeDefinition[] = [
           { action: 'line', x: 0, y: 'h' },
           { action: 'close' }
         ],
-        lineStyle: { lineWidth: 1, lineColor: '212,214,217' }
+        lineStyle: { lineWidth: 1, lineColor: '203,205,208' }
       },
       {
         actions: [
@@ -448,7 +448,7 @@ export const andriodElementsLegacyShapes: ShapeDefinition[] = [
           { action: 'line', x: 0, y: 'h' },
           { action: 'close' }
         ],
-        lineStyle: { lineWidth: 1, lineColor: '212,214,217' }
+        lineStyle: { lineWidth: 1, lineColor: '203,205,208' }
       },
       {
         actions: [
@@ -555,7 +555,7 @@ export const andriodElementsLegacyShapes: ShapeDefinition[] = [
           { action: 'line', x: 0, y: 'h' },
           { action: 'close' }
         ],
-        lineStyle: { lineWidth: 1, lineColor: '212,214,217' }
+        lineStyle: { lineWidth: 1, lineColor: '203,205,208' }
       },
       {
         actions: [
@@ -568,7 +568,7 @@ export const andriodElementsLegacyShapes: ShapeDefinition[] = [
           { action: 'move', x: 'w*0.041667', y: 'h*0.996875' },
           { action: 'line', x: 'w', y: 'h*0.996875' }
         ],
-        lineStyle: { lineColor: '220,220,220' },
+        lineStyle: { lineColor: '205,207,210' },
         fillStyle: { type: 'none' }
       },
       {
@@ -611,7 +611,7 @@ export const andriodElementsLegacyShapes: ShapeDefinition[] = [
           { action: 'line', x: 0, y: 'h' },
           { action: 'close' }
         ],
-        lineStyle: { lineWidth: 1, lineColor: '212,214,217' }
+        lineStyle: { lineWidth: 1, lineColor: '203,205,208' }
       },
       {
         actions: [
@@ -624,7 +624,7 @@ export const andriodElementsLegacyShapes: ShapeDefinition[] = [
           { action: 'move', x: 'w*0.041667', y: 'h*0.998077' },
           { action: 'line', x: 'w', y: 'h*0.998077' }
         ],
-        lineStyle: { lineColor: '220,220,220' },
+        lineStyle: { lineColor: '205,207,210' },
         fillStyle: { type: 'none' }
       },
       {
@@ -671,7 +671,7 @@ export const andriodElementsLegacyShapes: ShapeDefinition[] = [
           { action: 'line', x: 0, y: 'h' },
           { action: 'close' }
         ],
-        lineStyle: { lineWidth: 1, lineColor: '212,214,217' }
+        lineStyle: { lineWidth: 1, lineColor: '203,205,208' }
       },
       {
         actions: [{ action: 'move', x: 'w*0.041667', y: 'h*0.9875' }, { action: 'line', x: 'w', y: 'h*0.9875' }],
@@ -717,7 +717,7 @@ export const andriodElementsLegacyShapes: ShapeDefinition[] = [
           { action: 'quadraticCurve', x1: 0, y1: 'h', x: 0, y: 'h*0.977778' },
           { action: 'close' }
         ],
-        lineStyle: { lineWidth: 1, lineColor: '212,214,217' }
+        lineStyle: { lineWidth: 1, lineColor: '203,205,208' }
       },
       {
         actions: [
@@ -813,7 +813,9 @@ export const andriodElementsLegacyShapes: ShapeDefinition[] = [
     anchors: [],
     lineStyle: { lineWidth: 0 },
     fillStyle: { type: 'solid', color: '97,97,101' },
-    attribute: { linkable: false }
+    attribute: { linkable: false },
+    fontStyle: { color: '255,255,255', size: 10 },
+    textBlock: [{ position: { x: 'w*0.076923', y: 0, w: 'w*0.846154', h: 'h' }, text: '提示' }]
   },
   /** 对话框与确认（210×120） */
   {

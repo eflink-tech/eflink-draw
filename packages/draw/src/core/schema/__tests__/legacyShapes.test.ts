@@ -57,7 +57,7 @@ describe('旧 Schema 移植图形', () => {
   it('旧素材用位图表达的细节已重画为矢量（开关滑块、勾选、放大镜、键盘按键）', () => {
     const subs = (name: string) => shapeRegistry.getShape(name)!.path.length
     expect(subs('ios7SwitchOn'), '轨道 + 滑块').toBe(2)
-    expect(subs('andriodCheck'), '方框 + 对勾').toBeGreaterThanOrEqual(3)
+    expect(subs('andriodCheck'), '方框 + 对勾').toBe(2)
     expect(subs('andriodSlider'), '两段轨道 + 圆形滑块').toBe(3)
     expect(subs('ios7Keyboard'), '逐键矢量').toBeGreaterThan(25)
     expect(subs('andriodInput'), '逐键矢量').toBeGreaterThan(25)
@@ -103,9 +103,11 @@ describe('旧 Schema 移植图形', () => {
       expect(typeof h, shape.name).toBe('number')
       // 通栏元素不得超出所属平台的屏幕宽度
       expect(w!, `${shape.name} 宽 ${w}`).toBeLessThanOrEqual(screenW[shape.group!])
-      // 独立控件（按钮 / 输入框 / 开关）不该有半屏宽
-      if (shape.group!.endsWith('_control')) {
-        expect(w! <= 160 && h! <= 40, `${shape.name} ${w}×${h}`).toBe(true)
+      // 独立控件（按钮 / 输入框 / 开关）不该有半屏宽（按钮定档 84×50，高度上限放宽到 60）；
+      // 单选组是「圆 + 文字」三项横排的组合图形，宽度按通栏元素只受屏宽上限约束
+      const isGroup = shape.name === 'andriodRadio'
+      if (shape.group!.endsWith('_control') && !isGroup) {
+        expect(w! <= 160 && h! <= 60, `${shape.name} ${w}×${h}`).toBe(true)
       }
       // 文字不会自适应缩小：字号必须放得进框子，否则会溢出到隔壁图形上
       if (shape.textBlock?.some((b) => b.text.trim())) {

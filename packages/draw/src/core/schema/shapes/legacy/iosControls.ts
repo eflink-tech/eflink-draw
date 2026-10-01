@@ -8,59 +8,61 @@
 import type { ShapeDefinition } from '@/types'
 
 export const iosControlsLegacyShapes: ShapeDefinition[] = [
-  /** 按钮（150×32） */
+  /** 按钮（84×50） */
   {
     name: 'ios7Button1',
     title: '按钮',
     category: 'mobile',
     group: 'mobile_ios_control',
     groupName: 'iOS 控件',
-    props: { w: 150, h: 32 },
+    props: { w: 84, h: 50 },
     path: [
       [
-        { action: 'move', x: 0, y: 'h*0.1' },
-        { action: 'quadraticCurve', x1: 0, y1: 0, x: 'w*0.016667', y: 0 },
-        { action: 'line', x: 'w*0.983333', y: 0 },
-        { action: 'quadraticCurve', x1: 'w', y1: 0, x: 'w', y: 'h*0.1' },
-        { action: 'line', x: 'w', y: 'h*0.9' },
-        { action: 'quadraticCurve', x1: 'w', y1: 'h', x: 'w*0.983333', y: 'h' },
-        { action: 'line', x: 'w*0.016667', y: 'h' },
-        { action: 'quadraticCurve', x1: 0, y1: 'h', x: 0, y: 'h*0.9' },
+        { action: 'move', x: 8, y: 0 },
+        { action: 'line', x: 'w-8', y: 0 },
+        { action: 'quadraticCurve', x1: 'w', y1: 0, x: 'w', y: 8 },
+        { action: 'line', x: 'w', y: 'h-8' },
+        { action: 'quadraticCurve', x1: 'w', y1: 'h', x: 'w-8', y: 'h' },
+        { action: 'line', x: 8, y: 'h' },
+        { action: 'quadraticCurve', x1: 0, y1: 'h', x: 0, y: 'h-8' },
+        { action: 'line', x: 0, y: 8 },
+        { action: 'quadraticCurve', x1: 0, y1: 0, x: 8, y: 0 },
         { action: 'close' }
       ]
     ],
     anchors: [],
     textBlock: [{ position: { x: 'w*0.041667', y: 0, w: 'w*0.916667', h: 'h' }, text: '操作' }],
-    lineStyle: { lineWidth: 1, lineColor: '208,210,214' },
-    fontStyle: { size: 13, color: '252,84,57', bold: true },
+    lineStyle: { lineWidth: 1, lineColor: '199,201,205' },
+    fontStyle: { size: 16, color: '34,124,231', bold: false },
     attribute: { linkable: false },
     fillStyle: { type: 'solid', color: '248,248,250' }
   },
-  /** 按钮（150×32） */
+  /** 按钮（84×50） */
   {
     name: 'ios7Button2',
     title: '按钮',
     category: 'mobile',
     group: 'mobile_ios_control',
     groupName: 'iOS 控件',
-    props: { w: 150, h: 32 },
+    props: { w: 84, h: 50 },
     path: [
       [
-        { action: 'move', x: 0, y: 'h*0.1' },
-        { action: 'quadraticCurve', x1: 0, y1: 0, x: 'w*0.016667', y: 0 },
-        { action: 'line', x: 'w*0.983333', y: 0 },
-        { action: 'quadraticCurve', x1: 'w', y1: 0, x: 'w', y: 'h*0.1' },
-        { action: 'line', x: 'w', y: 'h*0.9' },
-        { action: 'quadraticCurve', x1: 'w', y1: 'h', x: 'w*0.983333', y: 'h' },
-        { action: 'line', x: 'w*0.016667', y: 'h' },
-        { action: 'quadraticCurve', x1: 0, y1: 'h', x: 0, y: 'h*0.9' },
+        { action: 'move', x: 8, y: 0 },
+        { action: 'line', x: 'w-8', y: 0 },
+        { action: 'quadraticCurve', x1: 'w', y1: 0, x: 'w', y: 8 },
+        { action: 'line', x: 'w', y: 'h-8' },
+        { action: 'quadraticCurve', x1: 'w', y1: 'h', x: 'w-8', y: 'h' },
+        { action: 'line', x: 8, y: 'h' },
+        { action: 'quadraticCurve', x1: 0, y1: 'h', x: 0, y: 'h-8' },
+        { action: 'line', x: 0, y: 8 },
+        { action: 'quadraticCurve', x1: 0, y1: 0, x: 8, y: 0 },
         { action: 'close' }
       ]
     ],
     anchors: [],
     textBlock: [{ position: { x: 'w*0.041667', y: 0, w: 'w*0.916667', h: 'h' }, text: '取消' }],
-    lineStyle: { lineWidth: 1, lineColor: '208,210,214' },
-    fontStyle: { size: 13, color: '34,124,231' },
+    lineStyle: { lineWidth: 1, lineColor: '199,201,205' },
+    fontStyle: { size: 16, color: '34,124,231' },
     attribute: { linkable: false },
     fillStyle: { type: 'solid', color: '248,248,250' }
   },
@@ -87,7 +89,7 @@ export const iosControlsLegacyShapes: ShapeDefinition[] = [
     ],
     anchors: [],
     textBlock: [{ position: { x: 'w*0.041667', y: 0, w: 'w*0.916667', h: 'h' }, text: '文本' }],
-    lineStyle: { lineWidth: 1, lineColor: '208,210,214' },
+    lineStyle: { lineWidth: 1, lineColor: '199,201,205' },
     fillStyle: { type: 'solid', color: '255,255,255' },
     fontStyle: { size: 13, color: '80,80,80', textAlign: 'left' },
     attribute: { linkable: false }
@@ -123,7 +125,8 @@ export const iosControlsLegacyShapes: ShapeDefinition[] = [
           { action: 'move', x: 'w*0.75', y: 'h/2-6' },
           { action: 'line', x: 'w*0.75', y: 'h/2+6' }
         ],
-        fillStyle: { type: 'none' }
+        fillStyle: { type: 'none' },
+        lineStyle: { lineWidth: 1.5, lineColor: '153,154,158' }
       },
       {
         actions: [
@@ -139,9 +142,9 @@ export const iosControlsLegacyShapes: ShapeDefinition[] = [
     ],
     anchors: [],
     textBlock: [],
-    lineStyle: { lineWidth: 2, lineColor: '0,122,255' },
-    fillStyle: { type: 'solid', color: '0,0,0' },
-    shapeStyle: { alpha: 0.1 },
+    lineStyle: { lineWidth: 1, lineColor: '199,201,205' },
+    fillStyle: { type: 'solid', color: '248,248,250' },
+    shapeStyle: { alpha: 1 },
     attribute: { linkable: false }
   },
   /** Slider 范围选择（150×22） */

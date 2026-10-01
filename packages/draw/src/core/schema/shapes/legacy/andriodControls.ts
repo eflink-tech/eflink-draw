@@ -8,24 +8,25 @@
 import type { ShapeDefinition } from '@/types'
 
 export const andriodControlsLegacyShapes: ShapeDefinition[] = [
-  /** 按钮（88×32） */
+  /** 按钮（84×50） */
   {
     name: 'andriodButton1',
     title: '按钮',
     category: 'mobile',
     group: 'mobile_and_control',
     groupName: 'Android 控件',
-    props: { w: 88, h: 32 },
+    props: { w: 84, h: 50 },
     path: [
       [
-        { action: 'move', x: 0, y: 'h*0.114286' },
-        { action: 'quadraticCurve', x1: 0, y1: 0, x: 'w*0.05', y: 0 },
-        { action: 'line', x: 'w*0.95', y: 0 },
-        { action: 'quadraticCurve', x1: 'w', y1: 0, x: 'w', y: 'h*0.114286' },
-        { action: 'line', x: 'w', y: 'h*0.885714' },
-        { action: 'quadraticCurve', x1: 'w', y1: 'h', x: 'w*0.95', y: 'h' },
-        { action: 'line', x: 'w*0.05', y: 'h' },
-        { action: 'quadraticCurve', x1: 0, y1: 'h', x: 0, y: 'h*0.885714' },
+        { action: 'move', x: 10, y: 0 },
+        { action: 'line', x: 'w-10', y: 0 },
+        { action: 'quadraticCurve', x1: 'w', y1: 0, x: 'w', y: 10 },
+        { action: 'line', x: 'w', y: 'h-10' },
+        { action: 'quadraticCurve', x1: 'w', y1: 'h', x: 'w-10', y: 'h' },
+        { action: 'line', x: 10, y: 'h' },
+        { action: 'quadraticCurve', x1: 0, y1: 'h', x: 0, y: 'h-10' },
+        { action: 'line', x: 0, y: 10 },
+        { action: 'quadraticCurve', x1: 0, y1: 0, x: 10, y: 0 },
         { action: 'close' }
       ]
     ],
@@ -33,7 +34,7 @@ export const andriodControlsLegacyShapes: ShapeDefinition[] = [
     textBlock: [{ position: { x: 'w*0.125', y: 0, w: 'w*0.75', h: 'h' }, text: '按钮' }],
     lineStyle: { lineWidth: 0 },
     fillStyle: { type: 'solid', color: '0,150,136' },
-    fontStyle: { size: 12, color: '255,255,255', bold: false },
+    fontStyle: { size: 13, color: '255,255,255', bold: false },
     attribute: { linkable: false }
   },
   /** 输入框（150×30） */
@@ -64,31 +65,21 @@ export const andriodControlsLegacyShapes: ShapeDefinition[] = [
     fontStyle: { size: 11, color: '60,60,60', bold: false, textAlign: 'left' },
     attribute: { linkable: false }
   },
-  /** 复选框（20×20） */
+  /** 复选框（66×20） */
   {
     name: 'andriodCheck',
     title: '复选框',
     category: 'mobile',
     group: 'mobile_and_control',
     groupName: 'Android 控件',
-    props: { w: 20, h: 20 },
+    props: { w: 66, h: 20 },
     path: [
       {
         actions: [
-          { action: 'move', x: 0, y: 0 },
-          { action: 'line', x: 'w', y: 0 },
-          { action: 'line', x: 'w', y: 'h' },
-          { action: 'line', x: 0, y: 'h' },
-          { action: 'close' }
-        ],
-        lineStyle: { lineWidth: 0 }
-      },
-      {
-        actions: [
-          { action: 'move', x: 'w*0.04', y: 'h*0.04' },
-          { action: 'line', x: 'w*0.96', y: 'h*0.04' },
-          { action: 'line', x: 'w*0.96', y: 'h*0.96' },
-          { action: 'line', x: 'w*0.04', y: 'h*0.96' },
+          { action: 'move', x: 'w*0', y: 'h*0.04' },
+          { action: 'line', x: 'h*0.92', y: 'h*0.04' },
+          { action: 'line', x: 'h*0.92', y: 'h*0.96' },
+          { action: 'line', x: 'w*0', y: 'h*0.96' },
           { action: 'close' }
         ],
         fillStyle: { type: 'none' },
@@ -96,60 +87,50 @@ export const andriodControlsLegacyShapes: ShapeDefinition[] = [
       },
       {
         actions: [
-          { action: 'line', x: 'w*0.24', y: 'h*0.52' },
-          { action: 'line', x: 'w*0.44', y: 'h*0.72' },
-          { action: 'line', x: 'w*0.76', y: 'h*0.28' }
+          { action: 'line', x: 'h*0.25', y: 'h*0.54' },
+          { action: 'line', x: 'h*0.46', y: 'h*0.75' },
+          { action: 'line', x: 'h*0.79', y: 'h*0.29' }
         ],
         fillStyle: { type: 'none' },
         lineStyle: { lineWidth: 2, lineColor: '0,150,136' }
       }
     ],
     anchors: [],
-    textBlock: [{ position: { x: 'w*1.16', y: 0, w: 'w*3', h: 'h' }, text: '' }],
+    textBlock: [{ position: { x: 'h+5', y: 0, w: 'w-h-5', h: 'h' }, text: '复选框' }],
     lineStyle: { lineWidth: 0 },
     fontStyle: { size: 10, color: '80,80,80', bold: false, textAlign: 'left' },
     attribute: { linkable: false },
     resizeDir: []
   },
-  /** 单选按钮（20×20） */
+  /** 单选按钮（234×24） */
   {
     name: 'andriodRadio',
     title: '单选按钮',
     category: 'mobile',
     group: 'mobile_and_control',
     groupName: 'Android 控件',
-    props: { w: 20, h: 20 },
+    props: { w: 234, h: 24 },
     path: [
       {
         actions: [
-          { action: 'move', x: 0, y: 0 },
-          { action: 'line', x: 'w', y: 0 },
-          { action: 'line', x: 'w', y: 'h' },
-          { action: 'line', x: 0, y: 'h' },
-          { action: 'close' }
-        ],
-        lineStyle: { lineWidth: 0 }
-      },
-      {
-        actions: [
-          { action: 'move', x: 'w*0.04', y: 'h*0.5' },
+          { action: 'move', x: 'w*0', y: '(h*0.08)+(h*0.84)/2' },
           {
             action: 'curve',
-            x1: 'w*0.04',
-            y1: 'h*-0.113333',
-            x2: 'w*0.96',
-            y2: 'h*-0.113333',
-            x: 'w*0.96',
-            y: 'h*0.5'
+            x1: 'w*0',
+            y1: '(h*0.08)-(h*0.84)/6',
+            x2: '(0)+(h*0.84)',
+            y2: '(h*0.08)-(h*0.84)/6',
+            x: '(0)+(h*0.84)',
+            y: '(h*0.08)+(h*0.84)/2'
           },
           {
             action: 'curve',
-            x1: 'w*0.96',
-            y1: 'h*1.113333',
-            x2: 'w*0.04',
-            y2: 'h*1.113333',
-            x: 'w*0.04',
-            y: 'h*0.5'
+            x1: '(0)+(h*0.84)',
+            y1: '(h*0.08)+(h*0.84)*7/6',
+            x2: 'w*0',
+            y2: '(h*0.08)+(h*0.84)*7/6',
+            x: 'w*0',
+            y: '(h*0.08)+(h*0.84)/2'
           },
           { action: 'close' }
         ],
@@ -158,19 +139,91 @@ export const andriodControlsLegacyShapes: ShapeDefinition[] = [
       },
       {
         actions: [
-          { action: 'move', x: 'w*0.32', y: 'h*0.5' },
-          { action: 'curve', x1: 'w*0.32', y1: 'h*0.26', x2: 'w*0.68', y2: 'h*0.26', x: 'w*0.68', y: 'h*0.5' },
-          { action: 'curve', x1: 'w*0.68', y1: 'h*0.74', x2: 'w*0.32', y2: 'h*0.74', x: 'w*0.32', y: 'h*0.5' },
+          { action: 'move', x: 'h*0.21', y: '(h*0.29)+(h*0.42)/2' },
+          {
+            action: 'curve',
+            x1: 'h*0.21',
+            y1: '(h*0.29)-(h*0.42)/6',
+            x2: '(h*0.21)+(h*0.42)',
+            y2: '(h*0.29)-(h*0.42)/6',
+            x: '(h*0.21)+(h*0.42)',
+            y: '(h*0.29)+(h*0.42)/2'
+          },
+          {
+            action: 'curve',
+            x1: '(h*0.21)+(h*0.42)',
+            y1: '(h*0.29)+(h*0.42)*7/6',
+            x2: 'h*0.21',
+            y2: '(h*0.29)+(h*0.42)*7/6',
+            x: 'h*0.21',
+            y: '(h*0.29)+(h*0.42)/2'
+          },
           { action: 'close' }
         ],
         fillStyle: { type: 'solid', color: '0,150,136' },
         lineStyle: { lineWidth: 0 }
+      },
+      {
+        actions: [
+          { action: 'move', x: 'w/3', y: '(h*0.08)+(h*0.84)/2' },
+          {
+            action: 'curve',
+            x1: 'w/3',
+            y1: '(h*0.08)-(h*0.84)/6',
+            x2: '(w/3)+(h*0.84)',
+            y2: '(h*0.08)-(h*0.84)/6',
+            x: '(w/3)+(h*0.84)',
+            y: '(h*0.08)+(h*0.84)/2'
+          },
+          {
+            action: 'curve',
+            x1: '(w/3)+(h*0.84)',
+            y1: '(h*0.08)+(h*0.84)*7/6',
+            x2: 'w/3',
+            y2: '(h*0.08)+(h*0.84)*7/6',
+            x: 'w/3',
+            y: '(h*0.08)+(h*0.84)/2'
+          },
+          { action: 'close' }
+        ],
+        fillStyle: { type: 'none' },
+        lineStyle: { lineWidth: 1.5, lineColor: '120,120,120' }
+      },
+      {
+        actions: [
+          { action: 'move', x: 'w*2/3', y: '(h*0.08)+(h*0.84)/2' },
+          {
+            action: 'curve',
+            x1: 'w*2/3',
+            y1: '(h*0.08)-(h*0.84)/6',
+            x2: '(w*2/3)+(h*0.84)',
+            y2: '(h*0.08)-(h*0.84)/6',
+            x: '(w*2/3)+(h*0.84)',
+            y: '(h*0.08)+(h*0.84)/2'
+          },
+          {
+            action: 'curve',
+            x1: '(w*2/3)+(h*0.84)',
+            y1: '(h*0.08)+(h*0.84)*7/6',
+            x2: 'w*2/3',
+            y2: '(h*0.08)+(h*0.84)*7/6',
+            x: 'w*2/3',
+            y: '(h*0.08)+(h*0.84)/2'
+          },
+          { action: 'close' }
+        ],
+        fillStyle: { type: 'none' },
+        lineStyle: { lineWidth: 1.5, lineColor: '120,120,120' }
       }
     ],
     anchors: [],
-    textBlock: [{ position: { x: 'w*1.16', y: 0, w: 'w*3', h: 'h' }, text: '' }],
+    textBlock: [
+      { position: { x: 'w*0.111', y: 0, w: 'w*0.22', h: 'h' }, text: '单选按钮' },
+      { position: { x: 'w*0.444', y: 0, w: 'w*0.22', h: 'h' }, text: '单选按钮' },
+      { position: { x: 'w*0.778', y: 0, w: 'w*0.22', h: 'h' }, text: '单选按钮' }
+    ],
     lineStyle: { lineWidth: 0 },
-    fontStyle: { size: 10, color: '80,80,80', bold: false, textAlign: 'left' },
+    fontStyle: { size: 12, color: '80,80,80', bold: false, textAlign: 'left' },
     attribute: { linkable: false },
     resizeDir: []
   },
@@ -196,29 +249,37 @@ export const andriodControlsLegacyShapes: ShapeDefinition[] = [
       {
         actions: [
           { action: 'move', x: 'w*0.028571', y: 'h*0.5' },
-          { action: 'quadraticCurve', x1: 'w*0.028571', y1: 'h*0.425', x: 'w*0.071429', y: 'h*0.425' },
-          { action: 'line', x: 'w*0.928571', y: 'h*0.425' },
-          { action: 'quadraticCurve', x1: 'w*0.971429', y1: 'h*0.425', x: 'w*0.971429', y: 'h*0.5' },
-          { action: 'line', x: 'w*0.971429', y: 'h*0.5' },
-          { action: 'quadraticCurve', x1: 'w*0.971429', y1: 'h*0.575', x: 'w*0.928571', y: 'h*0.575' },
-          { action: 'line', x: 'w*0.071429', y: 'h*0.575' },
-          { action: 'quadraticCurve', x1: 'w*0.028571', y1: 'h*0.575', x: 'w*0.028571', y: 'h*0.5' },
+          { action: 'quadraticCurve', x1: 'w*0.028571', y1: 'h*0.3', x: 'w*0.142857', y: 'h*0.3' },
+          { action: 'line', x: 'w*0.885714', y: 'h*0.3' },
+          { action: 'quadraticCurve', x1: 'w*1', y1: 'h*0.3', x: 'w*1', y: 'h*0.5' },
+          { action: 'line', x: 'w*1', y: 'h*0.5' },
+          { action: 'quadraticCurve', x1: 'w*1', y1: 'h*0.7', x: 'w*0.885714', y: 'h*0.7' },
+          { action: 'line', x: 'w*0.142857', y: 'h*0.7' },
+          { action: 'quadraticCurve', x1: 'w*0.028571', y1: 'h*0.7', x: 'w*0.028571', y: 'h*0.5' },
           { action: 'close' }
         ],
-        fillStyle: { type: 'solid', color: '190,190,190' },
+        fillStyle: { type: 'solid', color: '176,178,182' },
         lineStyle: { lineWidth: 0 }
       },
       {
         actions: [
-          { action: 'move', x: 'w*0.085714', y: 'h*0.5' },
-          { action: 'curve', x1: 'w*0.085714', y1: 0, x2: 'w*0.514286', y2: 0, x: 'w*0.514286', y: 'h*0.5' },
+          { action: 'move', x: 'w*0.071429', y: 'h*0.5' },
           {
             action: 'curve',
-            x1: 'w*0.514286',
-            y1: 'h*1',
-            x2: 'w*0.085714',
-            y2: 'h*1',
-            x: 'w*0.085714',
+            x1: 'w*0.071429',
+            y1: 'h*0.133333',
+            x2: 'w*0.385714',
+            y2: 'h*0.133333',
+            x: 'w*0.385714',
+            y: 'h*0.5'
+          },
+          {
+            action: 'curve',
+            x1: 'w*0.385714',
+            y1: 'h*0.866667',
+            x2: 'w*0.071429',
+            y2: 'h*0.866667',
+            x: 'w*0.071429',
             y: 'h*0.5'
           },
           { action: 'close' }
@@ -255,35 +316,43 @@ export const andriodControlsLegacyShapes: ShapeDefinition[] = [
       {
         actions: [
           { action: 'move', x: 'w*0.028571', y: 'h*0.5' },
-          { action: 'quadraticCurve', x1: 'w*0.028571', y1: 'h*0.425', x: 'w*0.071429', y: 'h*0.425' },
-          { action: 'line', x: 'w*0.928571', y: 'h*0.425' },
-          { action: 'quadraticCurve', x1: 'w*0.971429', y1: 'h*0.425', x: 'w*0.971429', y: 'h*0.5' },
-          { action: 'line', x: 'w*0.971429', y: 'h*0.5' },
-          { action: 'quadraticCurve', x1: 'w*0.971429', y1: 'h*0.575', x: 'w*0.928571', y: 'h*0.575' },
-          { action: 'line', x: 'w*0.071429', y: 'h*0.575' },
-          { action: 'quadraticCurve', x1: 'w*0.028571', y1: 'h*0.575', x: 'w*0.028571', y: 'h*0.5' },
-          { action: 'close' }
-        ],
-        fillStyle: { type: 'solid', color: '105,214,194' },
-        lineStyle: { lineWidth: 0 }
-      },
-      {
-        actions: [
-          { action: 'move', x: 'w*0.485714', y: 'h*0.5' },
-          { action: 'curve', x1: 'w*0.485714', y1: 0, x2: 'w*0.914286', y2: 0, x: 'w*0.914286', y: 'h*0.5' },
-          {
-            action: 'curve',
-            x1: 'w*0.914286',
-            y1: 'h*1',
-            x2: 'w*0.485714',
-            y2: 'h*1',
-            x: 'w*0.485714',
-            y: 'h*0.5'
-          },
+          { action: 'quadraticCurve', x1: 'w*0.028571', y1: 'h*0.3', x: 'w*0.142857', y: 'h*0.3' },
+          { action: 'line', x: 'w*0.885714', y: 'h*0.3' },
+          { action: 'quadraticCurve', x1: 'w*1', y1: 'h*0.3', x: 'w*1', y: 'h*0.5' },
+          { action: 'line', x: 'w*1', y: 'h*0.5' },
+          { action: 'quadraticCurve', x1: 'w*1', y1: 'h*0.7', x: 'w*0.885714', y: 'h*0.7' },
+          { action: 'line', x: 'w*0.142857', y: 'h*0.7' },
+          { action: 'quadraticCurve', x1: 'w*0.028571', y1: 'h*0.7', x: 'w*0.028571', y: 'h*0.5' },
           { action: 'close' }
         ],
         fillStyle: { type: 'solid', color: '0,150,136' },
         lineStyle: { lineWidth: 0 }
+      },
+      {
+        actions: [
+          { action: 'move', x: 'w*0.642857', y: 'h*0.5' },
+          {
+            action: 'curve',
+            x1: 'w*0.642857',
+            y1: 'h*0.133333',
+            x2: 'w*0.957143',
+            y2: 'h*0.133333',
+            x: 'w*0.957143',
+            y: 'h*0.5'
+          },
+          {
+            action: 'curve',
+            x1: 'w*0.957143',
+            y1: 'h*0.866667',
+            x2: 'w*0.642857',
+            y2: 'h*0.866667',
+            x: 'w*0.642857',
+            y: 'h*0.5'
+          },
+          { action: 'close' }
+        ],
+        fillStyle: { type: 'solid', color: '255,255,255' },
+        lineStyle: { lineWidth: 1, lineColor: '0,150,136' }
       }
     ],
     anchors: [],

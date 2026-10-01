@@ -129,7 +129,7 @@ export const iosElementsLegacyShapes: ShapeDefinition[] = [
           { action: 'line', x: 0, y: 'h' },
           { action: 'close' }
         ],
-        lineStyle: { lineWidth: 1, lineColor: '208,210,214' }
+        lineStyle: { lineWidth: 1, lineColor: '199,201,205' }
       }
     ],
     anchors: [],
@@ -555,7 +555,7 @@ export const iosElementsLegacyShapes: ShapeDefinition[] = [
           { action: 'line', x: 0, y: 'h' },
           { action: 'close' }
         ],
-        lineStyle: { lineWidth: 1, lineColor: '208,210,214' }
+        lineStyle: { lineWidth: 1, lineColor: '199,201,205' }
       },
       {
         actions: [
@@ -605,7 +605,7 @@ export const iosElementsLegacyShapes: ShapeDefinition[] = [
           { action: 'line', x: 0, y: 'h' },
           { action: 'close' }
         ],
-        lineStyle: { lineWidth: 1, lineColor: '208,210,214' }
+        lineStyle: { lineWidth: 1, lineColor: '199,201,205' }
       },
       {
         actions: [{ action: 'move', x: 0, y: 'h*0.03' }, { action: 'line', x: 'w', y: 'h*0.03' }],
@@ -654,7 +654,7 @@ export const iosElementsLegacyShapes: ShapeDefinition[] = [
           { action: 'line', x: 0, y: 'h' },
           { action: 'close' }
         ],
-        lineStyle: { lineWidth: 1, lineColor: '208,210,214' }
+        lineStyle: { lineWidth: 1, lineColor: '199,201,205' }
       },
       {
         actions: [
@@ -770,7 +770,7 @@ export const iosElementsLegacyShapes: ShapeDefinition[] = [
           { action: 'line', x: 0, y: 'h' },
           { action: 'close' }
         ],
-        lineStyle: { lineWidth: 1, lineColor: '208,210,214' }
+        lineStyle: { lineWidth: 1, lineColor: '199,201,205' }
       },
       {
         actions: [
@@ -849,7 +849,7 @@ export const iosElementsLegacyShapes: ShapeDefinition[] = [
           { action: 'line', x: 0, y: 'h' },
           { action: 'close' }
         ],
-        lineStyle: { lineWidth: 1, lineColor: '208,210,214' }
+        lineStyle: { lineWidth: 1, lineColor: '199,201,205' }
       },
       {
         actions: [
@@ -904,7 +904,7 @@ export const iosElementsLegacyShapes: ShapeDefinition[] = [
           { action: 'line', x: 0, y: 'h' },
           { action: 'close' }
         ],
-        lineStyle: { lineWidth: 1, lineColor: '208,210,214' }
+        lineStyle: { lineWidth: 1, lineColor: '199,201,205' }
       },
       {
         actions: [{ action: 'move', x: 'w*0.053571', y: 'h*0.9875' }, { action: 'line', x: 'w', y: 'h*0.9875' }],
@@ -953,7 +953,7 @@ export const iosElementsLegacyShapes: ShapeDefinition[] = [
       ]
     ],
     anchors: [],
-    lineStyle: { lineWidth: 1, lineColor: '208,210,214' },
+    lineStyle: { lineWidth: 1, lineColor: '199,201,205' },
     attribute: { linkable: false },
     fillStyle: { type: 'solid', color: '255,255,255' }
   },
@@ -1483,7 +1483,7 @@ export const iosElementsLegacyShapes: ShapeDefinition[] = [
       { position: { x: 'w*0.020833', y: 'h*0.652174', w: 'w/2-10', h: 'h*0.347826' }, text: '确定' },
       { position: { x: 'w/2+5', y: 'h*0.652174', w: 'w/2-10', h: 'h*0.347826' }, text: '取消' }
     ],
-    lineStyle: { lineWidth: 1, lineColor: '214,216,220' },
+    lineStyle: { lineWidth: 1, lineColor: '199,201,205' },
     fillStyle: { type: 'solid', color: '255,255,255' },
     attribute: { linkable: false },
     fontStyle: { size: 10 }
@@ -1505,7 +1505,7 @@ export const iosElementsLegacyShapes: ShapeDefinition[] = [
           { action: 'line', x: 0, y: 'h' },
           { action: 'close' }
         ],
-        lineStyle: { lineWidth: 1, lineColor: '208,210,214' }
+        lineStyle: { lineWidth: 1, lineColor: '199,201,205' }
       },
       {
         actions: [

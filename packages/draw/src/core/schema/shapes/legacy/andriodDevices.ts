@@ -19,13 +19,92 @@ export const andriodDevicesLegacyShapes: ShapeDefinition[] = [
     path: [
       {
         actions: [
-          { action: 'move', x: 0, y: 0 },
-          { action: 'line', x: 'w', y: 0 },
-          { action: 'line', x: 'w', y: 'h' },
-          { action: 'line', x: 0, y: 'h' },
+          { action: 'move', x: 'w*0.005556', y: 'h*0.052957' },
+          { action: 'quadraticCurve', x1: 'w*0.005556', y1: 'h*0.003322', x: 'w*0.088556', y: 'h*0.003322' },
+          { action: 'line', x: 'w*0.911444', y: 'h*0.003322' },
+          { action: 'quadraticCurve', x1: 'w*0.994444', y1: 'h*0.003322', x: 'w*0.994444', y: 'h*0.052957' },
+          { action: 'line', x: 'w*0.994444', y: 'h*0.947043' },
+          { action: 'quadraticCurve', x1: 'w*0.994444', y1: 'h*0.996678', x: 'w*0.911444', y: 'h*0.996678' },
+          { action: 'line', x: 'w*0.088556', y: 'h*0.996678' },
+          { action: 'quadraticCurve', x1: 'w*0.005556', y1: 'h*0.996678', x: 'w*0.005556', y: 'h*0.947043' },
           { action: 'close' }
         ],
+        fillStyle: { type: 'solid', color: '230,230,230' },
+        lineStyle: { lineWidth: 1, lineColor: '189,190,195' }
+      },
+      {
+        actions: [
+          { action: 'move', x: 'w*0.039', y: 'h*0.066' },
+          { action: 'line', x: 'w*0.961', y: 'h*0.066' },
+          { action: 'line', x: 'w*0.961', y: 'h*0.942' },
+          { action: 'line', x: 'w*0.039', y: 'h*0.942' },
+          { action: 'close' }
+        ],
+        fillStyle: { type: 'solid', color: '250,250,251' },
         lineStyle: { lineWidth: 0 }
+      },
+      {
+        actions: [
+          { action: 'move', x: 'w*0.444', y: 'h*0.032' },
+          { action: 'quadraticCurve', x1: 'w*0.444', y1: 'h*0.026', x: 'w*0.454033', y: 'h*0.026' },
+          { action: 'line', x: 'w*0.545967', y: 'h*0.026' },
+          { action: 'quadraticCurve', x1: 'w*0.556', y1: 'h*0.026', x: 'w*0.556', y: 'h*0.032' },
+          { action: 'line', x: 'w*0.556', y: 'h*0.032' },
+          { action: 'quadraticCurve', x1: 'w*0.556', y1: 'h*0.038', x: 'w*0.545967', y: 'h*0.038' },
+          { action: 'line', x: 'w*0.454033', y: 'h*0.038' },
+          { action: 'quadraticCurve', x1: 'w*0.444', y1: 'h*0.038', x: 'w*0.444', y: 'h*0.032' },
+          { action: 'close' }
+        ],
+        fillStyle: { type: 'solid', color: '172,174,179' },
+        lineStyle: { lineWidth: 0 }
+      },
+      {
+        actions: [
+          { action: 'move', x: 'w*0.414', y: 'h*0.958' },
+          { action: 'line', x: 'w*0.443', y: 'h*0.978' },
+          { action: 'line', x: 'w*0.414', y: 'h*0.978' },
+          { action: 'close' }
+        ],
+        fillStyle: { type: 'none' },
+        lineStyle: { lineWidth: 1.5, lineColor: '150,152,157' }
+      },
+      {
+        actions: [
+          { action: 'move', x: 'w*0.478', y: 'h*0.968445' },
+          {
+            action: 'curve',
+            x1: 'w*0.478',
+            y1: 'h*0.946518',
+            x2: 'w*0.533',
+            y2: 'h*0.946518',
+            x: 'w*0.533',
+            y: 'h*0.968445'
+          },
+          {
+            action: 'curve',
+            x1: 'w*0.533',
+            y1: 'h*0.990372',
+            x2: 'w*0.478',
+            y2: 'h*0.990372',
+            x: 'w*0.478',
+            y: 'h*0.968445'
+          },
+          { action: 'close' }
+        ],
+        fillStyle: { type: 'none' },
+        lineStyle: { lineWidth: 1.5, lineColor: '150,152,157' }
+      },
+      {
+        actions: [
+          { action: 'move', x: 'w*0.536', y: 'h*0.9585' },
+          { action: 'line', x: 'w*0.583', y: 'h*0.9585' },
+          { action: 'move', x: 'w*0.536', y: 'h*0.9677' },
+          { action: 'line', x: 'w*0.583', y: 'h*0.9677' },
+          { action: 'move', x: 'w*0.536', y: 'h*0.977' },
+          { action: 'line', x: 'w*0.583', y: 'h*0.977' }
+        ],
+        fillStyle: { type: 'none' },
+        lineStyle: { lineWidth: 1.2, lineColor: '150,152,157' }
       }
     ],
     anchors: [],

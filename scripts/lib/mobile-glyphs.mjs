@@ -44,6 +44,18 @@ const roundRectPath = (x, y, w, h, r) => [
 ]
 export { rectPath, ellipsePath, roundRectPath }
 
+/**
+ * 表达式版正圆：x/y/d 均为完整表达式字符串（如 'w/3'、'h*0.84'）。
+ * 用于新旧默认尺寸非等比的图形（如单选组 24×24 → 234×24）：数字坐标会被生成器
+ * 按旧框比例化，宽高轴各换各的，圆就压成椭圆；表达式原样保留、渲染时按当前尺寸求值。
+ */
+const circle = (x, y, d) => [
+  move(x, `(${y})+(${d})/2`),
+  cubic(x, `(${y})-(${d})/6`, `(${x})+(${d})`, `(${y})-(${d})/6`, `(${x})+(${d})`, `(${y})+(${d})/2`),
+  cubic(`(${x})+(${d})`, `(${y})+(${d})*7/6`, x, `(${y})+(${d})*7/6`, x, `(${y})+(${d})/2`),
+  CLOSE,
+]
+
 export const GREY = '120,120,120'
 const TEAL = '0,150,136'
 
@@ -81,40 +93,61 @@ const keyboard = (w, rows, keyFill, keyLine) => {
 const IOS_GREEN = '90,200,125'
 const SWITCH_WHITE = '255,255,255'
 
-export const LABEL_LEFT = (w) => [
-  { position: { x: 'w+4', y: 0, w: 'w*3', h: 'h' }, text: '' },
-]
-
 /**
  * name → 补丁。
  * subPaths 追加到（已剔除 image 子路径的）原路径之后；fill / alpha / textColor /
  * textBlocks 用于覆盖旧素材里靠位图表达的整块外观。
  */
 export const MOBILE_GLYPHS = {
+  // 复选框：左侧方框 + 右侧可编辑文字（对齐单选组的观感）；
+  // 方框与勾同样走表达式坐标（边长定 h 轴），非等比的新档尺寸下仍是正方形
   andriodCheck: {
+    replace: true,
     subPaths: () => [
-      sub(rectPath(1, 1, 23, 23), stroke(GREY)),
-      sub([line(6, 13), line(11, 18), line(19, 7)], stroke(TEAL, 2)),
+      sub(
+        [
+          move('0', 'h*0.04'),
+          line('h*0.92', 'h*0.04'),
+          line('h*0.92', 'h*0.96'),
+          line('0', 'h*0.96'),
+          CLOSE,
+        ],
+        stroke(GREY, 1.5),
+      ),
+      sub(
+        [line('h*0.25', 'h*0.54'), line('h*0.46', 'h*0.75'), line('h*0.79', 'h*0.29')],
+        stroke(TEAL, 2),
+      ),
     ],
-    textBlocks: LABEL_LEFT,
+    textBlocks: () => [{ position: { x: 'h+5', y: 0, w: 'w-h-5', h: 'h' }, text: '复选框' }],
   },
+  // 单选组：横排「圆 + 文字」三项，第一项选中（对齐 drawio/ProcessOn 的单选按钮组观感）。
+  // 圆走 circle（表达式版）：直径定 h 轴、位置定 w 轴，非等比的新档尺寸下仍是正圆
   andriodRadio: {
+    replace: true,
     subPaths: () => [
-      sub(ellipsePath(1, 1, 23, 23), stroke(GREY)),
-      sub(ellipsePath(8, 8, 9, 9), fill(TEAL)),
+      sub(circle('0', 'h*0.08', 'h*0.84'), stroke(GREY, 1.5)),
+      sub(circle('h*0.21', 'h*0.29', 'h*0.42'), fill(TEAL)),
+      sub(circle('w/3', 'h*0.08', 'h*0.84'), stroke(GREY, 1.5)),
+      sub(circle('w*2/3', 'h*0.08', 'h*0.84'), stroke(GREY, 1.5)),
     ],
-    textBlocks: LABEL_LEFT,
+    textBlocks: () => [
+      { position: { x: 'w*0.111', y: 0, w: 'w*0.22', h: 'h' }, text: '单选按钮' },
+      { position: { x: 'w*0.444', y: 0, w: 'w*0.22', h: 'h' }, text: '单选按钮' },
+      { position: { x: 'w*0.778', y: 0, w: 'w*0.22', h: 'h' }, text: '单选按钮' },
+    ],
   },
+  // Material 开关：轨道是全高胶囊（初版按旧位图描的 6px 细轨，视觉上认不出是开关）
   andriodSwitchOff: {
     subPaths: () => [
-      sub(roundRectPath(2, 17, 66, 6, 3), fill('190,190,190')),
-      sub(ellipsePath(6, 5, 30, 30), both(SWITCH_WHITE, '170,170,170')),
+      sub(roundRectPath(2, 12, 68, 16, 8), fill('176,178,182')),
+      sub(ellipsePath(5, 9, 22, 22), both(SWITCH_WHITE, '170,170,170')),
     ],
   },
   andriodSwitchOnf: {
     subPaths: () => [
-      sub(roundRectPath(2, 17, 66, 6, 3), fill('105,214,194')),
-      sub(ellipsePath(34, 5, 30, 30), fill(TEAL)),
+      sub(roundRectPath(2, 12, 68, 16, 8), fill(TEAL)),
+      sub(ellipsePath(45, 9, 22, 22), both(SWITCH_WHITE, TEAL)),
     ],
   },
   andriodSlider: {
@@ -215,4 +248,51 @@ export const MOBILE_GLYPHS = {
         '190,190,196',
       ),
   },
+
+  // ── 设备外框 ──────────────────────────────
+  // 旧素材只有一块直角纯色矩形（黑/灰机身在画布上是毫无细节的色块），
+  // 按 iPhone 8 / 经典 Android 的线框观感重画：圆角外框 + 屏区 + 听筒 + home 键/三键
+  ios7WhiteBg: {
+    replace: true,
+    subPaths: (w, h) => iosDeviceFrame(w, h, '255,255,255', '203,204,209', '172,174,179'),
+  },
+  ios7GreyBg: {
+    replace: true,
+    subPaths: (w, h) => iosDeviceFrame(w, h, '230,230,230', '189,190,195', '140,142,147'),
+  },
+  ios7BlackBg: {
+    replace: true,
+    subPaths: (w, h) => iosDeviceFrame(w, h, '45,45,48', '95,96,101', '150,152,157'),
+  },
+  andriodGreyBg: {
+    replace: true,
+    subPaths: (w, h) => [
+      sub(roundRectPath(2, 2, w - 4, h - 4, w * 0.083), both('230,230,230', '189,190,195', 1)),
+      sub(rectPath(w * 0.039, h * 0.066, w * 0.922, h * 0.876), fill('250,250,251')),
+      // 听筒（顶部边框内）+ 经典三键导航：返回 / home / 菜单
+      sub(roundRectPath(w * 0.444, h * 0.026, w * 0.112, h * 0.012, h * 0.006), fill('172,174,179')),
+      sub(
+        [move(w * 0.414, h * 0.958), line(w * 0.443, h * 0.978), line(w * 0.414, h * 0.978), CLOSE],
+        stroke('150,152,157', 1.5),
+      ),
+      sub(ellipsePath(w * 0.478, h * 0.952, w * 0.055, w * 0.055), stroke('150,152,157', 1.5)),
+      sub(
+        [
+          move(w * 0.536, h * 0.9585), line(w * 0.583, h * 0.9585),
+          move(w * 0.536, h * 0.9677), line(w * 0.583, h * 0.9677),
+          move(w * 0.536, h * 0.977), line(w * 0.583, h * 0.977),
+        ],
+        stroke('150,152,157', 1.2),
+      ),
+    ],
+  },
 }
+
+/** iPhone 8 线框：圆角外框 + 屏区 + 听筒/摄像头 + home 键，机身三色由调用方给 */
+const iosDeviceFrame = (w, h, body, edge, detail) => [
+  sub(roundRectPath(2, 2, w - 4, h - 4, w * 0.13), both(body, edge, 1)),
+  sub(rectPath(w * 0.057, h * 0.121, w * 0.886, h * 0.758), fill('250,250,251')),
+  sub(roundRectPath(w * 0.435, h * 0.063, w * 0.13, h * 0.015, h * 0.0075), fill(detail)),
+  sub(ellipsePath(w * 0.375, h * 0.056, w * 0.038, w * 0.038), fill(detail)),
+  sub(ellipsePath(w * 0.464, h * 0.917, w * 0.072, w * 0.072), stroke(detail, 1.5)),
+]

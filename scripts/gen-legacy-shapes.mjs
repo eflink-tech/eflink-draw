@@ -519,6 +519,8 @@ function styleSeg(shape, idx, patch) {
 function applyMobileStyle(shape, st) {
   if (st.fill != null) shape.fillStyle = st.fill === 'none' ? { type: 'none' } : { type: 'solid', color: st.fill }
   if (st.line) shape.lineStyle = { ...(shape.lineStyle ?? {}), ...st.line }
+  // 旧素材给整图形挂的透明度（如 stepper 为贴截图设的 alpha:0.1）在白画布上等于隐形
+  if (st.alpha != null) shape.shapeStyle = { ...(shape.shapeStyle ?? {}), alpha: st.alpha }
   if (st.body) {
     if (st.body === 'inherit') {
       const raw = shape.path[0]
@@ -528,6 +530,38 @@ function applyMobileStyle(shape, st) {
   for (const [i, p] of Object.entries(st.subs ?? {})) styleSeg(shape, Number(i), p)
   if (st.font) shape.fontStyle = { ...(shape.fontStyle ?? {}), ...st.font }
   if (st.text) for (const b of shape.textBlock ?? []) if (st.text[b.text]) b.text = st.text[b.text]
+  // 旧素材无文字的图形（如深灰气泡）补占位文案；已有的不动
+  if (st.label != null && !shape.textBlock?.length) {
+    shape.textBlock = [{ position: { x: 10, y: 0, w: 'w-20', h: 'h' }, text: st.label }]
+  }
+}
+
+/**
+ * 主体圆角重画：按钮这类 path[0] 是 9 命令圆角矩形的图形，旧素材圆角量按真机截图
+ * 量出来普遍过小（150×32 的按钮只有 3px，视觉上就是矩形），按像素半径重建。
+ * 半径用像素不随缩放比例变化，用户拉伸按钮时圆角形态稳定。
+ */
+function applyRadius(shape, r) {
+  const w = Number(shape.props?.w)
+  const h = Number(shape.props?.h)
+  const seg = shape.path?.[0]
+  if (!Number.isFinite(w) || !Number.isFinite(h) || !seg) return
+  const rad = Math.min(r, w / 2, h / 2)
+  const actions = [
+    { action: 'move', x: rad, y: 0 },
+    { action: 'line', x: `w-${rad}`, y: 0 },
+    { action: 'quadraticCurve', x1: 'w', y1: 0, x: 'w', y: rad },
+    { action: 'line', x: 'w', y: `h-${rad}` },
+    { action: 'quadraticCurve', x1: 'w', y1: 'h', x: `w-${rad}`, y: 'h' },
+    { action: 'line', x: rad, y: 'h' },
+    { action: 'quadraticCurve', x1: 0, y1: 'h', x: 0, y: `h-${rad}` },
+    { action: 'line', x: 0, y: rad },
+    { action: 'quadraticCurve', x1: 0, y1: 0, x: rad, y: 0 },
+    { action: 'close' },
+  ]
+  // path[0] 可能是裸数组（继承图形级样式）也可能挂着子路径样式，保持原形态
+  if (Array.isArray(seg)) shape.path[0] = actions
+  else seg.actions = actions
 }
 
 /**
@@ -628,6 +662,8 @@ function convertShape(s, cfg, refs, commands) {
     shape.props.h = cfg.iconDefault
   }
   if (cfg.category === 'mobile' && !cfg.iconScale) applyMobileSize(shape, style?.size)
+  // 圆角重画放在尺寸收敛之后：半径是按新默认尺寸定的像素值
+  if (style?.radius != null) applyRadius(shape, style.radius)
   return { shape }
 }
 
