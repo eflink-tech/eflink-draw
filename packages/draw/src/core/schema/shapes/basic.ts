@@ -1,4 +1,4 @@
-import type { FillStyle, PathDefinition, ShapeDefinition } from '@/types'
+import type { Anchor, FillStyle, PathAction, PathDefinition, ShapeDefinition } from '@/types'
 import { DEFAULT_LINE_WIDTH } from '@/types'
 
 // 尺寸、锚点、textBlock、路径均取自旧 Schema；样式（边线 2px / 50,50,50、
@@ -223,6 +223,221 @@ const sector: ShapeDefinition = {
     { action: 'close' },
   ]],
 }
+
+/**
+ * 扇形生成器：90° 四方向档（拼圆四象限）与 270° 缺口档。
+ *
+ * 90° 档：圆心在外接框一角（origin 指定，默认左下），弧凸向对角，框即扇形
+ * 包围盒；右上 / 左上 / 左下 / 右下四块拖到一起可拼成正圆。
+ * 270° 档：圆心居中、缺口朝右上（缺口平分线 45°），外接框为整圆框。
+ *
+ * 弧按每段 ≤ 90° 切成三次贝塞尔（控制臂长 (4/3)·tan(Δ/4)·半径）；坐标按默认框
+ * 归一成 w/h 比例式，非等比拉伸时泛化为椭圆扇形（与圆形 round 同款口径）。
+ */
+function sectorPie(
+  name: string,
+  title: string,
+  theta: number,
+  opts: { origin?: 'lb' | 'rb' | 'rt' | 'lt' } = {},
+  size = 54,
+): ShapeDefinition {
+  const rad = (d: number) => (d * Math.PI) / 180
+  const r = theta > 180 ? size / 2 : size
+  // 90° 档的圆心角与起始数学角（顺时针扫 θ）：lb=圆心左下（弧凸右上）等
+  const ORIGIN: Record<string, [number, number, number]> = {
+    lb: [0, size, 90],
+    rb: [size, size, 180],
+    rt: [size, 0, 270],
+    lt: [0, 0, 360],
+  }
+  let cx: number, cy: number, W: number, H: number, from: number, to: number
+  if (theta > 180) {
+    W = H = size
+    cx = cy = size / 2
+    const gap = (360 - theta) / 2
+    from = 45 - gap
+    to = from - theta
+  } else {
+    ;[cx, cy, from] = ORIGIN[opts.origin ?? 'lb']
+    to = from - theta
+    H = size
+    W = size * Math.sin(rad(theta))
+  }
+  // 屏幕坐标（y 向下）：数学角 φ 的圆上点，及沿行进方向的切线单位向量
+  const at = (phi: number): [number, number] => [cx + r * Math.cos(rad(phi)), cy - r * Math.sin(rad(phi))]
+  const sign = Math.sign(to - from)
+  const tangent = (phi: number): [number, number] => [-Math.sin(rad(phi)) * sign, -Math.cos(rad(phi)) * sign]
+  const ex = (v: number) => `w*${(v / W).toFixed(4)}`
+  const ey = (v: number) => `h*${(v / H).toFixed(4)}`
+
+  const n = Math.ceil(Math.abs(to - from) / 90)
+  const curves: PathAction[] = []
+  for (let i = 0; i < n; i++) {
+    const a = from + ((to - from) * i) / n
+    const b = from + ((to - from) * (i + 1)) / n
+    const k = (4 / 3) * Math.tan(rad(Math.abs(b - a) / 4)) * r
+    const [ax, ay] = at(a)
+    const [bx, by] = at(b)
+    const [tax, tay] = tangent(a)
+    const [tbx, tby] = tangent(b)
+    curves.push({
+      action: 'curve',
+      x1: ex(ax + k * tax),
+      y1: ey(ay + k * tay),
+      x2: ex(bx - k * tbx),
+      y2: ey(by - k * tby),
+      x: ex(bx),
+      y: ey(by),
+    })
+  }
+  const [sx, sy] = at(from)
+  const path: PathDefinition[] = [[
+    { action: 'move', x: ex(cx), y: ey(cy) },
+    { action: 'line', x: ex(sx), y: ey(sy) },
+    ...curves,
+    { action: 'close' },
+  ]]
+
+  // 锚点：小角度取弧起点 / 弧中 / 弧终点 / 圆心；大角度（缺口扇形）取弧上均匀四点
+  let anchors: Anchor[]
+  if (theta > 180) {
+    anchors = [0, 1 / 3, 2 / 3, 1].map((t) => {
+      const [x, y] = at(from + (to - from) * t)
+      return { x: ex(x), y: ey(y) }
+    })
+  } else {
+    const [ax, ay] = at(from)
+    const [mx, my] = at((from + to) / 2)
+    const [bx, by] = at(to)
+    anchors = [
+      { x: ex(ax), y: ey(ay) },
+      { x: ex(mx), y: ey(my) },
+      { x: ex(bx), y: ey(by) },
+      { x: ex(cx), y: ey(cy) },
+    ]
+  }
+
+  let textBlock: ShapeDefinition['textBlock']
+  if (theta > 180) {
+    textBlock = [{ position: { x: 'w*0.12', y: 'h*0.28', w: 'w*0.6', h: 'h*0.6' }, text: '' }]
+  } else {
+    // 正圆扇形重心距圆心 (2/3)r·sin(θ/2)/(θ/2)，文字区以重心为中心
+    const half = rad(theta) / 2
+    const d = ((2 / 3) * r * Math.sin(half)) / half
+    const gx = cx + d * Math.cos(rad((from + to) / 2))
+    const gy = cy - d * Math.sin(rad((from + to) / 2))
+    const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v))
+    textBlock = [{
+      position: {
+        x: ex(clamp(gx - W * 0.275, W * 0.02, W * 0.45)),
+        y: ey(clamp(gy - H * 0.23, H * 0.02, H * 0.52)),
+        w: 'w*0.55',
+        h: 'h*0.46',
+      },
+      text: '',
+    }]
+  }
+
+  return {
+    name,
+    title,
+    category: 'basic',
+    props: { w: Math.round(W), h: Math.round(H) },
+    anchors,
+    textBlock,
+    path,
+  }
+}
+
+/** 扇形 90° 四方向（生成器见 sectorPie）：四块拼成正圆；sector 是旧素材的 180° 档 */
+const sector90TR = sectorPie('sector90TR', '扇形（90° 右上）', 90)
+const sector90TL = sectorPie('sector90TL', '扇形（90° 左上）', 90, { origin: 'rb' })
+const sector90BL = sectorPie('sector90BL', '扇形（90° 左下）', 90, { origin: 'rt' })
+const sector90BR = sectorPie('sector90BR', '扇形（90° 右下）', 90, { origin: 'lt' })
+const sector270 = sectorPie('sector270', '扇形（270°）', 270)
+
+/**
+ * 弧形（90° 环段）四方向生成器：与扇形 90° 同参数化（origin 指定圆心所在角，
+ * 外弧贴框、内弧按 0.55 系数收缩），四方向拼在一起是圆环。
+ */
+function arcBandPie(name: string, title: string, origin: 'lb' | 'rb' | 'rt' | 'lt', size = 54): ShapeDefinition {
+  const rad = (d: number) => (d * Math.PI) / 180
+  const R = size
+  const r = size * 0.55
+  const ORIGIN: Record<string, [number, number, number]> = {
+    lb: [0, size, 90],
+    rb: [size, size, 180],
+    rt: [size, 0, 270],
+    lt: [0, 0, 360],
+  }
+  const [cx, cy, from] = ORIGIN[origin]
+  const to = from - 90
+  const at = (phi: number, radius: number): [number, number] => [cx + radius * Math.cos(rad(phi)), cy - radius * Math.sin(rad(phi))]
+  const sign = Math.sign(to - from)
+  const tangent = (phi: number): [number, number] => [-Math.sin(rad(phi)) * sign, -Math.cos(rad(phi)) * sign]
+  const ex = (v: number) => `w*${(v / size).toFixed(4)}`
+  const ey = (v: number) => `h*${(v / size).toFixed(4)}`
+  const kOut = (4 / 3) * Math.tan(rad(90 / 4)) * R
+  const kIn = (4 / 3) * Math.tan(rad(90 / 4)) * r
+
+  const [ox, oy] = at(from, R)
+  const [tx, ty] = at(to, R)
+  const [tox, toy] = tangent(from)
+  const [ttx, tty] = tangent(to)
+  const [ix0, iy0] = at(to, r)
+  const [ix1, iy1] = at(from, r)
+  const path: PathDefinition[] = [[
+    { action: 'move', x: ex(ox), y: ey(oy) },
+    { action: 'curve', x1: ex(ox + kOut * tox), y1: ey(oy + kOut * toy), x2: ex(tx - kOut * ttx), y2: ey(ty - kOut * tty), x: ex(tx), y: ey(ty) },
+    { action: 'line', x: ex(ix0), y: ey(iy0) },
+    // 内弧反向行进（to → from）：控制臂方向与外弧相反
+    { action: 'curve', x1: ex(ix0 - kIn * ttx), y1: ey(iy0 - kIn * tty), x2: ex(ix1 + kIn * tox), y2: ey(iy1 + kIn * toy), x: ex(ix1), y: ey(iy1) },
+    { action: 'close' },
+  ]]
+
+  const mid = (from + to) / 2
+  const [amx, amy] = at(mid, R)
+  const [imx, imy] = at(mid, r)
+  const [ax, ay] = at(from, R)
+  const [bx, by] = at(to, R)
+  const anchors: Anchor[] = [
+    { x: ex(ax), y: ey(ay) },
+    { x: ex(amx), y: ey(amy) },
+    { x: ex(bx), y: ey(by) },
+    { x: ex(imx), y: ey(imy) },
+  ]
+
+  // 90° 环段质心：角平分线上 (2/3)·(R³−r³)/(R²−r²)·sin45°/(π/4)，文字区以质心为中心
+  const dBar = ((2 / 3) * ((R ** 3 - r ** 3) / (R ** 2 - r ** 2)) * Math.sin(rad(45))) / rad(45)
+  const gx = cx + dBar * Math.cos(rad(mid))
+  const gy = cy - dBar * Math.sin(rad(mid))
+  const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v))
+  const textBlock: ShapeDefinition['textBlock'] = [{
+    position: {
+      x: ex(clamp(gx - size * 0.24, size * 0.02, size * 0.5)),
+      y: ey(clamp(gy - size * 0.21, size * 0.02, size * 0.56)),
+      w: 'w*0.48',
+      h: 'h*0.42',
+    },
+    text: '',
+  }]
+
+  return {
+    name,
+    title,
+    category: 'basic',
+    props: { w: Math.round(size), h: Math.round(size) },
+    anchors,
+    textBlock,
+    path,
+  }
+}
+
+/** 弧形四方向（生成器见 arcBandPie）：四块拼成圆环 */
+const arcBandTR = arcBandPie('arcBandTR', '弧形（右上）', 'lb')
+const arcBandTL = arcBandPie('arcBandTL', '弧形（左上）', 'rb')
+const arcBandBL = arcBandPie('arcBandBL', '弧形（左下）', 'rt')
+const arcBandBR = arcBandPie('arcBandBR', '弧形（右下）', 'lt')
 
 /** 扇形2（旧 sector2：80×45） */
 const sector2: ShapeDefinition = {
@@ -978,7 +1193,16 @@ export const basicShapes: ShapeDefinition[] = [
   arrowLine,
   // 曲线图形
   sector,
+  sector90TR,
+  sector90TL,
+  sector90BL,
+  sector90BR,
+  sector270,
   sector2,
+  arcBandTR,
+  arcBandTL,
+  arcBandBL,
+  arcBandBR,
   cloud,
   comment,
   teardrop,
