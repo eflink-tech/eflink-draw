@@ -2,7 +2,14 @@ import { describe, expect, it } from 'vitest'
 import '@/core/schema/shapes' // 触发图形注册副作用
 import { isLinker, type DocumentData, type ElementInstance, type LinkerInstance } from '@/types'
 import { barEdgeX, SEQ_LOOP_W } from '@/core/editor/seqMessage'
-import { DRAW_TEMPLATES, buildTemplateDocument, getTemplateById } from '../index'
+import {
+  DRAW_TEMPLATES,
+  TEMPLATE_CATEGORIES,
+  buildTemplateDocument,
+  buildTemplateThumbnail,
+  getTemplateById,
+  getTemplatesByCategory,
+} from '../index'
 import type { TemplateSpec } from '../types'
 
 function shapesOf(doc: DocumentData): ElementInstance[] {
@@ -244,6 +251,237 @@ describe('状态转换图', () => {
   it('迁移标注覆盖支付/发货/收货/关闭条件', () => {
     const texts = linkersOf(doc).map((l) => l.text)
     expect(texts).toEqual(expect.arrayContaining(['支付成功', '商家发货', '确认收货', '超时未支付', '申请退款']))
+  })
+})
+
+// ═══════════════════════════════════════════
+// 模板库全量：18 类覆盖与缩略图
+// ═══════════════════════════════════════════
+
+describe('模板库注册表', () => {
+  it('共 18 个模板，ID 唯一，顺序对齐产品编号', () => {
+    expect(DRAW_TEMPLATES).toHaveLength(18)
+    expect(new Set(DRAW_TEMPLATES.map((t) => t.id)).size).toBe(18)
+    expect(DRAW_TEMPLATES.map((t) => t.id)).toEqual([
+      'basic-flow',
+      'swimlane',
+      'bpmn-process',
+      'decision-tree',
+      'system-flow',
+      'dfd-flow',
+      'uml-activity',
+      'uml-sequence',
+      'linear-steps',
+      'loop-flow',
+      'parallel-flow',
+      'approval-flow',
+      'service-ticket',
+      'order-process',
+      'cicd-flow',
+      'exception-flow',
+      'vsm-flow',
+      'state-transition',
+    ])
+  })
+
+  it('每个分类都有模板，卡片元信息完整', () => {
+    for (const c of TEMPLATE_CATEGORIES) {
+      expect(getTemplatesByCategory(c.id).length).toBeGreaterThan(0)
+    }
+    for (const t of DRAW_TEMPLATES) {
+      expect(t.title.length).toBeGreaterThan(0)
+      expect(t.description.length).toBeGreaterThan(0)
+      expect(t.keywords.length).toBeGreaterThan(0)
+      expect(t.page.width).toBeGreaterThan(0)
+      expect(t.page.height).toBeGreaterThan(0)
+    }
+  })
+
+  it('缩略图为纯矢量 SVG（无位图），viewBox 与页面尺寸一致', () => {
+    for (const t of DRAW_TEMPLATES) {
+      const svg = buildTemplateThumbnail(t)
+      expect(svg.startsWith('<svg')).toBe(true)
+      expect(svg).toContain(`viewBox="0 0 ${t.page.width} ${t.page.height}"`)
+      expect(svg).not.toContain('<image')
+      expect(svg).not.toContain('data:')
+      // 至少包含图元；有连线的模板必须渲染出连线
+      expect(svg).toMatch(/<(rect|polygon|ellipse|polyline)/)
+      if (t.links.length > 0) expect(svg).toContain('<polyline')
+    }
+  })
+})
+
+// ═══════════════════════════════════════════
+// M2 模板特征校验
+// ═══════════════════════════════════════════
+
+describe('决策流程图', () => {
+  const doc = buildTemplateDocument(getTemplateById('decision-tree')!)
+
+  it('两级判断 + 三路汇合到打款', () => {
+    expect(shapesOf(doc).filter((s) => s.name === 'decision')).toHaveLength(2)
+    const pay = shapesOf(doc).find((s) => s.textBlock[0]?.text === '财务打款')!
+    const incoming = linkersOf(doc).filter((l) => l.to.id === pay.id)
+    expect(incoming).toHaveLength(3)
+    const sources = incoming.map((l) => (doc.elements[l.from.id!] as ElementInstance).textBlock[0].text)
+    expect(sources).toEqual(expect.arrayContaining(['财务复核', '主管审批', '自动批准']))
+  })
+})
+
+describe('线性步骤流程图', () => {
+  const doc = buildTemplateDocument(getTemplateById('linear-steps')!)
+
+  it('6 个箭头块首尾相接、同高排布（无冗余连线）', () => {
+    const arrows = shapesOf(doc).filter((s) => s.name === 'singleRightArrow').sort((a, b) => a.props.x - b.props.x)
+    expect(arrows).toHaveLength(6)
+    expect(new Set(arrows.map((a) => a.props.y)).size).toBe(1)
+    for (let i = 1; i < arrows.length; i++) {
+      expect(arrows[i].props.x).toBe(arrows[i - 1].props.x + arrows[i - 1].props.w)
+    }
+    expect(linkersOf(doc)).toHaveLength(0)
+  })
+})
+
+describe('循环流程图', () => {
+  const doc = buildTemplateDocument(getTemplateById('loop-flow')!)
+
+  it('校验失败经修正后回连到读取数据（重试闭环）', () => {
+    const read = shapesOf(doc).find((s) => s.textBlock[0]?.text === '读取数据')!
+    const fix = shapesOf(doc).find((s) => s.textBlock[0]?.text === '修正数据错误')!
+    const retry = linkersOf(doc).find((l) => l.from.id === fix.id && l.to.id === read.id)
+    expect(retry?.text).toBe('重试')
+    expect(retry!.points.length).toBeGreaterThan(0)
+  })
+})
+
+describe('并行流程图', () => {
+  const doc = buildTemplateDocument(getTemplateById('parallel-flow')!)
+
+  it('两根同步条分叉汇合，分支连线各含折点', () => {
+    const bars = shapesOf(doc).filter((s) => s.name === 'Synchronization')
+    expect(bars).toHaveLength(2)
+    for (const bar of bars) {
+      expect(linkersOf(doc).filter((l) => l.from.id === bar.id).length).toBe(bar === bars[0] ? 2 : 1)
+    }
+    const branch = linkersOf(doc).filter((l) => l.points.length > 0)
+    expect(branch.length).toBeGreaterThanOrEqual(4)
+  })
+})
+
+describe('审批流程图', () => {
+  const doc = buildTemplateDocument(getTemplateById('approval-flow')!)
+
+  it('3 泳道 + 预算判断双分支，泳道体不上色', () => {
+    const lane = shapeByName(doc, 'swimlaneV')
+    expect(lane.laneCount).toBe(3)
+    expect(lane.laneColors).toBeUndefined()
+    expect(lane.textBlock.map((b) => b.text)).toEqual(['费用报销审批', '申请人', '部门主管', '财务'])
+    const flags = linkersOf(doc).map((l) => l.text)
+    expect(flags).toContain('超预算')
+    expect(flags).toContain('未超预算')
+  })
+})
+
+describe('系统流程图', () => {
+  const doc = buildTemplateDocument(getTemplateById('system-flow')!)
+
+  it('缓存与数据库为圆柱形，链路自上而下贯通', () => {
+    expect(shapesOf(doc).filter((s) => s.name === 'directData')).toHaveLength(2)
+    const chain = ['客户端请求', 'API 网关', '认证鉴权', '业务服务']
+    let prev: ElementInstance | null = null
+    for (const text of chain) {
+      const node = shapesOf(doc).find((s) => s.textBlock[0]?.text === text)!
+      if (prev) {
+        expect(linkersOf(doc).some((l) => l.from.id === prev!.id && l.to.id === node.id)).toBe(true)
+      }
+      prev = node
+    }
+  })
+})
+
+describe('数据流图(DFD)', () => {
+  const doc = buildTemplateDocument(getTemplateById('dfd-flow')!)
+
+  it('外部实体 + 加工圆形 + 两个数据存储', () => {
+    expect(shapesOf(doc).filter((s) => s.name === 'rectangle')).toHaveLength(2)
+    expect(shapeByName(doc, 'round')).toBeTruthy()
+    expect(shapesOf(doc).filter((s) => s.name === 'storedData')).toHaveLength(2)
+    expect(linkersOf(doc).map((l) => l.text)).toEqual(
+      expect.arrayContaining(['订单', '查询商品', '写入订单', '读取订单']),
+    )
+  })
+})
+
+describe('UML 活动图', () => {
+  const doc = buildTemplateDocument(getTemplateById('uml-activity')!)
+
+  it('起止符号 + 同步条分叉汇合', () => {
+    expect(shapeByName(doc, 'umlStart')).toBeTruthy()
+    expect(shapeByName(doc, 'umlEnd')).toBeTruthy()
+    expect(shapesOf(doc).filter((s) => s.name === 'Synchronization')).toHaveLength(2)
+    expect(shapesOf(doc).filter((s) => s.name === 'roundRectangle')).toHaveLength(5)
+  })
+})
+
+describe('服务工单流程图', () => {
+  const doc = buildTemplateDocument(getTemplateById('service-ticket')!)
+
+  it('未解决时升级专家并回连处理环节', () => {
+    const handle = shapesOf(doc).find((s) => s.textBlock[0]?.text === '工程师处理')!
+    const esc = shapesOf(doc).find((s) => s.textBlock[0]?.text === '升级专家支持')!
+    const back = linkersOf(doc).find((l) => l.from.id === esc.id && l.to.id === handle.id)
+    expect(back).toBeTruthy()
+    expect(back!.points.length).toBeGreaterThan(0)
+  })
+})
+
+describe('订单处理流程图', () => {
+  const doc = buildTemplateDocument(getTemplateById('order-process')!)
+
+  it('支付失败进入取消/退款/关闭支线', () => {
+    const cancel = shapesOf(doc).find((s) => s.textBlock[0]?.text === '取消订单')!
+    const refund = shapesOf(doc).find((s) => s.textBlock[0]?.text === '退款处理')!
+    const closed = shapesOf(doc).find((s) => s.textBlock[0]?.text === '订单关闭')!
+    expect(linkersOf(doc).some((l) => l.from.id === cancel.id && l.to.id === refund.id)).toBe(true)
+    expect(linkersOf(doc).some((l) => l.from.id === refund.id && l.to.id === closed.id)).toBe(true)
+  })
+})
+
+describe('软件开发与部署流程图', () => {
+  const doc = buildTemplateDocument(getTemplateById('cicd-flow')!)
+
+  it('测试失败与验收未通过均回到修复缺陷', () => {
+    const fix = shapesOf(doc).find((s) => s.textBlock[0]?.text === '修复缺陷')!
+    expect(linkersOf(doc).filter((l) => l.to.id === fix.id)).toHaveLength(2)
+    expect(linkersOf(doc).map((l) => l.text)).toEqual(
+      expect.arrayContaining(['失败', '重提', '未通过']),
+    )
+  })
+})
+
+describe('异常处理流程图', () => {
+  const doc = buildTemplateDocument(getTemplateById('exception-flow')!)
+
+  it('捕获异常后事务回滚并重试处理', () => {
+    const rollback = shapesOf(doc).find((s) => s.textBlock[0]?.text === '事务回滚')!
+    const process = shapesOf(doc).find((s) => s.textBlock[0]?.text === '处理数据')!
+    const retry = linkersOf(doc).find((l) => l.from.id === rollback.id && l.to.id === process.id)
+    expect(retry?.text).toBe('回滚后重试')
+  })
+})
+
+describe('价值流图(VSM)', () => {
+  const doc = buildTemplateDocument(getTemplateById('vsm-flow')!)
+
+  it('3 个库存三角 + 8 段时间轴，信息流为虚线', () => {
+    expect(shapesOf(doc).filter((s) => s.name === 'triangle')).toHaveLength(3)
+    expect(shapesOf(doc).filter((s) => s.name === 'rectangle' && s.props.h === 26)).toHaveLength(8)
+    const dashed = linkersOf(doc).filter((l) => l.lineStyle.lineStyle === 'dashed')
+    expect(dashed).toHaveLength(3)
+    // 工序间物料流沿同一水平线穿过库存三角后方（路由点共线在 y=515）
+    const flows = linkersOf(doc).filter((l) => l.from.y === 515 && l.to.y === 515)
+    expect(flows).toHaveLength(3)
+    for (const l of flows) for (const p of l.points) expect(p.y).toBeCloseTo(515, 5)
   })
 })
 
