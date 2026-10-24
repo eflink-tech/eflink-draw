@@ -6,6 +6,7 @@ import { useEditorStore } from '@/store/editorStore'
 import { isLinker, type ElementInstance, type LinkerInstance } from '@/types'
 import { registerSnapLines, registerTip } from '@/core/editor/uiOverlay'
 import { registerCanvasContainer } from '@/core/editor/panelDrag'
+import { FIT_PAGE_EVENT } from '@/core/editor/viewportEvents'
 import { getContentWorldBounds, getScrollBounds, thumbPosFromVp, vpFromThumbPos } from '@/core/editor/viewportBounds'
 import { getDarkerColor, effectivePageSize } from '@/core/editor/grid'
 import { absToWorld, getShapesByRange, hitElementId } from '@/core/editor/interaction'
@@ -38,6 +39,26 @@ export function Canvas() {
   const stageRef = useRef<Konva.Stage>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [stageSize, setStageSize] = useState({ width: 800, height: 600 })
+
+  // 模板新建/插入后：把整页缩放居中到可视区（画布掌握真实可视尺寸）
+  useEffect(() => {
+    const onFit = () => {
+      const pageSize = effectivePageSize(useEditorStore.getState().document.page)
+      const margin = 40
+      const raw = Math.min(
+        (stageSize.width - margin * 2) / pageSize.width,
+        (stageSize.height - margin * 2) / pageSize.height,
+      )
+      const scale = Math.max(0.1, Math.min(1, Math.floor(raw * 100) / 100))
+      useEditorStore.getState().updateViewport({
+        scale,
+        x: Math.round((stageSize.width - pageSize.width * scale) / 2),
+        y: Math.round((stageSize.height - pageSize.height * scale) / 2),
+      })
+    }
+    window.addEventListener(FIT_PAGE_EVENT, onFit)
+    return () => window.removeEventListener(FIT_PAGE_EVENT, onFit)
+  }, [stageSize.width, stageSize.height])
 
   const roRef = useRef<ResizeObserver | null>(null)
 

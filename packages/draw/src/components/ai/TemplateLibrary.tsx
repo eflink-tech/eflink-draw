@@ -66,7 +66,7 @@ export function TemplateLibrary({ onSelect }: TemplateLibraryProps) {
 
   return (
     <div style={{ padding: '20px' }}>
-      <h2>模板库</h2>
+      <h2>AI 快捷指令</h2>
       <div
         style={{
           display: 'grid',

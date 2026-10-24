@@ -53,6 +53,35 @@ function commitAlign(
   return { document: { ...state.document, elements }, isDirty: true }
 }
 
+/** 插入模板时与现有内容的间距 / 与页面边缘的最小留白 */
+const INSERT_GAP = 80
+const INSERT_PAGE_MARGIN = 40
+
+/** 元素集合包围盒（连线取端点与折点） */
+function boundsOf(elements: (ElementInstance | LinkerInstance)[]) {
+  if (elements.length === 0) return null
+  let minX = Infinity
+  let minY = Infinity
+  let maxX = -Infinity
+  let maxY = -Infinity
+  for (const el of elements) {
+    if (isLinker(el)) {
+      for (const p of [el.from, el.to, ...el.points]) {
+        minX = Math.min(minX, p.x)
+        minY = Math.min(minY, p.y)
+        maxX = Math.max(maxX, p.x)
+        maxY = Math.max(maxY, p.y)
+      }
+    } else {
+      minX = Math.min(minX, el.props.x)
+      minY = Math.min(minY, el.props.y)
+      maxX = Math.max(maxX, el.props.x + el.props.w)
+      maxY = Math.max(maxY, el.props.y + el.props.h)
+    }
+  }
+  return { minX, minY, maxX, maxY }
+}
+
 interface Viewport {
   x: number
   y: number
@@ -94,6 +123,10 @@ interface EditorState {
   loadDocument: (doc: DocumentData) => void
   /** 新建空白文档：清历史、复位编辑态、落盘覆盖自动保存 */
   newDocument: () => void
+  /** 以模板文档新建：与 newDocument 同语义（清历史、落盘），但载入模板元素 */
+  newDocumentFromTemplate: (doc: DocumentData) => void
+  /** 把模板文档并入当前画布：整体放到现有内容右侧，页面按需扩张，单条历史 */
+  insertDocument: (doc: DocumentData) => void
   selectElement: (id: string, multi?: boolean) => void
   clearSelection: () => void
   setHoveredId: (id: string | null) => void
@@ -233,6 +266,91 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       isDirty: false,
     })
   },
+
+  newDocumentFromTemplate: (doc) => {
+    // 模板文档自带全新 ID，直接接管；持久化与空白新建保持一致（刷新可恢复）
+    const next: DocumentData = { ...doc, elements: { ...doc.elements } }
+    historyManager.clear()
+    saveDocumentToStorage(next)
+    mirrorToRemote(next)
+    set({
+      document: next,
+      selectedIds: new Set(),
+      hoveredId: null,
+      linkerDraft: null,
+      textEdit: null,
+      activeTarget: null,
+      creatingShape: null,
+      clipboard: null,
+      currentTool: 'select',
+      brushData: null,
+      isDirty: false,
+    })
+  },
+
+  insertDocument: (doc) =>
+    set((state) => {
+      const existingBounds = boundsOf(Object.values(state.document.elements))
+      const templateBounds = boundsOf(Object.values(doc.elements))
+      if (!templateBounds) return state
+
+      // 空画布沿用模板原始坐标；已有内容则放到其右侧、顶部对齐，避免覆盖
+      const dx = existingBounds ? Math.round(existingBounds.maxX + INSERT_GAP - templateBounds.minX) : 0
+      const dy = existingBounds ? Math.round(existingBounds.minY - templateBounds.minY) : 0
+
+      // 层级接续当前最大 z-index，并保持模板内部声明顺序
+      let z = Math.max(0, ...Object.values(state.document.elements).map((e) => e.props.zindex)) + 1
+      const added: Record<string, ElementInstance | LinkerInstance> = {}
+      for (const el of Object.values(doc.elements).sort((a, b) => a.props.zindex - b.props.zindex)) {
+        const clone = JSON.parse(JSON.stringify(el)) as ElementInstance | LinkerInstance
+        clone.props.zindex = z++
+        if (isLinker(clone)) {
+          clone.from = { ...clone.from, x: clone.from.x + dx, y: clone.from.y + dy }
+          clone.to = { ...clone.to, x: clone.to.x + dx, y: clone.to.y + dy }
+          clone.points = clone.points.map((p) => ({ x: p.x + dx, y: p.y + dy }))
+        } else {
+          clone.props.x += dx
+          clone.props.y += dy
+        }
+        added[clone.id] = clone
+      }
+
+      // 页面只增不减：容纳插入内容即可
+      const page = state.document.page
+      const merged = boundsOf([...Object.values(state.document.elements), ...Object.values(added)])!
+      const pagePatch: Partial<PageConfig> = {}
+      if (merged.maxX + INSERT_PAGE_MARGIN > page.width) {
+        pagePatch.width = Math.ceil(merged.maxX + INSERT_PAGE_MARGIN)
+      }
+      if (merged.maxY + INSERT_PAGE_MARGIN > page.height) {
+        pagePatch.height = Math.ceil(merged.maxY + INSERT_PAGE_MARGIN)
+      }
+      const hasPagePatch = pagePatch.width !== undefined || pagePatch.height !== undefined
+
+      // 元素创建与扩页合并为一条历史，undo 一次整体回退
+      historyManager.beginBatch([])
+      try {
+        historyManager.send('create', { elements: JSON.parse(JSON.stringify(Object.values(added))) })
+        if (hasPagePatch) {
+          historyManager.send('updatePage', {
+            oldPage: JSON.parse(JSON.stringify(page)),
+            newPage: { ...page, ...pagePatch },
+          })
+        }
+      } finally {
+        historyManager.commit()
+      }
+
+      return {
+        document: {
+          ...state.document,
+          page: { ...page, ...pagePatch },
+          elements: { ...state.document.elements, ...added },
+        },
+        selectedIds: new Set(Object.keys(added)),
+        isDirty: true,
+      }
+    }),
 
   // 普通点击：单选；multi（Ctrl/Shift）：切换加入/移出选区
   selectElement: (id, multi = false) =>

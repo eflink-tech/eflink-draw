@@ -14,7 +14,7 @@ const SEL = {
   // 停用：「已生成」文案与模板入口随面板改版移除，TC2-TC8（fixme）重写时更新
   replyGenerated: 'text=已生成',
   templateBtn: 'button:has-text("📋 模板")',
-  templateModal: 'text=模板库',
+  templateModal: 'text=AI 快捷指令',
   orderTemplateCard: 'text=订单处理流程',
 } as const
 

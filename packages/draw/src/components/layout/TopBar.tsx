@@ -16,6 +16,7 @@ import { useEditorStore } from '@/store/editorStore'
 import { applyFontPatch } from '@/core/editor/styleOps'
 import { isLinker, type ArrowStyle, type ElementInstance, type LinkerInstance } from '@/types'
 import { PromptDialog } from '@/components/common/PromptDialog'
+import { TemplatePickerDialog } from '@/components/templates/TemplatePickerDialog'
 import { ExportImage, EXPORT_EVENT } from '@/components/export/ExportImage'
 import { HotkeyDialog } from '@/components/common/HotkeyDialog'
 import { parseDocumentFile, buildExportFileNameEfd, serializeDocumentFile, triggerDownload } from '@/core/editor/fileOps'
@@ -570,6 +571,7 @@ export function TopBar() {
   const [openMenu, setOpenMenu] = useState<string | null>(null)
   const [renameOpen, setRenameOpen] = useState(false)
   const [hotkeyOpen, setHotkeyOpen] = useState(false)
+  const [templatePickerOpen, setTemplatePickerOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleImportFile = (file: File | undefined) => {
@@ -621,6 +623,7 @@ export function TopBar() {
             if (window.confirm('新建将清空当前画布，确定？')) useEditorStore.getState().newDocument()
           },
         },
+        { label: '从模板新建…', onClick: () => setTemplatePickerOpen(true) },
         { label: '导入文件', onClick: () => {
           if (fileInputRef.current) fileInputRef.current.accept = '.efd.json,.json'
           fileInputRef.current?.click()
@@ -1039,6 +1042,7 @@ export function TopBar() {
       {/* 离屏导出（监听 efdraw:export） */}
       <ExportImage />
       {hotkeyOpen && <HotkeyDialog onClose={() => setHotkeyOpen(false)} />}
+      {templatePickerOpen && <TemplatePickerDialog onClose={() => setTemplatePickerOpen(false)} />}
       <ShareDialog open={shareOpen} doc={shareDoc} onClose={closeShare} />
     </div>
   )
