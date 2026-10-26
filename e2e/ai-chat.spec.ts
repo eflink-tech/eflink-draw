@@ -69,7 +69,7 @@ function registerSettingsMock(
 
     IDBObjectStore.prototype.get = function (key: IDBValidKey | IDBKeyRange) {
       if (
-        this.transaction?.db?.name === 'efdraw-ai' &&
+        this.transaction?.db?.name === 'doculuma-draw-ai' &&
         this.name === 'settings' &&
         key === 'main'
       ) {
@@ -111,7 +111,7 @@ function overrideSettingsMockAsUnconfigured(page: Parameters<typeof test>[0]['pa
 
     IDBObjectStore.prototype.get = function (key: IDBValidKey | IDBKeyRange) {
       if (
-        this.transaction?.db?.name === 'efdraw-ai' &&
+        this.transaction?.db?.name === 'doculuma-draw-ai' &&
         this.name === 'settings' &&
         key === 'main'
       ) {

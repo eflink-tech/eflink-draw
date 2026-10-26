@@ -11,7 +11,7 @@ import { Canvas } from '@/components/canvas/Canvas'
 import { AIAssistantRoot } from '@/components/ai/AIAssistantRoot'
 import { AIChatPanel } from '@/components/ai/AIChatPanel'
 import { useEditorStore } from '@/store/editorStore'
-import { loadDocumentFromStorage, loadFromRemote } from '@/core/editor/persistence'
+import { loadDocumentFromStorage, loadFromRemote, STORAGE_KEY } from '@/core/editor/persistence'
 import { DRAW_MESSAGES } from '@/i18n/messages'
 import { setDrawLocale } from '@/i18n/runtime'
 
@@ -24,7 +24,7 @@ export interface DrawEditorBrand {
 export interface DrawEditorProps {
   /** 界面语言（zh-CN / en / es / pt-BR），默认 zh-CN */
   locale?: OfficeLocale | string;
-  /** 品牌区（logo + 产品名）；不传则用默认「易飞绘图」 */
+  /** 品牌区（logo + 产品名）；不传则用默认「DocuLuma Draw」 */
   branding?: DrawEditorBrand | false;
 }
 
@@ -49,21 +49,21 @@ function DrawEditorInner({ branding }: Omit<DrawEditorProps, 'locale'>) {
     })
 
     // 离页拦截 bridge：宿主（EditorLeaveGuard）通过它读取脏状态、触发保存、清理本地草稿
-    ;(window as unknown as Record<string, unknown>).__eflinkEditorBridge = {
+    ;(window as unknown as Record<string, unknown>).__doculumaEditorBridge = {
       isDirty: () => useEditorStore.getState().isDirty,
       save: () => {
         useEditorStore.getState().saveDocument()
       },
       discard: () => {
         try {
-          localStorage.removeItem('efdraw:document:v1')
+          localStorage.removeItem(STORAGE_KEY)
         } catch {
           /* ignore */
         }
       },
     }
     return () => {
-      delete (window as unknown as Record<string, unknown>).__eflinkEditorBridge
+      delete (window as unknown as Record<string, unknown>).__doculumaEditorBridge
     }
   }, [])
 

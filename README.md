@@ -1,4 +1,4 @@
-# EFLink Draw 易飞绘图
+# DocuLuma Draw
 
 开箱即用的在线流程图/绘图编辑器。基于 [Konva](https://konvajs.org/) 画布引擎与 React 构建，**既可以独立运行（本仓库 demo 应用），也可以作为 React 组件嵌入任意应用**（npm 包 `@eflink-tech/draw`）。
 
@@ -99,7 +99,7 @@ eflink-draw/
 │       ├── ai/         # AI 助手（服务调用、动作执行、自动布局、模板）
 │       ├── store/      # zustand 编辑器状态
 │       └── types/      # 数据模型
-├── apps/demo/          # 独立 demo 应用（易飞绘图）
+├── apps/demo/          # 独立 demo 应用（DocuLuma Draw）
 ├── e2e/                # Playwright 端到端测试
 └── scripts/            # CI 发布辅助脚本
 ```
@@ -116,7 +116,7 @@ git push          # 推送后机器人自动开 Version PR
 
 ## 联系我们
 
-- **在线体验**：<https://eflink.tech>（易飞绘图 · 免费在线流程图 / 示意图绘制）
+- **在线体验**：<https://offices.doculuma.com/draw>（DocuLuma Draw · 免费在线流程图 / 示意图绘制）
 - **问题反馈与交流**：[eflink.tech/contact](https://eflink.tech/contact)
 - **邮箱**：[support@eflink.tech](mailto:support@eflink.tech)
 

@@ -6,7 +6,7 @@ export interface SystemPromptParams {
 export function buildSystemPrompt(params: SystemPromptParams): string {
   const { canvasContext, schemaList } = params
 
-  return `你是 efdraw 绘图助手，一个专业的流程图/BPMN/UML 设计师。
+  return `你是 DocuLuma Draw 绘图助手，一个专业的流程图/BPMN/UML 设计师。
 
 ## 你的能力
 - 根据用户描述生成流程图、BPMN 图、UML 图

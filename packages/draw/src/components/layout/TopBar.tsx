@@ -24,7 +24,7 @@ import { parseDocumentFile, buildExportFileNameEfd, serializeDocumentFile, trigg
 import { applyLayerAction } from '@/core/editor/layerAction'
 import { getLinkerPoints } from '@/core/editor/linker'
 import { makeStoreRectGetter } from '@/core/editor/interaction'
-import logoUrl from '@/assets/draw-eflink-logo.png'
+import logoUrl from '@/assets/draw-doculuma-logo.png'
 import { getEditorBackHref } from '@/core/editor/chrome'
 import { ShareDialog } from './ShareDialog'
 import { getDrawShareHandler } from '@/core/share/shareBridge'
@@ -1065,7 +1065,7 @@ export function TopBar({ branding }: { branding?: OfficeHeaderBrand | false } = 
           onCancel={() => setRenameOpen(false)}
         />
       )}
-      {/* 离屏导出（监听 efdraw:export） */}
+      {/* 离屏导出（监听 doculuma:draw:export） */}
       <ExportImage />
       {hotkeyOpen && <HotkeyDialog onClose={() => setHotkeyOpen(false)} />}
       {templatePickerOpen && <TemplatePickerDialog onClose={() => setTemplatePickerOpen(false)} />}

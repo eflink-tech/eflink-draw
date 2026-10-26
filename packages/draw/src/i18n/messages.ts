@@ -9,7 +9,7 @@ type Row = readonly [string, string, string, string];
 
 const ROWS = {
   'draw.untitled': ['未命名图表', 'Untitled diagram', 'Diagrama sin título', 'Diagrama sem título'],
-  'draw.brand': ['易飞绘图', 'EfLink Draw', 'EfLink Draw', 'EfLink Draw'],
+  'draw.brand': ['DocuLuma Draw', 'DocuLuma Draw', 'DocuLuma Draw', 'DocuLuma Draw'],
 
   'draw.menu.file': ['文件', 'File', 'Archivo', 'Arquivo'],
   'draw.menu.edit': ['编辑', 'Edit', 'Editar', 'Editar'],

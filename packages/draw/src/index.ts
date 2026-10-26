@@ -2,6 +2,10 @@
 // 图形定义注册（形状 schema 侧-effects）必须先于组件执行
 import './core/schema/shapes'
 import './styles.css'
+// 一次性迁移：efdraw:* 本地缓存 → doculuma:draw:*（必须早于任何读写新键的代码）
+import { migrateLegacyLocalStorage } from './storage/legacy'
+
+migrateLegacyLocalStorage()
 
 // 组件
 export { DrawEditor } from './DrawEditor'

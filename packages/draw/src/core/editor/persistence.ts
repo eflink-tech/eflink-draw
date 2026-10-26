@@ -2,8 +2,8 @@
 // 存储格式：{ version: 1, doc: DocumentData }，version 用于未来格式演进
 import type { DocumentData } from '@/types'
 
-/** localStorage 存储键（v1 为当前格式版本） */
-export const STORAGE_KEY = 'efdraw:document:v1'
+/** localStorage 存储键（v1 为当前格式版本；旧键 efdraw:document:v1 由 storage/legacy 一次性迁移） */
+export const STORAGE_KEY = 'doculuma:draw:document:v1'
 
 /** 存储格式版本号 */
 const STORAGE_VERSION = 1

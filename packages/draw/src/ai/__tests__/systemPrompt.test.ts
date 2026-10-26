@@ -7,7 +7,7 @@ describe('buildSystemPrompt', () => {
       canvasContext: '{}',
       schemaList: ['flowStart', 'flowProcess'],
     })
-    expect(result).toContain('efdraw 绘图助手')
+    expect(result).toContain('DocuLuma Draw 绘图助手')
   })
 
   it('包含当前画布状态', () => {

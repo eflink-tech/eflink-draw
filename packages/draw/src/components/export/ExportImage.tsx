@@ -1,5 +1,5 @@
 // src/components/export/ExportImage.tsx
-// 离屏导出 PNG：监听 CustomEvent('efdraw:export')，按页面尺寸渲染整页（背景+连线+图形）并下载。
+// 离屏导出 PNG：监听 CustomEvent('doculuma:draw:export')，按页面尺寸渲染整页（背景+连线+图形）并下载。
 // 复用 ElementRenderer / LinkerRenderer，挂在固定的屏幕外容器（position:fixed; left:-10000px）。
 // 导出触发方须在 detail 里携带 { keepSelection: string[] }，截图完成前由本组件清空/恢复选区，避免选中高亮入图。
 import { useEffect, useRef, useState } from 'react'
@@ -12,7 +12,7 @@ import { LinkerRenderer } from '@/components/canvas/LinkerRenderer'
 import { buildExportFileName, triggerDownload } from '@/core/editor/fileOps'
 import { isLinker, rgbToCSS, type ElementInstance, type LinkerInstance } from '@/types'
 
-export const EXPORT_EVENT = 'efdraw:export'
+export const EXPORT_EVENT = 'doculuma:draw:export'
 
 export function ExportImage() {
   const elements = useEditorStore((s) => s.document.elements)
