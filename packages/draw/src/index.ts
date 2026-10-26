@@ -1,6 +1,8 @@
 /** @eflink-tech/draw 对外导出面：编辑器组件 + store + 持久化辅助 */
 // 图形定义注册（形状 schema 侧-effects）必须先于组件执行
 import './core/schema/shapes'
+// 顶栏/菜单栏样式来自 office-kit：库构建会外部化该依赖，必须在此显式引入才会打进 dist/styles.css
+import '@eflink-tech/office-kit/styles.css'
 import './styles.css'
 // 一次性迁移：efdraw:* 本地缓存 → doculuma:draw:*（必须早于任何读写新键的代码）
 import { migrateLegacyLocalStorage } from './storage/legacy'
