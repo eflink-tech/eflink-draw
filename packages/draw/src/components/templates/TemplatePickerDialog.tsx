@@ -1,6 +1,8 @@
 // 模板选择弹窗：文件 → 从模板新建…
 // 左分类 / 中缩略图画廊 / 右预览与落点（新建画布 / 插入当前画布）
 import { useEffect, useMemo, useState } from 'react'
+import { useI18n } from '@eflink-tech/office-kit'
+import { translateTitle } from '@/i18n'
 import { createPortal } from 'react-dom'
 import {
   DRAW_TEMPLATES,
@@ -24,6 +26,8 @@ const CATEGORY_LABEL: Record<TemplateCategoryId, string> = Object.fromEntries(
 ) as Record<TemplateCategoryId, string>
 
 export function TemplatePickerDialog({ onClose }: TemplatePickerDialogProps) {
+  const { t: msg, locale } = useI18n()
+  const tt = (title: string) => translateTitle(title, locale)
   const [category, setCategory] = useState<CategoryFilter>('all')
   const [query, setQuery] = useState('')
   const [selectedId, setSelectedId] = useState(DRAW_TEMPLATES[0].id)
@@ -33,7 +37,7 @@ export function TemplatePickerDialog({ onClose }: TemplatePickerDialogProps) {
     const map: Record<string, string> = {}
     for (const t of DRAW_TEMPLATES) map[t.id] = buildTemplateThumbnail(t)
     return map
-  }, [])
+  }, [locale])
 
   const list = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -44,12 +48,13 @@ export function TemplatePickerDialog({ onClose }: TemplatePickerDialogProps) {
         : DRAW_TEMPLATES.filter((t) => t.category === category)
     if (!q) return base
     return base.filter((t) =>
-      [t.title, t.description, CATEGORY_LABEL[t.category], ...t.keywords]
+      [t.title, t.description, CATEGORY_LABEL[t.category], ...t.keywords,
+        tt(t.title), tt(t.description), tt(CATEGORY_LABEL[t.category])]
         .join(' ')
         .toLowerCase()
         .includes(q),
     )
-  }, [category, query])
+  }, [category, query, locale])
 
   const selected: TemplateSpec | undefined = useMemo(
     () => DRAW_TEMPLATES.find((t) => t.id === selectedId),
@@ -68,7 +73,7 @@ export function TemplatePickerDialog({ onClose }: TemplatePickerDialogProps) {
     const store = useEditorStore.getState()
     if (
       Object.keys(store.document.elements).length > 0 &&
-      !window.confirm('新建将清空当前画布，确定？')
+      !window.confirm(msg('draw.file.newConfirm'))
     ) {
       return
     }
@@ -92,20 +97,20 @@ export function TemplatePickerDialog({ onClose }: TemplatePickerDialogProps) {
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="从模板新建"
+        aria-label={msg('draw.template.title')}
         className="flex h-[640px] max-h-[88vh] w-[1000px] max-w-[94vw] flex-col overflow-hidden rounded-lg bg-white shadow-xl"
       >
         {/* 标题栏 */}
         <div className="flex items-center justify-between border-b border-[#eee] px-5 py-3">
           <div>
-            <div className="text-sm font-medium text-[#333]">从模板新建</div>
+            <div className="text-sm font-medium text-[#333]">{msg('draw.template.title')}</div>
             <div className="mt-0.5 text-xs text-gray-400">
-              {DRAW_TEMPLATES.length} 种常用流程图，选一个开始
+              {msg('draw.template.subtitle', { count: DRAW_TEMPLATES.length })}
             </div>
           </div>
           <button
             type="button"
-            aria-label="关闭"
+            aria-label={msg('action.close')}
             onClick={onClose}
             className="flex h-7 w-7 items-center justify-center rounded text-lg leading-none text-gray-500 hover:bg-gray-100"
           >
@@ -116,7 +121,7 @@ export function TemplatePickerDialog({ onClose }: TemplatePickerDialogProps) {
         <div className="flex min-h-0 flex-1">
           {/* 分类 */}
           <div className="w-[152px] shrink-0 overflow-y-auto border-r border-[#eee] py-2">
-            {([['all', '全部'], ...TEMPLATE_CATEGORIES.map((c) => [c.id, c.label] as const)] as const).map(
+            {([['all', msg('draw.template.all')] as const, ...TEMPLATE_CATEGORIES.map((c) => [c.id, tt(c.label)] as const)] as const).map(
               ([id, label]) => {
                 const count =
                   id === 'all'
@@ -146,14 +151,14 @@ export function TemplatePickerDialog({ onClose }: TemplatePickerDialogProps) {
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="搜索模板名称、关键字…"
-                aria-label="搜索模板"
+                placeholder={msg('draw.template.search')}
+                aria-label={msg('draw.template.searchAria')}
                 className="w-full rounded border border-[#ddd] px-2.5 py-1.5 text-xs outline-none focus:border-[#4a7fde]"
               />
             </div>
             <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
               {list.length === 0 ? (
-                <div className="py-16 text-center text-xs text-gray-400">没有匹配的模板</div>
+                <div className="py-16 text-center text-xs text-gray-400">{msg('draw.template.empty')}</div>
               ) : (
                 <div className="grid grid-cols-3 gap-3">
                   {list.map((t) => {
@@ -175,7 +180,7 @@ export function TemplatePickerDialog({ onClose }: TemplatePickerDialogProps) {
                           className="h-[86px] w-full overflow-hidden rounded bg-white [&>svg]:h-full [&>svg]:w-full"
                           dangerouslySetInnerHTML={{ __html: thumbnails[t.id] }}
                         />
-                        <div className="mt-1.5 truncate px-0.5 text-xs text-[#333]">{t.title}</div>
+                        <div className="mt-1.5 truncate px-0.5 text-xs text-[#333]">{tt(t.title)}</div>
                       </button>
                     )
                   })}
@@ -192,35 +197,36 @@ export function TemplatePickerDialog({ onClose }: TemplatePickerDialogProps) {
                   className="h-[180px] w-full overflow-hidden rounded border border-[#eee] bg-[#fafbfc] p-1 [&>svg]:h-full [&>svg]:w-full"
                   dangerouslySetInnerHTML={{ __html: thumbnails[selected.id] }}
                 />
-                <div className="mt-3 text-sm font-medium text-[#333]">{selected.title}</div>
+                <div className="mt-3 text-sm font-medium text-[#333]">{tt(selected.title)}</div>
                 <div className="mt-1 text-[11px] text-gray-400">
-                  {CATEGORY_LABEL[selected.category]} · {selected.nodes.length} 个图形 ·{' '}
-                  {selected.links.length} 条连线
+                  {tt(CATEGORY_LABEL[selected.category])} ·{' '}
+                  {msg('draw.template.nodes', { count: selected.nodes.length })} ·{' '}
+                  {msg('draw.template.links', { count: selected.links.length })}
                 </div>
-                <div className="mt-2 text-xs leading-5 text-gray-500">{selected.description}</div>
+                <div className="mt-2 text-xs leading-5 text-gray-500">{tt(selected.description)}</div>
                 <div className="mt-auto flex flex-col gap-2 pt-4">
                   <button
                     type="button"
                     onClick={() => applyNewCanvas(selected)}
                     className="rounded bg-[#2f6bd8] px-3 py-2 text-xs font-medium text-white hover:bg-[#275cbb]"
                   >
-                    新建画布使用
+                    {msg('draw.template.useNew')}
                   </button>
                   <button
                     type="button"
                     onClick={() => applyInsert(selected)}
                     className="rounded border border-[#d5dbe6] bg-white px-3 py-2 text-xs text-[#333] hover:bg-gray-50"
                   >
-                    插入当前画布
+                    {msg('draw.template.insert')}
                   </button>
                   <div className="text-center text-[11px] text-gray-400">
-                    已有内容时会插到其右侧，画布自动扩展
+                    {msg('draw.template.insertHint')}
                   </div>
                 </div>
               </>
             ) : (
               <div className="flex flex-1 items-center justify-center text-xs text-gray-400">
-                选择左侧模板查看预览
+                {msg('draw.template.pickHint')}
               </div>
             )}
           </div>

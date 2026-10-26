@@ -2,15 +2,16 @@
 import { useState, useRef, useEffect } from 'react'
 import {
   Undo2, Redo2, Bold, Italic, Underline,
-  Paintbrush as FormatBrush, Lock, Unlock, Link2, ArrowLeft, Share2, MessageCircle,
+  Paintbrush as FormatBrush, Lock, Unlock, Link2, Share2, MessageCircle,
 } from 'lucide-react'
+import { OfficeHeader, useI18n, type OfficeHeaderBrand, type OfficeMenu } from '@eflink-tech/office-kit'
+import { displayDocTitle } from '@/i18n'
 import { IconButton } from '@/components/common/IconButton'
 import { Tooltip } from '@/components/common/Tooltip'
 import { ColorPicker } from '@/components/common/ColorPicker'
 import { LineStyleDropdown } from '@/components/common/LineStyleDropdown'
 import { LineTypeDropdown } from '@/components/common/LineTypeDropdown'
 import { ArrowStyleDropdown } from '@/components/common/ArrowStyleDropdown'
-import { MenuDropdown } from '@/components/common/MenuDropdown'
 import { useUIStore } from '@/store/uiStore'
 import { useEditorStore } from '@/store/editorStore'
 import { applyFontPatch } from '@/core/editor/styleOps'
@@ -67,9 +68,10 @@ function FillColorButton({
 }) {
   const [open, setOpen] = useState(false)
   const btnRef = useRef<HTMLButtonElement>(null)
+  const { t } = useI18n()
 
   return (
-    <Tooltip text="填充颜色" disabled={disabled}>
+    <Tooltip text={t('draw.toolbar.fillColor')} disabled={disabled}>
       <div className="relative inline-block">
       <button
         ref={btnRef}
@@ -145,8 +147,10 @@ function TextColorButton({
   const [open, setOpen] = useState(false)
   const btnRef = useRef<HTMLButtonElement>(null)
 
+  const { t } = useI18n()
+
   return (
-    <Tooltip text="文本颜色" disabled={disabled}>
+    <Tooltip text={t('draw.toolbar.textColor')} disabled={disabled}>
       <div className="relative inline-block">
       <button
         ref={btnRef}
@@ -221,8 +225,10 @@ function LineColorButton({
   const [open, setOpen] = useState(false)
   const btnRef = useRef<HTMLButtonElement>(null)
 
+  const { t } = useI18n()
+
   return (
-    <Tooltip text="线条颜色" disabled={disabled}>
+    <Tooltip text={t('draw.toolbar.lineColor')} disabled={disabled}>
       <div className="relative inline-block">
       <button
         ref={btnRef}
@@ -294,8 +300,10 @@ function LayerDropdown({ items, disabled = false }: {
     return () => document.removeEventListener('mousedown', handler)
   }, [open])
 
+  const { t } = useI18n()
+
   return (
-    <Tooltip text="层级排列" disabled={disabled}>
+    <Tooltip text={t('draw.toolbar.layerOrder')} disabled={disabled}>
     <div className="relative inline-block" ref={rootRef}>
       <button
         disabled={disabled}
@@ -348,7 +356,8 @@ function LayerDropdown({ items, disabled = false }: {
   )
 }
 
-export function TopBar() {
+export function TopBar({ branding }: { branding?: OfficeHeaderBrand | false } = {}) {
+  const { t } = useI18n();
   const selectedIds = useEditorStore((s) => s.selectedIds)
   const elements = useEditorStore((s) => s.document.elements)
   const brushData = useEditorStore((s) => s.brushData)
@@ -568,7 +577,6 @@ export function TopBar() {
   const currentBeginArrow = firstSelectedLinker?.lineStyle.beginArrowStyle ?? 'none'
   const currentEndArrow = firstSelectedLinker?.lineStyle.endArrowStyle ?? 'solidArrow'
 
-  const [openMenu, setOpenMenu] = useState<string | null>(null)
   const [renameOpen, setRenameOpen] = useState(false)
   const [hotkeyOpen, setHotkeyOpen] = useState(false)
   const [templatePickerOpen, setTemplatePickerOpen] = useState(false)
@@ -610,198 +618,216 @@ export function TopBar() {
   }).length
   const canArrange = selectedIds.size > 0
 
-  const menus = [
+  const menus: OfficeMenu[] = [
     {
       key: 'file',
-      label: '文件',
+      label: t('draw.menu.file'),
       items: [
-        { label: '重命名', onClick: () => setRenameOpen(true) },
-        { divider: true },
-        {
-          label: '新建',
-          onClick: () => {
-            if (window.confirm('新建将清空当前画布，确定？')) useEditorStore.getState().newDocument()
+        [{ key: 'rename', label: t('draw.file.rename'), onSelect: () => setRenameOpen(true) }],
+        [
+          {
+            key: 'new',
+            label: t('draw.file.new'),
+            onSelect: () => {
+              if (window.confirm(t('draw.file.newConfirm'))) useEditorStore.getState().newDocument()
+            },
           },
-        },
-        { label: '从模板新建…', onClick: () => setTemplatePickerOpen(true) },
-        { label: '导入文件', onClick: () => {
-          if (fileInputRef.current) fileInputRef.current.accept = '.efd.json,.json'
-          fileInputRef.current?.click()
-        } },
-        { label: '下载文件', onClick: () => {
-          const st = useEditorStore.getState()
-          const json = serializeDocumentFile(st.document)
-          const blob = new Blob([json], { type: 'application/json' })
-          const url = URL.createObjectURL(blob)
-          const filename = buildExportFileNameEfd(st.document.page.title ?? '')
-          triggerDownload(url, filename)
-          // 延迟释放，避免极慢设备下载尚未启动时 URL 失效
-          setTimeout(() => URL.revokeObjectURL(url), 1000)
-        } },
-        { divider: true },
-        { label: '下载为 PNG', onClick: handleExport },
+          { key: 'template', label: t('draw.file.fromTemplate'), onSelect: () => setTemplatePickerOpen(true) },
+          {
+            key: 'import',
+            label: t('draw.file.import'),
+            onSelect: () => {
+              if (fileInputRef.current) fileInputRef.current.accept = '.efd.json,.json'
+              fileInputRef.current?.click()
+            },
+          },
+          {
+            key: 'download',
+            label: t('draw.file.download'),
+            onSelect: () => {
+              const st = useEditorStore.getState()
+              const json = serializeDocumentFile(st.document)
+              const blob = new Blob([json], { type: 'application/json' })
+              const url = URL.createObjectURL(blob)
+              const filename = buildExportFileNameEfd(st.document.page.title ?? '')
+              triggerDownload(url, filename)
+              // 延迟释放，避免极慢设备下载尚未启动时 URL 失效
+              setTimeout(() => URL.revokeObjectURL(url), 1000)
+            },
+          },
+        ],
+        [{ key: 'png', label: t('draw.file.downloadPng'), onSelect: handleExport }],
       ],
     },
-    // ── 编辑 ──
     {
       key: 'edit',
-      label: '编辑',
+      label: t('draw.menu.edit'),
       items: [
-        { label: '撤销', shortcut: shortcutText('Z'), disabled: !canUndo(), onClick: handleUndo },
-        { label: '恢复', shortcut: shortcutText('Z', true), disabled: !canRedo(), onClick: handleRedo },
-        { divider: true },
-        { label: '剪切', shortcut: shortcutText('X'), disabled: selectedIds.size === 0, onClick: () => { const st = useEditorStore.getState(); st.copySelectedElements(); st.deleteElements([...st.selectedIds]) } },
-        { label: '复制', shortcut: shortcutText('C'), disabled: selectedIds.size === 0, onClick: () => useEditorStore.getState().copySelectedElements() },
-        { label: '粘贴', shortcut: shortcutText('V'), disabled: !useEditorStore.getState().clipboard, onClick: () => useEditorStore.getState().pasteElements() },
-        { label: '复用', shortcut: shortcutText('D'), disabled: selectedIds.size === 0, onClick: () => { useEditorStore.getState().copySelectedElements(); useEditorStore.getState().pasteElements() } },
-        { label: '格式刷', shortcut: shortcutText('B', true), disabled: selectedIds.size === 0, onClick: handleBrush },
-        { divider: true },
-        { label: '全选', shortcut: shortcutText('A'), onClick: () => useEditorStore.getState().selectIds(Object.keys(useEditorStore.getState().document.elements), 'replace') },
-        { label: '删除', shortcut: '⌦', disabled: selectedIds.size === 0, onClick: () => useEditorStore.getState().deleteElements([...useEditorStore.getState().selectedIds]) },
+        [
+          { key: 'undo', label: t('action.undo'), shortcut: shortcutText('Z'), disabled: !canUndo(), onSelect: handleUndo },
+          { key: 'redo', label: t('action.redo'), shortcut: shortcutText('Z', true), disabled: !canRedo(), onSelect: handleRedo },
+        ],
+        [
+          { key: 'cut', label: t('action.cut'), shortcut: shortcutText('X'), disabled: selectedIds.size === 0, onSelect: () => { const st = useEditorStore.getState(); st.copySelectedElements(); st.deleteElements([...st.selectedIds]) } },
+          { key: 'copy', label: t('action.copy'), shortcut: shortcutText('C'), disabled: selectedIds.size === 0, onSelect: () => useEditorStore.getState().copySelectedElements() },
+          { key: 'paste', label: t('action.paste'), shortcut: shortcutText('V'), disabled: !useEditorStore.getState().clipboard, onSelect: () => useEditorStore.getState().pasteElements() },
+          { key: 'duplicate', label: t('draw.edit.duplicate'), shortcut: shortcutText('D'), disabled: selectedIds.size === 0, onSelect: () => { useEditorStore.getState().copySelectedElements(); useEditorStore.getState().pasteElements() } },
+          { key: 'brush', label: t('draw.edit.formatBrush'), shortcut: shortcutText('B', true), disabled: selectedIds.size === 0, onSelect: handleBrush },
+        ],
+        [
+          { key: 'selectAll', label: t('action.selectAll'), shortcut: shortcutText('A'), onSelect: () => useEditorStore.getState().selectIds(Object.keys(useEditorStore.getState().document.elements), 'replace') },
+          { key: 'delete', label: t('action.delete'), shortcut: '⌦', disabled: selectedIds.size === 0, onSelect: () => useEditorStore.getState().deleteElements([...useEditorStore.getState().selectedIds]) },
+        ],
       ],
     },
-    // ── 视图 ──
     {
       key: 'view',
-      label: '视图',
+      label: t('draw.menu.view'),
       items: [
-        { label: '放大', shortcut: shortcutText('+'), onClick: () => zoomStep('in') },
-        { label: '缩小', shortcut: shortcutText('-'), onClick: () => zoomStep('out') },
-        { divider: true },
-        ...[0.5, 0.75, 1, 1.5, 2].map((v) => ({
-          label: `${Math.round(v * 100)}%`, checked: scale === v, onClick: () => zoom(v),
+        [
+          { key: 'zoomIn', label: t('action.zoomIn'), shortcut: shortcutText('+'), onSelect: () => zoomStep('in') },
+          { key: 'zoomOut', label: t('action.zoomOut'), shortcut: shortcutText('-'), onSelect: () => zoomStep('out') },
+        ],
+        [0.5, 0.75, 1, 1.5, 2].map((v) => ({
+          key: `zoom${v}`,
+          label: `${Math.round(v * 100)}%`,
+          checked: scale === v,
+          onSelect: () => zoom(v),
         })),
-        { divider: true },
-        { label: '重置缩放', shortcut: shortcutText('0'), onClick: () => zoom(1) },
-        { divider: true },
-        { label: '显示图形库', checked: uiVisible, onClick: () => useUIStore.getState().toggleLeftPanel() },
-        { label: '显示属性面板', checked: uiVisibleRight, onClick: () => useUIStore.getState().toggleRightPanel() },
-        { label: '显示 AI 助手', checked: aiPanelVisible, onClick: () => useUIStore.getState().toggleAiPanel() },
+        [{ key: 'zoomReset', label: t('action.zoomReset'), shortcut: shortcutText('0'), onSelect: () => zoom(1) }],
+        [
+          { key: 'shapes', label: t('draw.view.showShapes'), checked: uiVisible, onSelect: () => useUIStore.getState().toggleLeftPanel() },
+          { key: 'properties', label: t('draw.view.showProperties'), checked: uiVisibleRight, onSelect: () => useUIStore.getState().toggleRightPanel() },
+          { key: 'ai', label: t('draw.view.showAi'), checked: aiPanelVisible, onSelect: () => useUIStore.getState().toggleAiPanel() },
+        ],
       ],
     },
-    // ── 插入 ──
     {
       key: 'insert',
-      label: '插入',
+      label: t('draw.menu.insert'),
       items: [
-        { label: '文本', shortcut: 'T', onClick: () => { const s = useEditorStore.getState(); s.setTool(s.currentTool === 'text' ? 'select' : 'text') } },
-        { label: '连线', shortcut: 'L', onClick: () => { const s = useEditorStore.getState(); s.setTool(s.currentTool === 'linker' ? 'select' : 'linker') } },
-        { label: '图片', shortcut: 'I', disabled: true },
+        [
+          { key: 'text', label: t('draw.insert.text'), shortcut: 'T', onSelect: () => { const s = useEditorStore.getState(); s.setTool(s.currentTool === 'text' ? 'select' : 'text') } },
+          { key: 'linker', label: t('draw.insert.linker'), shortcut: 'L', onSelect: () => { const s = useEditorStore.getState(); s.setTool(s.currentTool === 'linker' ? 'select' : 'linker') } },
+          { key: 'image', label: t('draw.insert.image'), shortcut: 'I', disabled: true },
+        ],
       ],
     },
-    // ── 排列 ──（对齐/分布/匹配大小在后续任务接入；层级/锁定/组合现在接）
     {
       key: 'arrange',
-      label: '排列',
+      label: t('draw.menu.arrange'),
       items: [
-        {
-          label: '置于顶层', shortcut: layerShortcutText(']'), disabled: !canArrange,
-          icon: <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 3L3 6L8 9L13 6L8 3Z" fill="#333"/><path d="M3 9L8 12.5L13 9" stroke="#999" strokeWidth="1.5" strokeLinecap="round"/></svg>,
-          onClick: () => handleLayer('front'),
-        },
-        {
-          label: '置于底层', shortcut: layerShortcutText('['), disabled: !canArrange,
-          icon: <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 3L3 6L8 9L13 6L8 3Z" fill="#ccc"/><path d="M3 9L8 12.5L13 9" stroke="#999" strokeWidth="1.5" strokeLinecap="round"/></svg>,
-          onClick: () => handleLayer('back'),
-        },
-        { label: '上移一层', shortcut: layerShortcutText(']', true), disabled: !canArrange, onClick: () => handleLayer('forward') },
-        { label: '下移一层', shortcut: layerShortcutText('[', true), disabled: !canArrange, onClick: () => handleLayer('backward') },
-        { divider: true },
-        {
-          label: '对齐',
-          children: [
-            { label: '左对齐', icon: <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="4" cy="5" r="2.5" fill="#333"/><rect x="8" y="3.5" width="6" height="3" fill="#999"/><circle cx="4" cy="11" r="2.5" fill="#333"/><rect x="8" y="9.5" width="6" height="3" fill="#999"/><line x1="9" y1="2" x2="9" y2="14" stroke="#4a7fde" strokeWidth="1.5"/></svg>, disabled: arrangeEligible < 2, onClick: () => useEditorStore.getState().alignShapes([...selectedIds], 'left') },
-            { label: '水平居中', disabled: arrangeEligible < 2, onClick: () => useEditorStore.getState().alignShapes([...selectedIds], 'center') },
-            { label: '右对齐', disabled: arrangeEligible < 2, onClick: () => useEditorStore.getState().alignShapes([...selectedIds], 'right') },
-            { divider: true },
-            { label: '顶端对齐', disabled: arrangeEligible < 2, onClick: () => useEditorStore.getState().alignShapes([...selectedIds], 'top') },
-            { label: '垂直居中', disabled: arrangeEligible < 2, onClick: () => useEditorStore.getState().alignShapes([...selectedIds], 'middle') },
-            { label: '底端对齐', disabled: arrangeEligible < 2, onClick: () => useEditorStore.getState().alignShapes([...selectedIds], 'bottom') },
-          ],
-        },
-        {
-          label: '分布',
-          children: [
-            { label: '水平平均分布', disabled: arrangeEligible < 3, onClick: () => useEditorStore.getState().distributeShapes([...selectedIds], 'horizontal') },
-            { label: '垂直平均分布', disabled: arrangeEligible < 3, onClick: () => useEditorStore.getState().distributeShapes([...selectedIds], 'vertical') },
-          ],
-        },
-        {
-          label: '匹配大小',
-          children: [
-            { label: '宽度', disabled: arrangeEligible < 2, onClick: () => useEditorStore.getState().matchSize([...selectedIds], { w: true }) },
-            { label: '高度', disabled: arrangeEligible < 2, onClick: () => useEditorStore.getState().matchSize([...selectedIds], { h: true }) },
-            { label: '宽度和高度', disabled: arrangeEligible < 2, onClick: () => useEditorStore.getState().matchSize([...selectedIds], { w: true, h: true }) },
-          ],
-        },
-        { divider: true },
-        { label: '锁定', shortcut: shortcutText('L'), disabled: !canArrange, onClick: handleLock },
-        { label: '解锁', shortcut: shortcutText('L', true), disabled: !canArrange, onClick: handleUnlock },
-        { divider: true },
-        { label: '组合', shortcut: shortcutText('G'), disabled: arrangeEligible < 2, onClick: () => useEditorStore.getState().groupSelected() },
-        { label: '取消组合', shortcut: shortcutText('G', true), disabled: !canArrange, onClick: () => useEditorStore.getState().ungroupSelected() },
+        [
+          {
+            key: 'front',
+            label: t('draw.arrange.front'),
+            shortcut: layerShortcutText(']'),
+            disabled: !canArrange,
+            icon: <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 3L3 6L8 9L13 6L8 3Z" fill="#333"/><path d="M3 9L8 12.5L13 9" stroke="#999" strokeWidth="1.5" strokeLinecap="round"/></svg>,
+            onSelect: () => handleLayer('front'),
+          },
+          {
+            key: 'back',
+            label: t('draw.arrange.back'),
+            shortcut: layerShortcutText('['),
+            disabled: !canArrange,
+            icon: <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 3L3 6L8 9L13 6L8 3Z" fill="#ccc"/><path d="M3 9L8 12.5L13 9" stroke="#999" strokeWidth="1.5" strokeLinecap="round"/></svg>,
+            onSelect: () => handleLayer('back'),
+          },
+          { key: 'forward', label: t('draw.arrange.forward'), shortcut: layerShortcutText(']', true), disabled: !canArrange, onSelect: () => handleLayer('forward') },
+          { key: 'backward', label: t('draw.arrange.backward'), shortcut: layerShortcutText('[', true), disabled: !canArrange, onSelect: () => handleLayer('backward') },
+        ],
+        [
+          {
+            key: 'align',
+            label: t('draw.arrange.align'),
+            children: [
+              [
+                { key: 'alignLeft', label: t('draw.align.left'), icon: <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="4" cy="5" r="2.5" fill="#333"/><rect x="8" y="3.5" width="6" height="3" fill="#999"/><circle cx="4" cy="11" r="2.5" fill="#333"/><rect x="8" y="9.5" width="6" height="3" fill="#999"/><line x1="9" y1="2" x2="9" y2="14" stroke="#4a7fde" strokeWidth="1.5"/></svg>, disabled: arrangeEligible < 2, onSelect: () => useEditorStore.getState().alignShapes([...selectedIds], 'left') },
+                { key: 'alignCenter', label: t('draw.align.centerH'), disabled: arrangeEligible < 2, onSelect: () => useEditorStore.getState().alignShapes([...selectedIds], 'center') },
+                { key: 'alignRight', label: t('draw.align.right'), disabled: arrangeEligible < 2, onSelect: () => useEditorStore.getState().alignShapes([...selectedIds], 'right') },
+              ],
+              [
+                { key: 'alignTop', label: t('draw.align.top'), disabled: arrangeEligible < 2, onSelect: () => useEditorStore.getState().alignShapes([...selectedIds], 'top') },
+                { key: 'alignMiddle', label: t('draw.align.middle'), disabled: arrangeEligible < 2, onSelect: () => useEditorStore.getState().alignShapes([...selectedIds], 'middle') },
+                { key: 'alignBottom', label: t('draw.align.bottom'), disabled: arrangeEligible < 2, onSelect: () => useEditorStore.getState().alignShapes([...selectedIds], 'bottom') },
+              ],
+            ],
+          },
+          {
+            key: 'distribute',
+            label: t('draw.arrange.distribute'),
+            children: [
+              [
+                { key: 'distH', label: t('draw.distribute.horizontal'), disabled: arrangeEligible < 3, onSelect: () => useEditorStore.getState().distributeShapes([...selectedIds], 'horizontal') },
+                { key: 'distV', label: t('draw.distribute.vertical'), disabled: arrangeEligible < 3, onSelect: () => useEditorStore.getState().distributeShapes([...selectedIds], 'vertical') },
+              ],
+            ],
+          },
+          {
+            key: 'matchSize',
+            label: t('draw.arrange.matchSize'),
+            children: [
+              [
+                { key: 'matchW', label: t('draw.matchSize.width'), disabled: arrangeEligible < 2, onSelect: () => useEditorStore.getState().matchSize([...selectedIds], { w: true }) },
+                { key: 'matchH', label: t('draw.matchSize.height'), disabled: arrangeEligible < 2, onSelect: () => useEditorStore.getState().matchSize([...selectedIds], { h: true }) },
+                { key: 'matchBoth', label: t('draw.matchSize.both'), disabled: arrangeEligible < 2, onSelect: () => useEditorStore.getState().matchSize([...selectedIds], { w: true, h: true }) },
+              ],
+            ],
+          },
+        ],
+        [
+          { key: 'lock', label: t('draw.arrange.lock'), shortcut: shortcutText('L'), disabled: !canArrange, onSelect: handleLock },
+          { key: 'unlock', label: t('draw.arrange.unlock'), shortcut: shortcutText('L', true), disabled: !canArrange, onSelect: handleUnlock },
+        ],
+        [
+          { key: 'group', label: t('draw.arrange.group'), shortcut: shortcutText('G'), disabled: arrangeEligible < 2, onSelect: () => useEditorStore.getState().groupSelected() },
+          { key: 'ungroup', label: t('draw.arrange.ungroup'), shortcut: shortcutText('G', true), disabled: !canArrange, onSelect: () => useEditorStore.getState().ungroupSelected() },
+        ],
       ],
     },
-    // ── 帮助 ──（快捷键列表在后续任务接入）
     {
       key: 'help',
-      label: '帮助',
-      items: [{ label: '快捷键列表', onClick: () => setHotkeyOpen(true) }],
+      label: t('draw.menu.help'),
+      items: [[{ key: 'shortcuts', label: t('action.shortcuts'), onSelect: () => setHotkeyOpen(true) }]],
     },
   ]
 
-  return (
-    <div className="flex flex-col border-b border-[#e0e0e0] bg-[#f8f8f8] select-none">
-      {/* 菜单栏 */}
-      <div className="flex items-center h-8 px-4">
-        {getEditorBackHref() && (
-          <a
-            href={getEditorBackHref()!}
-            title="返回"
-            className="mr-3 flex size-6 shrink-0 items-center justify-center rounded-md text-[#666] transition-colors hover:bg-[#ececec] hover:text-[#333]"
-          >
-            <ArrowLeft size={16} />
-          </a>
-        )}
-        <span className="flex items-center font-semibold text-sm text-[#333] mr-4">
-          <img src={logoUrl} alt="易飞绘图 Logo" className="w-[18px] h-[18px] mr-1.5" draggable={false} />
-          易飞绘图
-        </span>
-        {menus.map((menu) => (
-          <MenuDropdown
-            key={menu.key}
-            label={menu.label}
-            items={menu.items}
-            open={openMenu === menu.key}
-            onOpenChange={(o) => setOpenMenu(o ? menu.key : null)}
-            openOnHover
-          />
-        ))}
-
-        {/* 行尾分享入口（菜单栏右侧留白处；仅宿主注入分享实现后出现） */}
-        {getDrawShareHandler() !== null && (
-          <>
+  const actions = (
+    <>
+      {getDrawShareHandler() !== null && (
+        <>
           <button
             type="button"
             onClick={openShare}
-            title="生成分享链接"
-            className="ml-auto flex h-6 items-center gap-1 rounded-md px-2 text-xs text-[#666] transition-colors hover:bg-[#ececec] hover:text-[#333]"
+            title={t('draw.share.title')}
+            className="flex h-7 items-center gap-1 rounded-md px-2 text-xs text-[#666] transition-colors hover:bg-[#ececec] hover:text-[#333]"
           >
             <Share2 size={13} />
-            分享
+            {t('shell.share')}
           </button>
           <button
             type="button"
             onClick={() => window.open('/contact', '_blank')}
-            title="问题反馈"
-            className="ml-1 flex h-6 items-center gap-1 rounded-md px-2 text-xs text-[#666] transition-colors hover:bg-[#ececec] hover:text-[#333]"
+            title={t('shell.feedback')}
+            className="flex h-7 items-center gap-1 rounded-md px-2 text-xs text-[#666] transition-colors hover:bg-[#ececec] hover:text-[#333]"
           >
             <MessageCircle size={13} />
-            反馈
+            {t('shell.feedback')}
           </button>
-          </>
-        )}
-      </div>
+        </>
+      )}
+    </>
+  )
+
+  return (
+    <div className="flex flex-col border-b border-[#e0e0e0] bg-[#f8f8f8] select-none">
+      <OfficeHeader
+        brand={branding === false ? false : (branding ?? { logo: logoUrl, name: t('draw.brand') })}
+        backHref={getEditorBackHref()}
+        menus={menus}
+        actions={actions}
+      />
 
       {/* 工具栏 */}
       <div className="flex items-center h-9 px-4 gap-0.5">
@@ -809,13 +835,13 @@ export function TopBar() {
         <div className="flex items-center gap-0.5">
           <IconButton
             icon={<Undo2 size={16} />}
-            title={`撤销 (${shortcutText('Z')})`}
+            title={`${t('action.undo')} (${shortcutText('Z')})`}
             onClick={handleUndo}
             disabled={!canUndo()}
           />
           <IconButton
             icon={<Redo2 size={16} />}
-            title={`重做 (${shortcutText('Z', true)} / ${shortcutText('Y')})`}
+            title={`${t('action.redo')} (${shortcutText('Z', true)} / ${shortcutText('Y')})`}
             onClick={handleRedo}
             disabled={!canRedo()}
           />
@@ -826,7 +852,7 @@ export function TopBar() {
         {/* 格式刷 */}
         <IconButton
           icon={<FormatBrush size={16} />}
-          title="格式刷"
+          title={t('draw.edit.formatBrush')}
           active={!!brushData}
           onClick={handleBrush}
           disabled={selectedIds.size === 0 || firstSelected == null}
@@ -838,21 +864,21 @@ export function TopBar() {
         <div className="flex items-center gap-0.5">
           <IconButton
             icon={<Bold size={16} />}
-            title={`加粗 (${shortcutText('B')})`}
+            title={`${t('draw.toolbar.bold')} (${shortcutText('B')})`}
             active={!!firstSelected?.fontStyle?.bold}
             onClick={() => handleFontToggle('bold')}
             disabled={selectedIds.size === 0}
           />
           <IconButton
             icon={<Italic size={16} />}
-            title={`斜体 (${shortcutText('I')})`}
+            title={`${t('draw.toolbar.italic')} (${shortcutText('I')})`}
             active={!!firstSelected?.fontStyle?.italic}
             onClick={() => handleFontToggle('italic')}
             disabled={selectedIds.size === 0}
           />
           <IconButton
             icon={<Underline size={16} />}
-            title={`下划线 (${shortcutText('U')})`}
+            title={`${t('draw.toolbar.underline')} (${shortcutText('U')})`}
             active={!!firstSelected?.fontStyle?.underline}
             onClick={() => handleFontToggle('underline')}
             disabled={selectedIds.size === 0}
@@ -873,7 +899,7 @@ export function TopBar() {
         />
 
         <div className="flex items-center gap-0.5">
-          <Tooltip text="连线类型" disabled={linkerToolbarDisabled}>
+          <Tooltip text={t('draw.toolbar.linkerType')} disabled={linkerToolbarDisabled}>
             <LineTypeDropdown
               currentType={currentLinkerType}
               disabled={linkerToolbarDisabled}
@@ -884,7 +910,7 @@ export function TopBar() {
               ]}
             />
           </Tooltip>
-          <Tooltip text="起点" disabled={linkerToolbarDisabled}>
+          <Tooltip text={t('draw.toolbar.startPoint')} disabled={linkerToolbarDisabled}>
             <ArrowStyleDropdown
               currentStyle={currentBeginArrow}
               direction="backward"
@@ -892,7 +918,7 @@ export function TopBar() {
               items={ARROW_STYLE_ITEMS}
             />
           </Tooltip>
-          <Tooltip text="终点" disabled={linkerToolbarDisabled}>
+          <Tooltip text={t('draw.toolbar.endPoint')} disabled={linkerToolbarDisabled}>
             <ArrowStyleDropdown
               currentStyle={currentEndArrow}
               disabled={linkerToolbarDisabled}
@@ -933,7 +959,7 @@ export function TopBar() {
           disabled={selectedIds.size === 0}
           items={[
             {
-              label: '置于顶层',
+              label: t('draw.arrange.front'),
               shortcut: layerShortcutText(']'),
               onClick: () => handleLayer('front'),
               disabled: selectedIds.size === 0,
@@ -946,7 +972,7 @@ export function TopBar() {
               ),
             },
             {
-              label: '置于底层',
+              label: t('draw.arrange.back'),
               shortcut: layerShortcutText('['),
               onClick: () => handleLayer('back'),
               disabled: selectedIds.size === 0,
@@ -959,7 +985,7 @@ export function TopBar() {
               ),
             },
             {
-              label: '上移一层',
+              label: t('draw.arrange.forward'),
               shortcut: layerShortcutText(']', true),
               onClick: () => handleLayer('forward'),
               disabled: selectedIds.size === 0,
@@ -972,7 +998,7 @@ export function TopBar() {
               ),
             },
             {
-              label: '下移一层',
+              label: t('draw.arrange.backward'),
               shortcut: layerShortcutText('[', true),
               onClick: () => handleLayer('backward'),
               disabled: selectedIds.size === 0,
@@ -992,14 +1018,14 @@ export function TopBar() {
         {/* 锁定 */}
         <IconButton
           icon={<Lock size={16} />}
-          title={`锁定`}
+          title={t('draw.arrange.lock')}
           onClick={handleLock}
           disabled={selectedIds.size === 0 || allLocked}
         />
         {/* 解锁 */}
         <IconButton
           icon={<Unlock size={16} />}
-          title={`解锁`}
+          title={t('draw.arrange.unlock')}
           onClick={handleUnlock}
           disabled={selectedIds.size === 0 || allUnlocked}
         />
@@ -1009,7 +1035,7 @@ export function TopBar() {
         {/* 连线工具（切换式：再点一次回选择工具，等价快捷键 L） */}
         <IconButton
           icon={<Link2 size={16} />}
-          title="连线工具"
+          title={t('draw.toolbar.linkerTool')}
           active={currentTool === 'linker'}
           onClick={() =>
             useEditorStore
@@ -1030,8 +1056,8 @@ export function TopBar() {
       {/* 重命名浮层 */}
       {renameOpen && (
         <PromptDialog
-          title="重命名文件"
-          defaultValue={page.title ?? '未命名图表'}
+          title={t('draw.dialog.renameFile')}
+          defaultValue={displayDocTitle(page.title, t)}
           onSubmit={(v) => {
             useEditorStore.getState().updatePage({ title: v })
             setRenameOpen(false)

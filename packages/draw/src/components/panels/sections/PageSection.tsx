@@ -1,10 +1,12 @@
 // 页面设置（无选中时显示；写 document.page）
+import { useI18n } from '@eflink-tech/office-kit'
 import { useEditorStore } from '@/store/editorStore'
 import { effectivePageSize } from '@/core/editor/grid'
 import { ColorButton } from '@/components/common/ColorPicker'
 import { NumField, Row, Section } from '../fields'
 
 export function PageSection() {
+  const { t } = useI18n()
   const page = useEditorStore((s) => s.document.page)
   const updatePage = useEditorStore((s) => s.updatePage)
 
@@ -19,37 +21,37 @@ export function PageSection() {
   }
 
   return (
-    <Section title="页面设置">
-      <Row label="宽度">
+    <Section title={t('draw.prop.section.page')}>
+      <Row label={t('draw.prop.widthLong')}>
         <NumField value={size.width} min={100} live onCommit={(v) => commitSize('width', v)} />
       </Row>
-      <Row label="高度">
+      <Row label={t('draw.prop.heightLong')}>
         <NumField value={size.height} min={100} live onCommit={(v) => commitSize('height', v)} />
       </Row>
-      <Row label="背景色">
+      <Row label={t('draw.prop.background')}>
         <ColorButton
           value={page.backgroundColor === 'transparent' ? null : page.backgroundColor}
           transparent
           onSelect={(rgb) => updatePage({ backgroundColor: rgb ?? 'transparent' })}
         />
       </Row>
-      <Row label="网格">
+      <Row label={t('draw.prop.grid')}>
         <label className="flex items-center gap-1 cursor-pointer">
           <input
             type="checkbox"
             checked={page.showGrid}
             onChange={(e) => updatePage({ showGrid: e.target.checked })}
           />
-          <span>显示网格</span>
+          <span>{t('draw.prop.showGrid')}</span>
         </label>
       </Row>
-      <Row label="网格大小">
-        <div className="flex gap-1">
+      <Row label={t('draw.prop.gridSize')}>
+        <div className="flex flex-wrap gap-1">
           {[
-            { label: '小', v: 10 },
-            { label: '正常', v: 15 },
-            { label: '大', v: 20 },
-            { label: '很大', v: 30 },
+            { label: t('draw.prop.sizeSmall'), v: 10 },
+            { label: t('draw.prop.sizeNormal'), v: 15 },
+            { label: t('draw.prop.sizeBig'), v: 20 },
+            { label: t('draw.prop.sizeHuge'), v: 30 },
           ].map((o) => (
             <button
               key={o.label}

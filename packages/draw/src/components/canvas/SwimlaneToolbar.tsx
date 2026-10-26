@@ -2,6 +2,7 @@
 // 可调泳道数、方向（垂直/水平）、阶段数、颜色（标题背景/泳道背景/边框颜色）；
 // 布局重建见 buildSwimlaneUpdate。
 import { AlignCenter, AlignLeft, AlignRight, Bold, ChevronDown, ChevronUp, Columns, Rows } from 'lucide-react'
+import { useI18n } from '@eflink-tech/office-kit'
 import { useEditorStore } from '@/store/editorStore'
 import { isLinker, type FontStyle } from '@/types'
 import { worldToScreen } from '@/core/editor/interaction'
@@ -56,6 +57,7 @@ function Stepper({
 }
 
 export function SwimlaneToolbar() {
+  const { t } = useI18n()
   // 订阅 viewport：平移/缩放时工具栏跟随图形
   useEditorStore((s) => s.viewport)
   const selectedIds = useEditorStore((s) => s.selectedIds)
@@ -89,10 +91,10 @@ export function SwimlaneToolbar() {
   const target = resolveTarget(el, activeTarget)
   const targetLabel =
     target.kind === 'title'
-      ? '标题'
+      ? t('draw.swimlane.title')
       : target.kind === 'head'
-        ? `二级标题 ${target.index + 1}`
-        : `泳道 ${target.index + 1}`
+        ? t('draw.swimlane.subTitle', { index: target.index + 1 })
+        : t('draw.swimlane.lane', { index: target.index + 1 })
   const targetColor =
     target.kind === 'title'
       ? el.titleColor ?? null
@@ -133,7 +135,7 @@ export function SwimlaneToolbar() {
       onMouseDown={(e) => e.stopPropagation()}
     >
       <Stepper
-        label="泳道"
+        label={t('draw.swimlane.laneCount')}
         value={layout.laneCount}
         min={MIN_LANES}
         max={MAX_LANES}
@@ -142,13 +144,13 @@ export function SwimlaneToolbar() {
       <div className="h-4 w-px bg-[#e5e5e5]" />
       <span
         className="flex items-center gap-1"
-        title="在画布上点击标题带 / 二级标题格 / 泳道即可切换目标"
+        title={t('draw.swimlane.pickHint')}
       >
         <span className="text-xs text-[#555]">{targetLabel}</span>
         <ColorButton value={targetColor} onSelect={setTargetColor} transparent />
       </span>
       <span className="flex items-center gap-1">
-        <span className="text-xs text-[#555]">边框</span>
+        <span className="text-xs text-[#555]">{t('draw.swimlane.border')}</span>
         <ColorButton
           value={el.lineStyle.lineColor ?? '50,50,50'}
           onSelect={setBorderColor}
@@ -157,8 +159,8 @@ export function SwimlaneToolbar() {
       {targetBlockFont && (
         <>
           <div className="h-4 w-px bg-[#e5e5e5]" />
-          <span className="flex items-center gap-1" title="当前目标的文字样式">
-            <span className="text-xs text-[#555]">文字</span>
+          <span className="flex items-center gap-1" title={t('draw.swimlane.textStyleHint')}>
+            <span className="text-xs text-[#555]">{t('draw.swimlane.text')}</span>
             <ColorButton
               value={targetBlockFont.color ?? null}
               onSelect={(rgb) => setTargetFont({ color: rgb ?? undefined })}
@@ -175,7 +177,7 @@ export function SwimlaneToolbar() {
             {(['left', 'center', 'right'] as const).map((al) => (
               <button
                 key={al}
-                title={{ left: '左对齐', center: '居中', right: '右对齐' }[al]}
+                title={{ left: t('draw.align.left'), center: t('draw.swimlane.alignCenter'), right: t('draw.align.right') }[al]}
                 className={btn(targetBlockFont.textAlign === al)}
                 onClick={() => setTargetFont({ textAlign: al })}
               >
@@ -183,7 +185,7 @@ export function SwimlaneToolbar() {
               </button>
             ))}
             <button
-              title="加粗"
+              title={t('draw.toolbar.bold')}
               className={btn(!!targetBlockFont.bold)}
               onClick={() => setTargetFont({ bold: !targetBlockFont.bold })}
             >
@@ -194,14 +196,14 @@ export function SwimlaneToolbar() {
       )}
       <div className="h-4 w-px bg-[#e5e5e5]" />
       <button
-        title="垂直泳道"
+        title={t('draw.swimlane.vertical')}
         className={btn(layout.orientation === 'v')}
         onClick={() => apply({ orientation: 'v' })}
       >
         <Columns size={14} />
       </button>
       <button
-        title="水平泳道"
+        title={t('draw.swimlane.horizontal')}
         className={btn(layout.orientation === 'h')}
         onClick={() => apply({ orientation: 'h' })}
       >
@@ -209,7 +211,7 @@ export function SwimlaneToolbar() {
       </button>
       <div className="h-4 w-px bg-[#e5e5e5]" />
       <Stepper
-        label="阶段"
+        label={t('draw.swimlane.stageCount')}
         value={layout.stageCount}
         min={MIN_STAGES}
         max={MAX_STAGES}

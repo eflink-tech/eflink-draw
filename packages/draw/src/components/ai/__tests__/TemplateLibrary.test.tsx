@@ -4,6 +4,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { TemplateLibrary } from '../TemplateLibrary'
 import { templateStore } from '../../../ai/db'
 
+
 // Mock templateStore
 vi.mock('../../../ai/db', () => ({
   templateStore: {

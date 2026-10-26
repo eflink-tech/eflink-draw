@@ -6,6 +6,7 @@ import { compressImage } from '../../../ai/imageCompressor'
 import { AIService } from '../../../ai/aiService'
 import { useUIStore } from '../../../store/uiStore'
 
+
 // Mock settingsStore
 vi.mock('../../../ai/db', () => ({
   settingsStore: {

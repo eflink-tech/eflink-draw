@@ -1,10 +1,12 @@
 // 度量组：X/Y/宽/高/角度（Enter/blur 提交；位置尺寸走 moveElements/resizeElement 自动联动连线重路由）
+import { useI18n } from '@eflink-tech/office-kit'
 import { useEditorStore } from '@/store/editorStore'
 import type { ElementInstance } from '@/types'
 import { selectedShapes } from '@/core/editor/styleOps'
 import { NumField, Row, Section } from '../fields'
 
 export function MetricSection({ first }: { first: ElementInstance }) {
+  const { t } = useI18n()
   const moveElements = useEditorStore((s) => s.moveElements)
   const resizeElement = useEditorStore((s) => s.resizeElement)
   const updateElement = useEditorStore((s) => s.updateElement)
@@ -17,22 +19,22 @@ export function MetricSection({ first }: { first: ElementInstance }) {
   }
 
   return (
-    <Section title="度量">
-      <Row label="X">
+    <Section title={t('draw.prop.section.metrics')}>
+      <Row label={t('draw.prop.x')}>
         <NumField
           value={Math.round(x)}
           live
           onCommit={(v) => applyAll((el) => moveElements([el.id], v - el.props.x, 0))}
         />
       </Row>
-      <Row label="Y">
+      <Row label={t('draw.prop.y')}>
         <NumField
           value={Math.round(y)}
           live
           onCommit={(v) => applyAll((el) => moveElements([el.id], 0, v - el.props.y))}
         />
       </Row>
-      <Row label="宽">
+      <Row label={t('draw.prop.width')}>
         <NumField
           value={Math.round(w)}
           min={20}
@@ -42,7 +44,7 @@ export function MetricSection({ first }: { first: ElementInstance }) {
           }
         />
       </Row>
-      <Row label="高">
+      <Row label={t('draw.prop.height')}>
         <NumField
           value={Math.round(h)}
           min={20}
@@ -52,7 +54,7 @@ export function MetricSection({ first }: { first: ElementInstance }) {
           }
         />
       </Row>
-      <Row label="角度">
+      <Row label={t('draw.prop.angle')}>
         {/* 已知例外：角度不走 moveElements/resizeElement，而是 updateElement 直改 props，
             不触发连线重路由——与画布旋转手柄一致的既有行为 */}
         <NumField

@@ -1,6 +1,7 @@
 // packages/draw/src/DrawEditor.tsx
 // 组件库主组件：整幅绘图编辑器（布局 + 画布 + AI 助手），挂载即自动恢复上次文档
 import { useEffect } from 'react'
+import { I18nProvider, normalizeLocale, type OfficeLocale } from '@eflink-tech/office-kit'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { TopBar } from '@/components/layout/TopBar'
 import { LeftPanel } from '@/components/layout/LeftPanel'
@@ -11,8 +12,34 @@ import { AIAssistantRoot } from '@/components/ai/AIAssistantRoot'
 import { AIChatPanel } from '@/components/ai/AIChatPanel'
 import { useEditorStore } from '@/store/editorStore'
 import { loadDocumentFromStorage, loadFromRemote } from '@/core/editor/persistence'
+import { DRAW_MESSAGES } from '@/i18n/messages'
+import { setDrawLocale } from '@/i18n/runtime'
 
-export function DrawEditor() {
+/** 品牌区配置：顶栏左上角的 logo 与产品名 */
+export interface DrawEditorBrand {
+  logo?: string;
+  name: string;
+}
+
+export interface DrawEditorProps {
+  /** 界面语言（zh-CN / en / es / pt-BR），默认 zh-CN */
+  locale?: OfficeLocale | string;
+  /** 品牌区（logo + 产品名）；不传则用默认「易飞绘图」 */
+  branding?: DrawEditorBrand | false;
+}
+
+export function DrawEditor({ locale, branding }: DrawEditorProps) {
+  const resolved = normalizeLocale(locale);
+  // 非 React 模块（store / AI / 文件操作）读取同一份语言
+  setDrawLocale(resolved);
+  return (
+    <I18nProvider locale={resolved} messages={DRAW_MESSAGES}>
+      <DrawEditorInner branding={branding} />
+    </I18nProvider>
+  );
+}
+
+function DrawEditorInner({ branding }: Omit<DrawEditorProps, 'locale'>) {
   // 启动自动恢复：先载入本地缓存（即时），再异步拉取远端覆盖（远端为权威数据源）
   useEffect(() => {
     const saved = loadDocumentFromStorage()
@@ -43,7 +70,7 @@ export function DrawEditor() {
   return (
     <>
       <AppLayout
-        topBar={<TopBar />}
+        topBar={<TopBar branding={branding} />}
         leftPanel={<LeftPanel />}
         canvas={<Canvas />}
         rightPanel={<RightPanel />}

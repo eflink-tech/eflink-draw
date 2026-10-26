@@ -1,5 +1,6 @@
 // src/ai/jsonParser.ts
 import { AIError, type AIAction, type AIResponse } from './types'
+import { drawT } from '@/i18n/runtime'
 
 /**
  * 单次响应允许的最大动作数上限。
@@ -180,5 +181,5 @@ export function parseAIResponse(input: string): AIResponse {
     }
   }
 
-  throw new AIError('AI 输出格式错误：无法解析 JSON 或缺少 actions 字段', 'invalid_format')
+  throw new AIError(drawT('draw.err.invalidOutput'), 'invalid_format')
 }

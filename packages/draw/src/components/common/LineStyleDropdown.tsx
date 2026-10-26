@@ -1,5 +1,6 @@
 // 线条样式下拉组件（分体式按钮 + 样式预览菜单），顶部工具栏与属性面板共用
 import { useEffect, useRef, useState } from 'react'
+import { useI18n } from '@eflink-tech/office-kit'
 import { Tooltip } from '@/components/common/Tooltip'
 
 export type LineStyleValue = 'solid' | 'dashed' | 'dot' | 'dotdash'
@@ -42,6 +43,7 @@ export function LineStyleDropdown({ currentStyle, items }: {
   currentStyle: string
   items: LineStyleItem[]
 }) {
+  const { t } = useI18n()
   const [open, setOpen] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
 
@@ -59,7 +61,7 @@ export function LineStyleDropdown({ currentStyle, items }: {
   const style = currentStyle as LineStyleValue
 
   return (
-    <Tooltip text="线条样式">
+    <Tooltip text={t('draw.toolbar.lineStyleDropdown')}>
       <div className="relative inline-block" ref={rootRef}>
         <button
           className={`inline-flex items-center border rounded transition-colors cursor-pointer disabled:opacity-50 ${

@@ -1,8 +1,10 @@
 // src/components/ai/HistoryDialog.tsx
 // 历史对话列表面板：展示 IndexedDB 中的对话记录，支持选择加载与删除。
 import { useCallback, useEffect, useState } from 'react'
+import { useI18n } from '@eflink-tech/office-kit'
 import { conversationStore } from '../../ai/db'
 import type { Conversation } from '../../ai/types'
+import { drawT } from '@/i18n/runtime'
 
 interface HistoryDialogProps {
   /** 当前正在浏览的对话 id（高亮显示） */
@@ -14,10 +16,11 @@ interface HistoryDialogProps {
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message
-  return '读取历史对话失败'
+  return drawT('draw.ai.historyLoadFailed')
 }
 
 export function HistoryDialog({ currentId, onSelect, onClose }: HistoryDialogProps) {
+  const { t } = useI18n()
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -78,14 +81,14 @@ export function HistoryDialog({ currentId, onSelect, onClose }: HistoryDialogPro
           borderBottom: '1px solid #eee',
         }}
       >
-        <strong style={{ fontSize: '13px' }}>历史对话</strong>
-        <button type="button" aria-label="关闭历史" onClick={onClose} style={{ border: 'none', background: 'none', cursor: 'pointer' }}>
+        <strong style={{ fontSize: '13px' }}>{t('draw.ai.history')}</strong>
+        <button type="button" aria-label={t('draw.ai.closeHistory')} onClick={onClose} style={{ border: 'none', background: 'none', cursor: 'pointer' }}>
           ✕
         </button>
       </div>
 
       <div role="list" style={{ flex: 1, overflowY: 'auto' }}>
-        {loading && <div style={{ padding: '12px', color: '#999', fontSize: '13px' }}>加载中...</div>}
+        {loading && <div style={{ padding: '12px', color: '#999', fontSize: '13px' }}>{t('draw.ai.loading')}</div>}
         {error && (
           <div role="alert" style={{ padding: '12px', color: '#b00', fontSize: '12px' }}>
             {error}
@@ -93,21 +96,22 @@ export function HistoryDialog({ currentId, onSelect, onClose }: HistoryDialogPro
         )}
         {!loading && !error && conversations.length === 0 && (
           <div style={{ padding: '16px', textAlign: 'center', color: '#999', fontSize: '13px' }}>
-            暂无历史对话
+            {t('draw.ai.historyEmpty')}
           </div>
         )}
         {conversations.map((conv) => (
           <div key={conv.id} role="listitem" style={{ position: 'relative' }}>
             <button type="button" style={listItemStyle(conv.id === currentId)} onClick={() => onSelect(conv.id)}>
-              <span style={{ fontWeight: 500 }}>{conv.title || '未命名对话'}</span>
+              <span style={{ fontWeight: 500 }}>{conv.title || t('draw.ai.untitledConversation')}</span>
               <br />
               <span style={{ color: '#888', fontSize: '11px' }}>
-                {new Date(conv.updatedAt).toLocaleString()} · {conv.messages.length} 条消息
+                {new Date(conv.updatedAt).toLocaleString()} ·{' '}
+                {t('draw.ai.messageCount', { count: conv.messages.length })}
               </span>
             </button>
             <button
               type="button"
-              aria-label={`删除对话 ${conv.title || conv.id}`}
+              aria-label={t('draw.ai.deleteConversationAria', { title: conv.title || conv.id })}
               onClick={() => handleDelete(conv.id)}
               style={{
                 position: 'absolute',

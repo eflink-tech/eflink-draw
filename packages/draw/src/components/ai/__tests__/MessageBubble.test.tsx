@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react'
 import { MessageBubble } from '../MessageBubble'
 import type { ConversationMessage } from '../../../ai/types'
 
+
 function makeMessage(overrides: Partial<ConversationMessage> = {}): ConversationMessage {
   return {
     id: 'msg-1',

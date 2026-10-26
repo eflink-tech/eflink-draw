@@ -11,6 +11,7 @@ import { createEmptyDocument, type ElementInstance } from '@/types'
 // 副作用导入：向 shapeRegistry 注册全部图形（生产环境由画布组件触发，测试需显式引入）
 import '@/core/schema/shapes'
 
+
 vi.mock('../../../ai/db', () => ({
   settingsStore: {
     getSettings: vi.fn(),

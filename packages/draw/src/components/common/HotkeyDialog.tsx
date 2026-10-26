@@ -2,8 +2,10 @@
 // 快捷键分类弹窗（帮助→快捷键列表）。数据与 useEditorShortcuts 行为一致；
 // Mac 显示 ⌘ 修饰，其余显示 Ctrl。
 import { useEffect } from 'react'
+import { useI18n } from '@eflink-tech/office-kit'
 
 export interface HotkeyGroup {
+  /** i18n 消息键，渲染时经 t() 解析 */
   group: string
   items: { desc: string; keys: string }[]
 }
@@ -15,57 +17,51 @@ const SHIFT = IS_MAC ? '⇧' : 'Shift+'
 
 export const HOTKEY_GROUPS: HotkeyGroup[] = [
   {
-    group: '编辑',
+    group: 'draw.menu.edit',
     items: [
-      { desc: '撤销', keys: `${MOD}Z` },
-      { desc: '重做', keys: `${MOD}${SHIFT}Z / ${MOD}Y` },
-      { desc: '剪切 / 复制 / 粘贴', keys: `${MOD}X / ${MOD}C / ${MOD}V` },
-      { desc: '复制副本', keys: `${MOD}D` },
-      { desc: '全选', keys: `${MOD}A` },
-      { desc: '删除', keys: 'Delete / Backspace' },
+      { desc: 'action.undo', keys: `${MOD}Z` },
+      { desc: 'action.redo', keys: `${MOD}${SHIFT}Z / ${MOD}Y` },
+      { desc: 'draw.hotkey.cutCopyPaste', keys: `${MOD}X / ${MOD}C / ${MOD}V` },
+      { desc: 'draw.hotkey.duplicate', keys: `${MOD}D` },
+      { desc: 'action.selectAll', keys: `${MOD}A` },
+      { desc: 'action.delete', keys: 'Delete / Backspace' },
     ],
   },
   {
-    group: '文字',
+    group: 'draw.hotkey.text',
     items: [
-      { desc: '加粗 / 斜体 / 下划线', keys: `${MOD}B / ${MOD}I / ${MOD}U` },
-      { desc: '格式刷', keys: `${MOD}${SHIFT}B` },
+      { desc: 'draw.hotkey.boldItalicUnderline', keys: `${MOD}B / ${MOD}I / ${MOD}U` },
+      { desc: 'draw.edit.formatBrush', keys: `${MOD}${SHIFT}B` },
     ],
   },
   {
-    group: '层级',
+    group: 'draw.hotkey.layers',
     items: [
-      {
-        desc: '置于顶层 / 底层',
-        keys: `${MOD}] / ${MOD}[`,
-      },
-      {
-        desc: '上移 / 下移一层',
-        keys: IS_MAC ? `⌥] / ⌥[` : `Alt+] / Alt+[`,
-      },
+      { desc: 'draw.hotkey.frontBack', keys: `${MOD}] / ${MOD}[` },
+      { desc: 'draw.hotkey.stepLayers', keys: IS_MAC ? `⌥] / ⌥[` : `Alt+] / Alt+[` },
     ],
   },
   {
-    group: '排列',
+    group: 'draw.menu.arrange',
     items: [
-      { desc: '锁定 / 解锁', keys: `${MOD}L / ${MOD}${SHIFT}L` },
-      { desc: '组合 / 取消组合', keys: `${MOD}G / ${MOD}${SHIFT}G` },
+      { desc: 'draw.hotkey.lockUnlock', keys: `${MOD}L / ${MOD}${SHIFT}L` },
+      { desc: 'draw.hotkey.groupUngroup', keys: `${MOD}G / ${MOD}${SHIFT}G` },
     ],
   },
   {
-    group: '工具',
+    group: 'draw.hotkey.tools',
     items: [
-      { desc: '文本工具', keys: 'T' },
-      { desc: '连线工具', keys: 'L' },
-      { desc: '空格平移（松开进文字编辑）', keys: 'Space' },
+      { desc: 'draw.hotkey.textTool', keys: 'T' },
+      { desc: 'draw.toolbar.linkerTool', keys: 'L' },
+      { desc: 'draw.hotkey.panSpace', keys: 'Space' },
     ],
   },
   {
-    group: '视图',
+    group: 'draw.menu.view',
     items: [
-      { desc: '放大 / 缩小', keys: `${MOD}+ / ${MOD}-` },
-      { desc: '重置缩放', keys: `${MOD}0` },
-      { desc: '保存', keys: `${MOD}S` },
+      { desc: 'draw.hotkey.zoomInOut', keys: `${MOD}+ / ${MOD}-` },
+      { desc: 'action.zoomReset', keys: `${MOD}0` },
+      { desc: 'action.save', keys: `${MOD}S` },
     ],
   },
 ]
@@ -75,6 +71,7 @@ interface HotkeyDialogProps {
 }
 
 export function HotkeyDialog({ onClose }: HotkeyDialogProps) {
+  const { t } = useI18n()
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
@@ -90,21 +87,21 @@ export function HotkeyDialog({ onClose }: HotkeyDialogProps) {
     >
       <div className="max-h-[80vh] w-[380px] overflow-y-auto rounded-lg bg-white p-5 shadow-xl">
         <div className="mb-4 flex items-center justify-between">
-          <span className="text-sm font-medium text-[#333]">快捷键列表</span>
+          <span className="text-sm font-medium text-[#333]">{t('draw.hotkey.title')}</span>
           <button
             type="button"
             className="rounded px-2 py-0.5 text-xs border border-[#ddd] hover:bg-gray-50"
             onClick={onClose}
           >
-            关闭
+            {t('action.close')}
           </button>
         </div>
         {HOTKEY_GROUPS.map((g) => (
           <div key={g.group} className="mb-3">
-            <div className="mb-1 text-[11px] font-medium text-[#999]">{g.group}</div>
+            <div className="mb-1 text-[11px] font-medium text-[#999]">{t(g.group)}</div>
             {g.items.map((it) => (
               <div key={it.desc} className="flex items-center justify-between py-1 text-xs">
-                <span className="text-[#333]">{it.desc}</span>
+                <span className="text-[#333]">{t(it.desc)}</span>
                 <span className="text-[11px] text-gray-400">{it.keys}</span>
               </div>
             ))}

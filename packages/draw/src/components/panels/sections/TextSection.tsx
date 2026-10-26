@@ -1,4 +1,5 @@
 // 文本组：字体/字号/颜色/B/I/U/水平对齐/垂直对齐（图形作用于 fontStyle；连线作用于 linker.fontStyle）
+import { useI18n } from '@eflink-tech/office-kit'
 import type { ElementInstance, FontStyle, LinkerInstance } from '@/types'
 import { DEFAULT_FONT_SIZE, isLinker } from '@/types'
 import { ColorButton } from '@/components/common/ColorPicker'
@@ -8,10 +9,11 @@ import { NumField, Row, Section, ToggleButton } from '../fields'
 
 const SELECT_CLS = 'w-24 h-6 px-1.5 border border-[#ddd] rounded text-xs bg-white'
 
-const H_ALIGN_LABEL = ['左', '中', '右'] as const
-const V_ALIGN_LABEL = ['顶', '中', '底'] as const
+const H_ALIGN_KEYS = ['draw.prop.alignLeft', 'draw.prop.alignCenter', 'draw.prop.alignRight'] as const
+const V_ALIGN_KEYS = ['draw.prop.alignTop', 'draw.prop.alignMiddle', 'draw.prop.alignBottom'] as const
 
 export function TextSection({ first }: { first: ElementInstance | LinkerInstance }) {
+  const { t } = useI18n()
   const linkerMode = isLinker(first)
   // 连线无对齐概念（恒居中）→ 隐藏对齐两行；
   // 泳道族：当前文字目标（标题/二级标题）有块级覆盖时回显合并值
@@ -24,35 +26,35 @@ export function TextSection({ first }: { first: ElementInstance | LinkerInstance
   }
 
   return (
-    <Section title="文本">
-      <Row label="字体">
+    <Section title={t('draw.prop.section.text')}>
+      <Row label={t('draw.prop.fontFamily')}>
         <select
           value={font.fontFamily ?? DEFAULT_FONT_VALUE}
           onChange={(e) => patchFont({ fontFamily: e.target.value })}
           className={SELECT_CLS}
         >
           {FONT_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value}>{o.label}</option>
+            <option key={o.value} value={o.value}>{o.labelKey ? t(o.labelKey) : o.label}</option>
           ))}
         </select>
       </Row>
       {!linkerMode && (
-        <Row label="方向">
-          <div className="flex gap-1">
+        <Row label={t('draw.prop.direction')}>
+          <div className="flex flex-wrap gap-1">
             <ToggleButton
-              label="横"
+              label={t('draw.prop.horizontalText')}
               active={(font.orientation ?? 'horizontal') === 'horizontal'}
               onClick={() => patchFont({ orientation: 'horizontal' })}
             />
             <ToggleButton
-              label="竖"
+              label={t('draw.prop.verticalText')}
               active={font.orientation === 'vertical'}
               onClick={() => patchFont({ orientation: 'vertical' })}
             />
           </div>
         </Row>
       )}
-      <Row label="字号">
+      <Row label={t('draw.prop.fontSize')}>
         <NumField
           value={font.size ?? DEFAULT_FONT_SIZE}
           min={8}
@@ -62,13 +64,13 @@ export function TextSection({ first }: { first: ElementInstance | LinkerInstance
           live
         />
       </Row>
-      <Row label="颜色">
+      <Row label={t('draw.prop.color')}>
         <ColorButton
           value={font.color ?? '50,50,50'}
           onSelect={(rgb) => patchFont({ color: rgb ?? '50,50,50' })}
         />
       </Row>
-      <Row label="样式">
+      <Row label={t('draw.prop.style')}>
         <div className="flex gap-1">
           <ToggleButton label="B" active={!!font.bold} onClick={() => patchFont({ bold: !font.bold })} />
           <ToggleButton
@@ -85,24 +87,24 @@ export function TextSection({ first }: { first: ElementInstance | LinkerInstance
       </Row>
       {!linkerMode && (
         <>
-          <Row label="水平">
-            <div className="flex gap-1">
+          <Row label={t('draw.prop.alignH')}>
+            <div className="flex flex-wrap gap-1">
               {(['left', 'center', 'right'] as const).map((a, i) => (
                 <ToggleButton
                   key={a}
-                  label={H_ALIGN_LABEL[i]}
+                  label={t(H_ALIGN_KEYS[i]!)}
                   active={(font.textAlign ?? 'center') === a}
                   onClick={() => patchFont({ textAlign: a })}
                 />
               ))}
             </div>
           </Row>
-          <Row label="垂直">
-            <div className="flex gap-1">
+          <Row label={t('draw.prop.alignV')}>
+            <div className="flex flex-wrap gap-1">
               {(['top', 'middle', 'bottom'] as const).map((a, i) => (
                 <ToggleButton
                   key={a}
-                  label={V_ALIGN_LABEL[i]}
+                  label={t(V_ALIGN_KEYS[i]!)}
                   active={(font.vAlign ?? 'middle') === a}
                   onClick={() => patchFont({ vAlign: a })}
                 />

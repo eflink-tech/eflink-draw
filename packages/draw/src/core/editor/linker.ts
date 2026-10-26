@@ -736,25 +736,27 @@ export function applyMemorizedLinkerStyle(inst: LinkerInstance): void {
 export interface LinkerStylePreset {
   value: string
   label: string
+  /** i18n 消息键，属性面板渲染时用 t(labelKey) 取本地化标签 */
+  labelKey: string
   patch: { lineStyle: 'solid' | 'dashed' | 'dot' | 'dotdash'; beginArrowStyle: ArrowStyle; endArrowStyle: ArrowStyle }
 }
 
 /** UML 关系预设：一键写入线型与起止箭头（绘制层枚举已全量支持） */
 export const UML_RELATION_PRESETS: LinkerStylePreset[] = [
-  { value: 'association', label: '关联', patch: { lineStyle: 'solid', beginArrowStyle: 'none', endArrowStyle: 'solidArrow' } },
-  { value: 'directed', label: '定向关联', patch: { lineStyle: 'solid', beginArrowStyle: 'none', endArrowStyle: 'normal' } },
-  { value: 'dependency', label: '依赖', patch: { lineStyle: 'dashed', beginArrowStyle: 'none', endArrowStyle: 'normal' } },
-  { value: 'realization', label: '实现', patch: { lineStyle: 'dashed', beginArrowStyle: 'none', endArrowStyle: 'dashedArrow' } },
-  { value: 'generalization', label: '泛化', patch: { lineStyle: 'solid', beginArrowStyle: 'none', endArrowStyle: 'dashedArrow' } },
-  { value: 'aggregation', label: '聚合', patch: { lineStyle: 'solid', beginArrowStyle: 'dashedDiamond', endArrowStyle: 'none' } },
-  { value: 'composition', label: '组合', patch: { lineStyle: 'solid', beginArrowStyle: 'solidDiamond', endArrowStyle: 'none' } },
+  { value: 'association', label: '关联', labelKey: 'draw.link.association', patch: { lineStyle: 'solid', beginArrowStyle: 'none', endArrowStyle: 'solidArrow' } },
+  { value: 'directed', label: '定向关联', labelKey: 'draw.link.directed', patch: { lineStyle: 'solid', beginArrowStyle: 'none', endArrowStyle: 'normal' } },
+  { value: 'dependency', label: '依赖', labelKey: 'draw.link.dependency', patch: { lineStyle: 'dashed', beginArrowStyle: 'none', endArrowStyle: 'normal' } },
+  { value: 'realization', label: '实现', labelKey: 'draw.link.realization', patch: { lineStyle: 'dashed', beginArrowStyle: 'none', endArrowStyle: 'dashedArrow' } },
+  { value: 'generalization', label: '泛化', labelKey: 'draw.link.generalization', patch: { lineStyle: 'solid', beginArrowStyle: 'none', endArrowStyle: 'dashedArrow' } },
+  { value: 'aggregation', label: '聚合', labelKey: 'draw.link.aggregation', patch: { lineStyle: 'solid', beginArrowStyle: 'dashedDiamond', endArrowStyle: 'none' } },
+  { value: 'composition', label: '组合', labelKey: 'draw.link.composition', patch: { lineStyle: 'solid', beginArrowStyle: 'solidDiamond', endArrowStyle: 'none' } },
 ]
 
 /** 时序消息类型预设 */
 export const SEQ_MESSAGE_PRESETS: LinkerStylePreset[] = [
-  { value: 'sync', label: '同步消息', patch: { lineStyle: 'solid', beginArrowStyle: 'none', endArrowStyle: 'solidArrow' } },
-  { value: 'async', label: '异步消息', patch: { lineStyle: 'solid', beginArrowStyle: 'none', endArrowStyle: 'normal' } },
-  { value: 'return', label: '返回消息', patch: { lineStyle: 'dashed', beginArrowStyle: 'none', endArrowStyle: 'normal' } },
+  { value: 'sync', label: '同步消息', labelKey: 'draw.link.sync', patch: { lineStyle: 'solid', beginArrowStyle: 'none', endArrowStyle: 'solidArrow' } },
+  { value: 'async', label: '异步消息', labelKey: 'draw.link.async', patch: { lineStyle: 'solid', beginArrowStyle: 'none', endArrowStyle: 'normal' } },
+  { value: 'return', label: '返回消息', labelKey: 'draw.link.return', patch: { lineStyle: 'dashed', beginArrowStyle: 'none', endArrowStyle: 'normal' } },
 ]
 
 /** 反向匹配：连线当前样式命中的预设 value；无命中返回 ''（自定义） */

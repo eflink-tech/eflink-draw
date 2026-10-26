@@ -5,9 +5,14 @@ import './styles.css'
 
 // 组件
 export { DrawEditor } from './DrawEditor'
+export type { DrawEditorProps, DrawEditorBrand } from './DrawEditor'
 export { setDrawRemoteStore } from './core/editor/persistence'
 export { setEditorBackHref } from './core/editor/chrome'
 export type { DrawRemoteStore } from './core/editor/persistence'
+
+// 多语言：界面文案字典 + 素材标题（图形库/分类/模板）查表翻译
+export { DRAW_MESSAGES, setDrawLocale, getDrawLocale, drawT, translateTitle } from './i18n'
+export type { OfficeLocale } from '@eflink-tech/office-kit'
 
 // 分享桥接：宿主注入分享实现（编辑器分享按钮调用）
 export { setDrawShareHandler } from './core/share/shareBridge'

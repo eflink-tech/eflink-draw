@@ -2,6 +2,7 @@
 // 纯预设色板（灰阶 + 9×12 彩色矩阵，共 120 色）+ HEX 输入 + 透明按钮；
 // 从 ColorPicker 抽出，供 ColorPicker 弹层与菜单"背景颜色"子菜单共用。
 import { useState } from 'react'
+import { useI18n } from '@eflink-tech/office-kit'
 import { COLOR_ROWS, GRAY_PALETTE, hexToRgb, rgbToHex } from '@/core/utils/color'
 
 interface ColorGridProps {
@@ -15,6 +16,7 @@ interface ColorGridProps {
 }
 
 export function ColorGrid({ value, onSelect, transparent = false, onLiveSelect }: ColorGridProps) {
+  const { t } = useI18n()
   const [hex, setHex] = useState(value ? rgbToHex(value).slice(1) : '')
 
   const applyHex = (): void => {
@@ -77,7 +79,7 @@ export function ColorGrid({ value, onSelect, transparent = false, onLiveSelect }
             onMouseDown={(e) => e.preventDefault()}
             onClick={() => onSelect(null)}
           >
-            透明
+            {t('draw.color.transparent')}
           </button>
         )}
       </div>

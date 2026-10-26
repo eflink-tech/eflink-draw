@@ -1,9 +1,10 @@
 // src/core/editor/fileOps.ts
 // 文件菜单能力：导入 JSON 解析 / 下载触发 / 导出文件名清洗。
 // 纯函数便于单测；浏览器 DOM 操作集中在 triggerDownload。
-import type { DocumentData } from '@/types'
+import { DEFAULT_PAGE_TITLE, type DocumentData } from '@/types'
 import { isDocumentData } from './persistence'
 import { networkGroupsOfShapes } from '@/core/schema/shapes/networkLoader'
+import { drawT } from '@/i18n/runtime'
 
 /** 解析导入文件文本为 DocumentData；坏 JSON / 结构不完整返回 null */
 export function parseDocumentFile(text: string): DocumentData | null {
@@ -28,13 +29,17 @@ export function triggerDownload(dataUrl: string, filename: string): void {
 /** 由页面标题生成导出文件名（清洗非法字符 / 截断 / 空则默认名） */
 export function buildExportFileName(title: string): string {
   const clean = title.trim().replace(/[\\/:*?"<>|]/g, '').slice(0, 60)
-  return `${clean || '未命名图表'}.png`
+  // 未改名的文档用默认标题：导出文件名需跟随当前 locale
+  const base = clean && clean !== DEFAULT_PAGE_TITLE ? clean : drawT('draw.untitled')
+  return `${base}.png`
 }
 
 /** 由页面标题生成 .efd.json 导出文件名（清洗规则同上） */
 export function buildExportFileNameEfd(title: string): string {
   const clean = title.trim().replace(/[\\/:*?"<>|]/g, '').slice(0, 60)
-  return `${clean || '未命名图表'}.efd.json`
+  // 未改名的文档用默认标题：导出文件名需跟随当前 locale
+  const base = clean && clean !== DEFAULT_PAGE_TITLE ? clean : drawT('draw.untitled')
+  return `${base}.efd.json`
 }
 
 /** 将 DocumentData 序列化为 .efd.json 文件内容（格式化便于阅读与版本对比） */

@@ -2,6 +2,7 @@
 // 可切换语言标注（仅标注，不做语法高亮）、字号、明暗主题，并一键复制代码文本。
 import { useEffect, useRef, useState } from 'react'
 import { Check, Copy } from 'lucide-react'
+import { useI18n } from '@eflink-tech/office-kit'
 import { useEditorStore } from '@/store/editorStore'
 import { isLinker } from '@/types'
 import { worldToScreen } from '@/core/editor/interaction'
@@ -30,6 +31,7 @@ const THEME_COLORS = {
 const selCls = 'max-w-[110px] cursor-pointer appearance-none bg-transparent text-xs text-[#333] outline-none'
 
 export function CodeBlockToolbar() {
+  const { t } = useI18n()
   // 订阅 viewport：平移/缩放时工具栏跟随图形
   useEditorStore((s) => s.viewport)
   const selectedIds = useEditorStore((s) => s.selectedIds)
@@ -76,7 +78,7 @@ export function CodeBlockToolbar() {
     >
       <select
         className={selCls}
-        title="代码语言"
+        title={t('draw.code.language')}
         value={el.codeLanguage ?? 'plaintext'}
         onChange={(e) => useEditorStore.getState().updateElement(el.id, { codeLanguage: e.target.value })}
       >
@@ -87,7 +89,7 @@ export function CodeBlockToolbar() {
       <div className="h-4 w-px bg-[#e5e5e5]" />
       <select
         className={selCls}
-        title="字号"
+        title={t('draw.prop.fontSize')}
         value={el.fontStyle.size ?? 13}
         onChange={(e) =>
           useEditorStore.getState().updateElement(el.id, {
@@ -102,7 +104,7 @@ export function CodeBlockToolbar() {
       <div className="h-4 w-px bg-[#e5e5e5]" />
       <select
         className={selCls}
-        title="主题"
+        title={t('draw.code.theme')}
         value={dark ? 'dark' : 'light'}
         onChange={(e) => setTheme(e.target.value as 'light' | 'dark')}
       >
@@ -111,7 +113,7 @@ export function CodeBlockToolbar() {
       </select>
       <div className="h-4 w-px bg-[#e5e5e5]" />
       <button
-        title={copied ? '已复制' : '复制代码'}
+        title={copied ? t('draw.share.copied') : t('draw.code.copy')}
         className="rounded p-1 text-[#666] hover:bg-[#f0f0f0]"
         onClick={copyCode}
       >

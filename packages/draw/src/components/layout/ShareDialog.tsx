@@ -1,6 +1,7 @@
 // 分享弹窗：调用宿主注入的分享实现生成链接，展示并支持复制
 // 分享内容以点击"分享"时刻的画板快照为准
 import { useEffect, useRef, useState, type JSX } from 'react';
+import { useI18n } from '@eflink-tech/office-kit';
 import { Check, Copy, Loader2, RefreshCw, Share2, TriangleAlert } from 'lucide-react';
 import { getDrawShareHandler } from '../../core/share/shareBridge';
 import type { DrawShareResult } from '../../core/share/shareBridge';
@@ -38,6 +39,7 @@ async function copyText(text: string): Promise<boolean> {
 }
 
 export function ShareDialog({ open, doc, onClose }: ShareDialogProps): JSX.Element | null {
+  const { t } = useI18n();
   const [state, setState] = useState<ShareState>({ phase: 'loading' });
   const [copied, setCopied] = useState(false);
   // 分享结果（链接 + 宿主业务文案）与复制态
@@ -60,7 +62,7 @@ export function ShareDialog({ open, doc, onClose }: ShareDialogProps): JSX.Eleme
     const handler = getDrawShareHandler();
     const target = docRef.current;
     if (!handler || !target) {
-      setState({ phase: 'error', message: '当前环境不支持分享' });
+      setState({ phase: 'error', message: t('draw.share.unsupported') });
       return;
     }
     void handler(target)
@@ -72,7 +74,7 @@ export function ShareDialog({ open, doc, onClose }: ShareDialogProps): JSX.Eleme
       })
       .catch((err: unknown) => {
         if (!cancelled) {
-          setState({ phase: 'error', message: err instanceof Error ? err.message : '分享失败，请稍后重试' });
+          setState({ phase: 'error', message: err instanceof Error ? err.message : t('draw.share.failed') });
         }
       });
 
@@ -125,7 +127,7 @@ export function ShareDialog({ open, doc, onClose }: ShareDialogProps): JSX.Eleme
           <div className="flex items-center gap-2">
             <Share2 size={16} className="text-[#666]" />
             <h2 id="draw-share-dialog-title" className="text-base font-semibold text-[#333]">
-              分享画板
+              {t('draw.share.title')}
             </h2>
           </div>
         </div>
@@ -134,7 +136,7 @@ export function ShareDialog({ open, doc, onClose }: ShareDialogProps): JSX.Eleme
           {state.phase === 'loading' && (
             <div className="flex items-center justify-center gap-2 py-8 text-sm text-[#666]">
               <Loader2 size={16} className="animate-spin" />
-              正在生成分享链接...
+              {t('draw.share.generating')}
             </div>
           )}
 
@@ -148,7 +150,7 @@ export function ShareDialog({ open, doc, onClose }: ShareDialogProps): JSX.Eleme
                 className="inline-flex items-center gap-1.5 rounded-md border border-[#ddd] px-3 py-1.5 text-sm text-[#333] hover:bg-[#f8f8f8]"
               >
                 <RefreshCw size={14} />
-                重试
+                {t('draw.share.retry')}
               </button>
             </div>
           )}
@@ -161,7 +163,7 @@ export function ShareDialog({ open, doc, onClose }: ShareDialogProps): JSX.Eleme
                   readOnly
                   value={result.url}
                   onFocus={(e) => e.currentTarget.select()}
-                  aria-label="分享链接"
+                  aria-label={t('draw.share.link')}
                   className="min-w-0 flex-1 rounded-md border border-[#ddd] bg-[#f8f8f8] px-3 py-2 text-sm text-[#333] focus:outline-none"
                 />
                 <button
@@ -172,7 +174,7 @@ export function ShareDialog({ open, doc, onClose }: ShareDialogProps): JSX.Eleme
                   }`}
                 >
                   {copied ? <Check size={14} /> : <Copy size={14} />}
-                  {copied ? '已复制' : '复制'}
+                  {copied ? t('draw.share.copied') : t('draw.share.copy')}
                 </button>
               </div>
               {result.tips && result.tips.length > 0 && (
@@ -192,7 +194,7 @@ export function ShareDialog({ open, doc, onClose }: ShareDialogProps): JSX.Eleme
             onClick={onCloseRef.current}
             className="rounded-md bg-[#7c5cff] px-4 py-1.5 text-sm font-medium text-white hover:bg-[#6847e6]"
           >
-            完成
+            {t('draw.share.done')}
           </button>
         </div>
       </div>

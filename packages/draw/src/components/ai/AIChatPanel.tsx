@@ -18,18 +18,20 @@ import { compressImage } from '../../ai/imageCompressor'
 import { stripJsonBlocks } from '../../ai/stripJsonBlocks'
 import { computeFitToPage } from '../../ai/fitToPage'
 import { AI_TEMPLATE_SELECTED, AI_OPEN_SETTINGS } from '@/ai/events'
+import { useI18n } from '@eflink-tech/office-kit'
+import { drawT } from '@/i18n/runtime'
 
 /** 未知异常转用户可读消息 */
 function getUserErrorMessage(error: unknown): string {
   if (error instanceof Error && error.message) return error.message
-  return String(error ?? '未知错误')
+  return String(error ?? drawT('draw.ai.error.unknown'))
 }
 
 function readFileAsDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.onload = () => resolve(reader.result as string)
-    reader.onerror = () => reject(new Error('文件读取失败'))
+    reader.onerror = () => reject(new Error(drawT('draw.ai.error.fileRead')))
     reader.readAsDataURL(file)
   })
 }
@@ -38,7 +40,7 @@ function decodeImageDataUrl(dataUrl: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image()
     img.onload = () => resolve(img)
-    img.onerror = () => reject(new Error('图片加载失败'))
+    img.onerror = () => reject(new Error(drawT('draw.ai.error.imageDecode')))
     img.src = dataUrl
   })
 }
@@ -95,19 +97,28 @@ function buildExecutorStore(): ActionExecutorStore {
 function buildExecutionSummary(result: ExecutionResult): string {
   const parts: string[] = []
   const applied: string[] = []
-  if (result.added.length > 0) applied.push(`新增 ${result.added.length}`)
-  if (result.updated.length > 0) applied.push(`修改 ${result.updated.length}`)
+  if (result.added.length > 0) applied.push(drawT('draw.ai.added', { count: result.added.length }))
+  if (result.updated.length > 0)
+    applied.push(drawT('draw.ai.updated', { count: result.updated.length }))
   const deletedTotal = result.deleted.elements
   if (deletedTotal > 0) {
-    const cascade =
-      result.deleted.cascadeLinkers > 0 ? `（级联连线 ${result.deleted.cascadeLinkers}）` : ''
-    applied.push(`删除 ${deletedTotal}${cascade}`)
+    applied.push(
+      result.deleted.cascadeLinkers > 0
+        ? drawT('draw.ai.deletedCascade', {
+            count: deletedTotal,
+            cascade: result.deleted.cascadeLinkers,
+          })
+        : drawT('draw.ai.deleted', { count: deletedTotal }),
+    )
   }
-  if (applied.length > 0) parts.push(`已应用：${applied.join('、')}`)
+  if (applied.length > 0)
+    parts.push(drawT('draw.ai.applied', { items: applied.join(drawT('draw.ai.listSeparator')) }))
 
   if (result.skipped.length > 0) {
     const lines = result.skipped.map((s) => `- ${s.reason}`)
-    parts.unshift(`⚠ ${result.skipped.length} 个操作被跳过：\n${lines.join('\n')}`)
+    parts.unshift(
+      `${drawT('draw.ai.skipped', { count: result.skipped.length })}\n${lines.join('\n')}`,
+    )
   }
   return parts.join('\n')
 }
@@ -115,14 +126,15 @@ function buildExecutionSummary(result: ExecutionResult): string {
 /** 获取问候语 */
 function getGreeting(): string {
   const hour = new Date().getHours()
-  if (hour < 6) return '凌晨好'
-  if (hour < 12) return '上午好'
-  if (hour < 14) return '中午好'
-  if (hour < 18) return '下午好'
-  return '晚上好'
+  if (hour < 6) return drawT('draw.ai.greeting.early')
+  if (hour < 12) return drawT('draw.ai.greeting.morning')
+  if (hour < 14) return drawT('draw.ai.greeting.noon')
+  if (hour < 18) return drawT('draw.ai.greeting.afternoon')
+  return drawT('draw.ai.greeting.evening')
 }
 
 export const AIChatPanel = () => {
+  const { t } = useI18n()
   const [isConfigured, setIsConfigured] = useState(true)
   const [serviceError, setServiceError] = useState<string | null>(null)
   const [inputText, setInputText] = useState('')
@@ -288,7 +300,7 @@ export const AIChatPanel = () => {
     const addElements = actions.filter((a) => a.type === 'add_element')
     const addLinkers = actions.filter((a) => a.type === 'add_linker')
     if (addElements.length >= 2 && addLinkers.length === 0) {
-      return '⚠ AI 未生成连线动作，图形之间没有连接。可重试或手动连线。'
+      return t('draw.ai.linkerWarning')
     }
     return ''
   }
@@ -334,7 +346,7 @@ export const AIChatPanel = () => {
     abortControllerRef.current = new AbortController()
 
     const conversationId = await ensureConversation(
-      userText.slice(0, 20) || '图片对话',
+      userText.slice(0, 20) || t('draw.ai.imageConversationTitle'),
     )
     persistMessage(conversationId, userMessage)
 
@@ -399,14 +411,14 @@ export const AIChatPanel = () => {
             .join('\n')
         } catch (error: unknown) {
           // 动作执行失败不阻塞回复展示，但要明确告知用户画布未变化
-          execSummary = `⚠ 动作执行失败：${getUserErrorMessage(error)}`
+          execSummary = t('draw.ai.actionFailed', { reason: getUserErrorMessage(error) })
         }
       }
 
       // 用最终响应覆盖占位 assistant 消息的字段（reasoning/content 可能与缓冲相同，
       // 但以响应对象为准，保证一致性），同时追加执行摘要到 content
       const cleanMessage = stripJsonBlocks(response.message || '')
-      const finalContent = [cleanMessage || '已完成', execSummary].filter(Boolean).join('\n\n')
+      const finalContent = [cleanMessage || t('draw.ai.done'), execSummary].filter(Boolean).join('\n\n')
       setMessages((prev) =>
         prev.map((m) =>
           m.id !== streamingMsgId
@@ -438,10 +450,8 @@ export const AIChatPanel = () => {
       setMessages((prev) => prev.filter((m) => m.id !== streamingMsgId))
       // 带图消息失败时大概率是模型不支持视觉输入，给出可操作的指引
       const visionHint =
-        images && images.length > 0
-          ? '（当前模型可能不支持图片输入，请在 AI 设置中更换视觉模型，如 qwen-vl 系列）'
-          : ''
-      pushNotice(`错误：${getUserErrorMessage(error)}${visionHint}`)
+        images && images.length > 0 ? t('draw.ai.visionHint') : ''
+      pushNotice(t('draw.ai.errorPrefix', { message: `${getUserErrorMessage(error)}${visionHint}` }))
     } finally {
       streamBufferRef.current = null
       streamingMsgIdRef.current = null
@@ -462,7 +472,7 @@ export const AIChatPanel = () => {
         void sendToAI(detail.prompt)
       } else {
         // 初始化超时的显式反馈（替代曾经的静默放弃）
-        pushNotice('AI 服务初始化超时，请检查设置后重试')
+        pushNotice(t('draw.ai.serviceTimeout'))
       }
     }
     window.addEventListener(AI_TEMPLATE_SELECTED, onTemplateSelected)
@@ -475,14 +485,14 @@ export const AIChatPanel = () => {
     try {
       const conv = await conversationStore.loadConversation(conversationId)
       if (!conv) {
-        pushNotice('该对话不存在或已被删除')
+        pushNotice(t('draw.ai.conversationMissing'))
         return
       }
       applyConversationId(conv.id)
       setMessages(conv.messages)
       setHistoryOpen(false)
     } catch (error: unknown) {
-      pushNotice(`读取对话失败：${getUserErrorMessage(error)}`)
+      pushNotice(t('draw.ai.loadConversationFailed', { reason: getUserErrorMessage(error) }))
     }
   }
 
@@ -493,7 +503,7 @@ export const AIChatPanel = () => {
     if (!aiServiceRef.current) {
       await waitForService()
       if (!aiServiceRef.current) {
-        pushNotice(serviceError ?? 'AI 服务尚未就绪，请确认已在设置中正确配置')
+        pushNotice(serviceError ?? t('draw.ai.serviceNotReady'))
         return
       }
     }
@@ -515,7 +525,7 @@ export const AIChatPanel = () => {
         const dataUrl = await loadImageAsCompressedDataUrl(file)
         setPendingImages((prev) => [...prev, { dataUrl }])
       } catch (err: unknown) {
-        pushNotice(`图片处理失败：${getUserErrorMessage(err)}`)
+        pushNotice(t('draw.ai.imageProcessFailed', { reason: getUserErrorMessage(err) }))
       }
     }
   }
@@ -542,9 +552,9 @@ export const AIChatPanel = () => {
   }
 
   const examplePrompts = [
-    '工单处理过程的状态流转',
-    '用户注册并完成邮箱验证的流程',
-    '下单时前端与后端的调用时序',
+    t('draw.ai.examplePrompt1'),
+    t('draw.ai.examplePrompt2'),
+    t('draw.ai.examplePrompt3'),
   ]
 
   // 纯内容面板（由 AppLayout 控制显示/隐藏）
@@ -569,12 +579,12 @@ export const AIChatPanel = () => {
         }}
       >
         <span style={{ fontWeight: 600, fontSize: '14px', color: '#333' }}>
-          AI 智能助手
+          {t('draw.ai.title')}
         </span>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <button
             onClick={() => window.dispatchEvent(new CustomEvent(AI_OPEN_SETTINGS))}
-            aria-label="AI 设置"
+            aria-label={t('draw.panel.aiSettings')}
             style={{
               border: 'none',
               background: 'none',
@@ -599,7 +609,7 @@ export const AIChatPanel = () => {
           </button>
           <button
             onClick={() => useUIStore.getState().toggleAiPanel()}
-            aria-label="收起"
+            aria-label={t('draw.ai.collapse')}
             style={{
               border: 'none',
               background: 'none',
@@ -641,9 +651,9 @@ export const AIChatPanel = () => {
               lineHeight: '1.5',
             }}
           >
-            <strong>尚未配置 AI 服务</strong>
+            <strong>{t('draw.ai.notConfiguredTitle')}</strong>
             <p style={{ margin: '8px 0 0', fontSize: '12px' }}>
-              请先前往设置页面配置 API Key 等信息后使用。
+              {t('draw.ai.notConfiguredHint')}
             </p>
           </div>
         ) : messages.length === 0 ? (
@@ -652,10 +662,10 @@ export const AIChatPanel = () => {
             <div style={{ textAlign: 'center', padding: '32px 0 24px' }}>
               <div style={{ fontSize: '48px', marginBottom: '16px' }}>✨</div>
               <h2 style={{ fontSize: '20px', fontWeight: 600, color: '#333', marginBottom: '12px' }}>
-                {getGreeting()}，今天想用 AI 做点什么呢
+                {t('draw.ai.welcome', { greeting: getGreeting() })}
               </h2>
               <p style={{ fontSize: '13px', color: '#888', lineHeight: '1.6' }}>
-                点击下方提示词，快速生成流程图，或者截图粘贴图片，也可以描述您想要创建的内容
+                {t('draw.ai.welcomeHint')}
               </p>
             </div>
 
@@ -741,8 +751,8 @@ export const AIChatPanel = () => {
             }}
           >
             <textarea
-              aria-label="消息输入"
-              placeholder="你可以这样提问：用户登录注册流程。"
+              aria-label={t('draw.ai.inputAria')}
+              placeholder={t('draw.ai.inputPlaceholder')}
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               onPaste={handlePaste}
@@ -775,7 +785,7 @@ export const AIChatPanel = () => {
                   <div key={`${i}-${img.dataUrl.slice(-12)}`} style={{ position: 'relative' }}>
                     <img
                       src={img.dataUrl}
-                      alt={`待发送图片 ${i + 1}`}
+                      alt={t('draw.ai.pendingImageAlt', { index: i + 1 })}
                       style={{
                         height: '40px',
                         borderRadius: '6px',
@@ -784,7 +794,7 @@ export const AIChatPanel = () => {
                       }}
                     />
                     <button
-                      aria-label={`移除图片 ${i + 1}`}
+                      aria-label={t('draw.ai.removeImage', { index: i + 1 })}
                       onClick={() => setPendingImages((prev) => prev.filter((_, j) => j !== i))}
                       style={{
                         position: 'absolute',
@@ -815,7 +825,7 @@ export const AIChatPanel = () => {
               multiple
               onChange={handleImageUpload}
               style={{ display: 'none' }}
-              aria-label="图片文件选择"
+              aria-label={t('draw.ai.filePickerAria')}
             />
             <div
               style={{
@@ -827,7 +837,7 @@ export const AIChatPanel = () => {
             >
               <button
                 onClick={() => fileInputRef.current?.click()}
-                aria-label="图片上传"
+                aria-label={t('draw.ai.uploadImage')}
                 style={{
                   border: 'none',
                   background: 'none',
@@ -840,7 +850,7 @@ export const AIChatPanel = () => {
               </button>
               <button
                 onClick={() => void handleSend()}
-                aria-label="发送"
+                aria-label={t('draw.ai.send')}
                 disabled={sending}
                 style={{
                   border: 'none',
@@ -869,7 +879,7 @@ export const AIChatPanel = () => {
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="历史对话"
+          aria-label={t('draw.ai.history')}
           style={{
             position: 'absolute',
             inset: 0,

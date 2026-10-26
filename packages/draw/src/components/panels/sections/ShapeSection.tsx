@@ -1,5 +1,6 @@
 // 图形样式组：填充（FillSection）与线条（LineSection）
 // 图形与连线共用线条组；连线模式额外提供线型/箭头图形化下拉（切换重算路由）
+import { useI18n } from '@eflink-tech/office-kit'
 import type { ArrowStyle, ElementInstance, LinkerInstance } from '@/types'
 import { isLinker } from '@/types'
 import { ColorButton } from '@/components/common/ColorPicker'
@@ -15,13 +16,14 @@ import { NumField, Row, Section, SliderField } from '../fields'
 const SELECT_CLS = 'w-24 h-6 px-1.5 border border-[#ddd] rounded text-xs bg-white'
 
 export function FillSection({ first }: { first: ElementInstance }) {
+  const { t } = useI18n()
   const fill = first.fillStyle
   // 项目无渐变：gradient 回显为纯色（切换类型时 convertFillStyle 补默认值）
   const fillType = fill.type === 'none' ? 'none' : 'solid'
 
   return (
-    <Section title="填充">
-      <Row label="类型">
+    <Section title={t('draw.prop.section.fill')}>
+      <Row label={t('draw.prop.type')}>
         <select
           value={fillType}
           onChange={(e) =>
@@ -31,11 +33,11 @@ export function FillSection({ first }: { first: ElementInstance }) {
           }
           className={SELECT_CLS}
         >
-          <option value="none">无</option>
-          <option value="solid">纯色</option>
+          <option value="none">{t('draw.prop.none')}</option>
+          <option value="solid">{t('draw.prop.solid')}</option>
         </select>
       </Row>
-      <Row label="颜色">
+      <Row label={t('draw.prop.color')}>
         <ColorButton
           value={fill.type === 'solid' ? fill.color ?? '255,255,255' : null}
           disabled={fillType === 'none'}
@@ -46,7 +48,7 @@ export function FillSection({ first }: { first: ElementInstance }) {
           }
         />
       </Row>
-      <Row label="透明度">
+      <Row label={t('draw.prop.opacity')}>
         <SliderField
           value={Math.round(first.shapeStyle.alpha * 100)}
           min={0}
@@ -61,6 +63,7 @@ export function FillSection({ first }: { first: ElementInstance }) {
 }
 
 export function LineSection({ first }: { first: ElementInstance | LinkerInstance }) {
+  const { t } = useI18n()
   const linkerMode = isLinker(first)
   const lineColor = first.lineStyle.lineColor ?? '50,50,50'
   const lineWidth = first.lineStyle.lineWidth ?? 2
@@ -103,14 +106,14 @@ export function LineSection({ first }: { first: ElementInstance | LinkerInstance
   }
 
   return (
-    <Section title="线条">
-      <Row label="颜色">
+    <Section title={t('draw.prop.section.line')}>
+      <Row label={t('draw.prop.color')}>
         <ColorButton
           value={lineColor}
           onSelect={(rgb) => setCommon({ lineColor: rgb ?? '50,50,50' })}
         />
       </Row>
-      <Row label="粗细">
+      <Row label={t('draw.prop.thickness')}>
         <NumField
           value={lineWidth}
           min={0}
@@ -121,7 +124,7 @@ export function LineSection({ first }: { first: ElementInstance | LinkerInstance
           onCommit={(v) => setCommon({ lineWidth: v })}
         />
       </Row>
-      <Row label="样式">
+      <Row label={t('draw.prop.style')}>
         {/* 与顶部工具栏同款线型下拉（分体按钮 + 线型预览菜单） */}
         <LineStyleDropdown
           currentStyle={lineStyle}
@@ -132,7 +135,7 @@ export function LineSection({ first }: { first: ElementInstance | LinkerInstance
         />
       </Row>
       {linker && (
-        <Row label="UML 关系">
+        <Row label={t('draw.prop.umlRelation')}>
           <select
             className={SELECT_CLS}
             value={matchStylePreset(UML_RELATION_PRESETS, linker)}
@@ -141,15 +144,15 @@ export function LineSection({ first }: { first: ElementInstance | LinkerInstance
               if (preset) applyPreset(preset.patch)
             }}
           >
-            <option value="">自定义</option>
+            <option value="">{t('draw.prop.custom')}</option>
             {UML_RELATION_PRESETS.map((p) => (
-              <option key={p.value} value={p.value}>{p.label}</option>
+              <option key={p.value} value={p.value}>{t(p.labelKey)}</option>
             ))}
           </select>
         </Row>
       )}
       {linker?.seq && (
-        <Row label="消息类型">
+        <Row label={t('draw.prop.messageType')}>
           <select
             className={SELECT_CLS}
             value={matchStylePreset(SEQ_MESSAGE_PRESETS, linker)}
@@ -158,15 +161,15 @@ export function LineSection({ first }: { first: ElementInstance | LinkerInstance
               if (preset) applyPreset(preset.patch)
             }}
           >
-            <option value="">自定义</option>
+            <option value="">{t('draw.prop.custom')}</option>
             {SEQ_MESSAGE_PRESETS.map((p) => (
-              <option key={p.value} value={p.value}>{p.label}</option>
+              <option key={p.value} value={p.value}>{t(p.labelKey)}</option>
             ))}
           </select>
         </Row>
       )}
       {linkerMode && (
-        <Row label="线型">
+        <Row label={t('draw.prop.lineType')}>
           <LineTypeDropdown
             currentType={(first as LinkerInstance).linkerType}
             items={([
@@ -179,7 +182,7 @@ export function LineSection({ first }: { first: ElementInstance | LinkerInstance
       )}
       {linkerMode && (
         <>
-          <Row label="起箭头">
+          <Row label={t('draw.prop.beginArrow')}>
             <ArrowStyleDropdown
               currentStyle={(first as LinkerInstance).lineStyle.beginArrowStyle ?? 'none'}
               direction="backward"
@@ -196,7 +199,7 @@ export function LineSection({ first }: { first: ElementInstance | LinkerInstance
               ] as const)}
             />
           </Row>
-          <Row label="止箭头">
+          <Row label={t('draw.prop.endArrow')}>
             <ArrowStyleDropdown
               currentStyle={(first as LinkerInstance).lineStyle.endArrowStyle ?? 'none'}
               items={([
@@ -219,6 +222,7 @@ export function LineSection({ first }: { first: ElementInstance | LinkerInstance
 }
 
 export function ShadowSection({ first }: { first: ElementInstance }) {
+  const { t } = useI18n()
   const ss = first.shapeStyle
   const enabled = ss.shadowEnabled === true
 
@@ -227,22 +231,22 @@ export function ShadowSection({ first }: { first: ElementInstance }) {
   }
 
   return (
-    <Section title="阴影">
-      <Row label="启用">
+    <Section title={t('draw.prop.section.shadow')}>
+      <Row label={t('draw.prop.enabled')}>
         <input
           type="checkbox"
           checked={enabled}
           onChange={(e) => patchShadow({ shadowEnabled: e.target.checked })}
         />
       </Row>
-      <Row label="颜色">
+      <Row label={t('draw.prop.color')}>
         <ColorButton
           value={ss.shadowColor ?? '0,0,0'}
           disabled={!enabled}
           onSelect={(rgb) => patchShadow({ shadowColor: rgb ?? '0,0,0' })}
         />
       </Row>
-      <Row label="模糊">
+      <Row label={t('draw.prop.blur')}>
         <NumField
           value={ss.shadowBlur ?? 0}
           min={0}
@@ -253,7 +257,7 @@ export function ShadowSection({ first }: { first: ElementInstance }) {
           onCommit={(v) => patchShadow({ shadowBlur: v })}
         />
       </Row>
-      <Row label="X 偏移">
+      <Row label={t('draw.prop.xOffset')}>
         <NumField
           value={ss.shadowOffsetX ?? 0}
           min={-50}
@@ -264,7 +268,7 @@ export function ShadowSection({ first }: { first: ElementInstance }) {
           onCommit={(v) => patchShadow({ shadowOffsetX: v })}
         />
       </Row>
-      <Row label="Y 偏移">
+      <Row label={t('draw.prop.yOffset')}>
         <NumField
           value={ss.shadowOffsetY ?? 0}
           min={-50}

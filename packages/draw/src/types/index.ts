@@ -342,6 +342,9 @@ export function rgbToCSS(rgb: RGBColor): string {
 }
 
 /** 创建默认的 PageConfig */
+/** 新建文档的默认页面标题（中文原文）；界面按 locale 用 draw.untitled 文案替换展示 */
+export const DEFAULT_PAGE_TITLE = '未命名图表'
+
 export function createDefaultPageConfig(overrides?: Partial<PageConfig>): PageConfig {
   return {
     showGrid: true,
@@ -351,7 +354,7 @@ export function createDefaultPageConfig(overrides?: Partial<PageConfig>): PageCo
     width: 1600,
     backgroundColor: '255,255,255',
     padding: 0,
-    title: '未命名图表',
+    title: DEFAULT_PAGE_TITLE,
     ...overrides,
   }
 }

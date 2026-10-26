@@ -1,5 +1,6 @@
 // src/components/ai/AIAssistantRoot.tsx
 import { useEffect, useRef, useState } from 'react'
+import { useI18n } from '@eflink-tech/office-kit'
 import { SettingsPage } from './SettingsPage'
 import { TemplateLibrary } from './TemplateLibrary'
 import type { Template } from '@/ai/types'
@@ -22,6 +23,7 @@ function Modal({
   children: React.ReactNode
   cardClassName?: string
 }) {
+  const { t } = useI18n()
   const cardRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -43,7 +45,7 @@ function Modal({
       >
         <button
           type="button"
-          aria-label="关闭"
+          aria-label={t('action.close')}
           onClick={onClose}
           className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded hover:bg-gray-100 text-gray-500 text-lg leading-none"
         >

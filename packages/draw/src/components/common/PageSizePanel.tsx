@@ -2,6 +2,7 @@
 // 页面大小面板：A3/A4/A5 预设 + 自定义宽/高输入，嵌入 页面>页面大小 子菜单。
 // 预设为纵向像素坐标（与 design 一致：A4=1050×1500），原样写入 width/height。
 import { useState } from 'react'
+import { useI18n } from '@eflink-tech/office-kit'
 
 const PRESETS = [
   { label: 'A3', w: 1500, h: 2100 },
@@ -19,6 +20,7 @@ interface PageSizePanelProps {
 }
 
 export function PageSizePanel({ width, height, onApply }: PageSizePanelProps) {
+  const { t } = useI18n()
   const [w, setW] = useState(String(width))
   const [h, setH] = useState(String(height))
 
@@ -42,7 +44,7 @@ export function PageSizePanel({ width, height, onApply }: PageSizePanelProps) {
       </div>
       <div className="flex items-center gap-2">
         <label className="flex items-center gap-1 text-[11px] text-[#555]">
-          宽
+          {t('draw.page.width')}
           <input
             value={w}
             onChange={(e) => setW(e.target.value.replace(/[^\d]/g, ''))}
@@ -51,7 +53,7 @@ export function PageSizePanel({ width, height, onApply }: PageSizePanelProps) {
           />
         </label>
         <label className="flex items-center gap-1 text-[11px] text-[#555]">
-          高
+          {t('draw.page.height')}
           <input
             value={h}
             onChange={(e) => setH(e.target.value.replace(/[^\d]/g, ''))}
@@ -64,7 +66,7 @@ export function PageSizePanel({ width, height, onApply }: PageSizePanelProps) {
           className="rounded border border-[#ddd] px-2 py-0.5 hover:bg-gray-100"
           onClick={() => apply()}
         >
-          应用
+          {t('draw.page.apply')}
         </button>
       </div>
     </div>

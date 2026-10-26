@@ -1,6 +1,7 @@
 // src/components/common/PromptDialog.tsx
 // 通用单行输入浮层（重命名文件用）：蒙层 + 居中卡片 + 自动聚焦 + Enter 提交
 import { useEffect, useRef } from 'react'
+import { useI18n } from '@eflink-tech/office-kit'
 import { createPortal } from 'react-dom'
 
 interface PromptDialogProps {
@@ -11,6 +12,7 @@ interface PromptDialogProps {
 }
 
 export function PromptDialog({ title, defaultValue, onSubmit, onCancel }: PromptDialogProps) {
+  const { t } = useI18n()
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -44,14 +46,14 @@ export function PromptDialog({ title, defaultValue, onSubmit, onCancel }: Prompt
             className="rounded px-3 py-1 text-xs border border-[#ddd] hover:bg-gray-50"
             onClick={onCancel}
           >
-            取消
+            {t('action.cancel')}
           </button>
           <button
             type="button"
             className="rounded px-3 py-1 text-xs bg-[#c00] text-white hover:bg-[#a00]"
             onClick={submit}
           >
-            确定
+            {t('action.confirm')}
           </button>
         </div>
       </div>

@@ -14,6 +14,8 @@ import {
   type NetIconEntry,
 } from '@/core/schema/shapes/networkLoader'
 import { useEditorStore } from '@/store/editorStore'
+import { useI18n, type OfficeLocale } from '@eflink-tech/office-kit'
+import { translateTitle } from '@/i18n'
 import { startPanelDrag } from '@/core/editor/panelDrag'
 import { ShapePreview } from '@/components/common/ShapePreview'
 import {
@@ -281,7 +283,7 @@ const vendorPanelOf = (vendorId: string) => NET_VENDORS.find((v) => v.id === ven
 
 type PanelChild = NonNullable<(typeof SHAPE_CATEGORIES)[number]['children']>[number]
 
-/** 品类标题在厂商 tab 下省略厂商前缀（Cisco tab 里的「Cisco 路由器」→「路由器」） */
+/** 品类标题在厂商 tab 下省略厂商前缀（Cisco tab 里的「Cisco 路由器」→「路由器」）；两侧都传已翻译文本 */
 function shortGroupName(name: string, vendorName: string): string {
   const short = name.startsWith(vendorName) ? name.slice(vendorName.length).trim() : name
   return short || name
@@ -296,7 +298,18 @@ function loadedGroupShapes(groupId: string): Array<{ name: string; title: string
   }))
 }
 
+/** 搜索结果的品类后缀：中文用全角括号，其余语言用半角并留空格 */
+function useGroupSuffix(locale: OfficeLocale) {
+  return (groupName: string): string => {
+    const name = translateTitle(groupName, locale)
+    return locale === 'zh-CN' ? `（${name}）` : ` (${name})`
+  }
+}
+
 export function LeftPanel() {
+  const { t, locale } = useI18n()
+  const tt = (title: string) => translateTitle(title, locale)
+  const groupSuffix = useGroupSuffix(locale)
   const activeCategory = useUIStore((s) => s.activeCategory)
   const setActiveCategory = useUIStore((s) => s.setActiveCategory)
   useUIStore((s) => s.netIconsRev) // 图标 chunk 注册完成后刷新面板缩略图
@@ -327,7 +340,9 @@ export function LeftPanel() {
         (e) =>
           e.title.toLowerCase().includes(q) ||
           e.name.toLowerCase().includes(q) ||
-          e.groupName.toLowerCase().includes(q),
+          e.groupName.toLowerCase().includes(q) ||
+          tt(e.title).toLowerCase().includes(q) ||
+          tt(e.groupName).toLowerCase().includes(q),
       )
       .slice(0, 100)
   }, [query, searchEntries])
@@ -436,7 +451,7 @@ export function LeftPanel() {
             onMouseEnter={(e) => {
               const rect = e.currentTarget.getBoundingClientRect()
               setTooltip({
-                text: shape.title,
+                text: tt(shape.title),
                 x: rect.right + 6,
                 y: rect.top + rect.height / 2,
               })
@@ -462,17 +477,19 @@ export function LeftPanel() {
   /** 搜索结果：跨厂商按中文标题/英文名匹配，命中品类自动按需加载 */
   const renderSearchResults = () => {
     const q = query.trim()
-    if (!searchResults) return <div className="p-3 text-[11px] text-gray-400">正在载入图标索引…</div>
+    if (!searchResults) return <div className="p-3 text-[11px] text-gray-400">{t('draw.search.loading')}</div>
     if (searchResults.length === 0) {
-      return <div className="p-3 text-[11px] text-gray-400">没有匹配「{q}」的图形</div>
+      return <div className="p-3 text-[11px] text-gray-400">{t('draw.search.empty', { query: q })}</div>
     }
     return (
       <div>
         <div className="px-3 py-1.5 text-[11px] text-gray-400 bg-[#fafafa] border-b border-[#f0f0f0]">
-          {searchResults.length >= 100 ? `「${q}」匹配过多，仅显示前 100 个` : `「${q}」匹配 ${searchResults.length} 个`}
+          {searchResults.length >= 100
+            ? t('draw.search.tooMany', { query: q })
+            : t('draw.search.count', { query: q, count: searchResults.length })}
         </div>
         {renderShapeGrid(
-          searchResults.map((e) => ({ name: e.name, title: `${e.title || e.name}（${e.groupName}）` })),
+          searchResults.map((e) => ({ name: e.name, title: `${tt(e.title || e.name)}${groupSuffix(e.groupName)}` })),
           true,
         )}
       </div>
@@ -488,14 +505,14 @@ export function LeftPanel() {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="搜索图形…"
+            placeholder={t('draw.search.placeholder')}
             className="flex-1 min-w-0 bg-transparent text-xs outline-none placeholder:text-gray-400"
           />
           {query && (
             <button
               className="text-gray-400 hover:text-gray-600"
               onClick={() => setQuery('')}
-              aria-label="清空搜索"
+              aria-label={t('draw.search.clear')}
             >
               <X size={14} />
             </button>
@@ -535,7 +552,7 @@ export function LeftPanel() {
                 >
                   {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                   <Icon size={14} className="ml-1 mr-2" />
-                  <span>{cat.name}</span>
+                  <span>{tt(cat.name)}</span>
                   <span className="ml-auto text-[10px] text-gray-400">{total}</span>
                 </button>
 
@@ -560,7 +577,7 @@ export function LeftPanel() {
                                   : 'bg-[#f0f0f0] text-[#666] hover:bg-[#e4e4e4]',
                               ].join(' ')}
                             >
-                              {v.name}
+                              {tt(v.name)}
                               <span className="ml-1 opacity-70">{vTotal}</span>
                             </button>
                           )
@@ -568,10 +585,10 @@ export function LeftPanel() {
                         <button
                           data-action="load-vendor"
                           onClick={() => loadVendor(vendor.id)}
-                          title={`一次性加载 ${vendor.name} 全部品类`}
+                          title={t('draw.panel.loadAllVendor', { name: tt(vendor.name) })}
                           className="ml-auto px-1.5 py-0.5 text-[10px] text-gray-400 hover:text-blue-500 cursor-pointer"
                         >
-                          加载全部
+                          {t('draw.panel.loadAll')}
                         </button>
                       </div>
                     )}
@@ -595,7 +612,7 @@ export function LeftPanel() {
                             >
                               {open ? <ChevronDown size={12} className="mr-1 shrink-0" /> : <ChevronRight size={12} className="mr-1 shrink-0" />}
                               <span className="truncate">
-                                {child.lazy ? shortGroupName(child.name, vendorName) : child.name}
+                                {child.lazy ? shortGroupName(tt(child.name), tt(vendorName)) : tt(child.name)}
                               </span>
                               <span
                                 className={[
@@ -610,7 +627,7 @@ export function LeftPanel() {
                               <button
                                 data-pin={child.id}
                                 onClick={() => togglePref(child.id)}
-                                title={pinned ? '取消常驻（下次进入不再自动预载）' : '设为常驻（进入编辑器自动预载）'}
+                                title={pinned ? t('draw.panel.unpin') : t('draw.panel.pin')}
                                 className="px-1.5 cursor-pointer"
                               >
                                 <Star
@@ -622,7 +639,7 @@ export function LeftPanel() {
                           </div>
                           {open &&
                             (child.lazy && !loaded ? (
-                              <div className="px-8 py-1.5 text-[11px] text-gray-300">正在载入矢量数据…</div>
+                              <div className="px-8 py-1.5 text-[11px] text-gray-300">{t('draw.panel.loadingVectors')}</div>
                             ) : (
                               renderShapeGrid(childShapesOf(child), !!child.lazy)
                             ))}
@@ -653,7 +670,7 @@ export function LeftPanel() {
               >
                 {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                 <Icon size={14} className="ml-1 mr-2" />
-                <span>{cat.name}</span>
+                <span>{tt(cat.name)}</span>
                 <span className="ml-auto text-[10px] text-gray-400">{catShapes.length}</span>
               </button>
 

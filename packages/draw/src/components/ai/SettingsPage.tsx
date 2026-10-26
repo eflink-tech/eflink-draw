@@ -1,16 +1,19 @@
 // src/components/ai/SettingsPage.tsx
 import { useEffect, useState } from 'react'
+import { useI18n } from '@eflink-tech/office-kit'
 import { settingsStore } from '../../ai/db'
 import { AIService } from '../../ai/aiService'
 import type { AISettings } from '../../ai/types'
 import { ACCENT_COLOR } from './theme'
+import { drawT } from '@/i18n/runtime'
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error && error.message) return error.message
-  return '操作失败，请重试'
+  return drawT('draw.ai.actionFailedRetry')
 }
 
 export const SettingsPage = () => {
+  const { t } = useI18n()
   const [settings, setSettings] = useState<AISettings>({
     baseUrl: '',
     apiKey: '',
@@ -41,15 +44,15 @@ export const SettingsPage = () => {
   }
 
   const handleReset = async () => {
-    if (!confirm('确定要清空已保存的 AI 配置吗？此操作不可恢复。')) return
+    if (!confirm(t('draw.ai.resetConfirm'))) return
     setResetting(true)
     setTestResult(null)
     try {
       await settingsStore.resetSettings()
       setSettings({ baseUrl: '', apiKey: '', model: '' })
-      setTestResult({ success: true, message: '已清空配置' })
+      setTestResult({ success: true, message: t('draw.ai.resetDone') })
     } catch (error: unknown) {
-      setTestResult({ success: false, message: `清空失败：${getErrorMessage(error)}` })
+      setTestResult({ success: false, message: t('draw.ai.resetFailed', { reason: getErrorMessage(error) }) })
     }
     setResetting(false)
   }
@@ -61,7 +64,7 @@ export const SettingsPage = () => {
     try {
       await settingsStore.saveSettings(settings)
     } catch (error: unknown) {
-      setTestResult({ success: false, message: `保存失败：${getErrorMessage(error)}` })
+      setTestResult({ success: false, message: t('draw.ai.saveFailed', { reason: getErrorMessage(error) }) })
       setSaving(false)
       return
     }
@@ -71,19 +74,22 @@ export const SettingsPage = () => {
     const ping = await AIService.ping(settings)
     setTestResult(
       ping.ok
-        ? { success: true, message: '已保存，连接正常' }
-        : { success: false, message: `已保存，但连通性检测失败：${ping.error ?? '未知错误'}` },
+        ? { success: true, message: t('draw.ai.savedConnected') }
+        : {
+            success: false,
+            message: t('draw.ai.savedPingFailed', { error: ping.error ?? t('draw.ai.error.unknown') }),
+          },
     )
     setSaving(false)
   }
 
   if (loading) {
-    return <div>加载中...</div>
+    return <div>{t('draw.ai.loading')}</div>
   }
 
   return (
     <div className="settings-page" style={{ padding: '20px', maxWidth: '600px', margin: '0 auto' }}>
-      <h2>AI 助手设置</h2>
+      <h2>{t('draw.ai.settingsTitle')}</h2>
 
       {loadError && (
         <div
@@ -97,7 +103,7 @@ export const SettingsPage = () => {
             marginBottom: '20px',
           }}
         >
-          读取已保存配置失败：{loadError}
+          {t('draw.ai.loadSettingsFailed', { error: loadError })}
         </div>
       )}
 
@@ -142,7 +148,7 @@ export const SettingsPage = () => {
         {/* 已存密钥的掩码提示：让用户能确认是否已有配置，同时不暴露完整密钥 */}
         {settings.apiKey && (
           <p style={{ margin: '6px 0 0', fontSize: '12px', color: '#888' }}>
-            当前已保存：{settingsStore.maskApiKey(settings.apiKey)}
+            {t('draw.ai.currentlySaved', { masked: settingsStore.maskApiKey(settings.apiKey) })}
           </p>
         )}
       </div>
@@ -176,7 +182,8 @@ export const SettingsPage = () => {
           marginBottom: '20px',
         }}
       >
-        <strong>提示：</strong>AI 绘图依赖图片理解能力，请选择支持视觉的多模态模型（如 GPT-4o、Claude 3 Sonnet、Qwen-VL 等）。
+        <strong>{t('draw.ai.hintLabel')}</strong>
+        {t('draw.ai.multimodalHint')}
       </div>
 
       <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
@@ -192,7 +199,7 @@ export const SettingsPage = () => {
             cursor: saving ? 'not-allowed' : 'pointer',
           }}
         >
-          {saving ? '保存中...' : '保存'}
+          {saving ? t('draw.ai.saving') : t('action.save')}
         </button>
 
         <button
@@ -207,7 +214,7 @@ export const SettingsPage = () => {
             cursor: resetting ? 'not-allowed' : 'pointer',
           }}
         >
-          {resetting ? '清空中...' : '清空配置'}
+          {resetting ? t('draw.ai.clearing') : t('draw.ai.clearConfig')}
         </button>
       </div>
 

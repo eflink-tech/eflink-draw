@@ -6,6 +6,8 @@ import { useUIStore } from '@/store/uiStore'
 import { effectivePageSize } from '@/core/editor/grid'
 import { MenuDropdown } from '@/components/common/MenuDropdown'
 import { PromptDialog } from '@/components/common/PromptDialog'
+import { useI18n } from '@eflink-tech/office-kit'
+import { displayDocTitle } from '@/i18n'
 
 /** Mac 平台判定（快捷键显示用）：优先 userAgentData.platform，回退 userAgent */
 const IS_MAC =
@@ -21,6 +23,7 @@ function shortcutText(key: string, shift = false): string {
 const ZOOM_LEVELS = [0.5, 0.75, 1, 1.5, 2]
 
 export function BottomBar() {
+  const { t } = useI18n()
   const viewport = useEditorStore((s) => s.viewport)
   const updateViewport = useEditorStore((s) => s.updateViewport)
   const document = useEditorStore((s) => s.document)
@@ -31,7 +34,7 @@ export function BottomBar() {
   const setFocusMode = useUIStore((s) => s.setFocusMode)
   const [zoomOpen, setZoomOpen] = useState(false)
   const [renameOpen, setRenameOpen] = useState(false)
-  const fileTitle = document.page.title ?? '未命名图表'
+  const fileTitle = displayDocTitle(document.page.title, t)
 
   const zoomPercent = Math.round(viewport.scale * 100)
 
@@ -49,7 +52,7 @@ export function BottomBar() {
       onClick: () => updateViewport({ scale: v }),
     })),
     { divider: true },
-    { label: '重置缩放', shortcut: shortcutText('0'), onClick: () => updateViewport({ scale: 1 }) },
+    { label: t('action.zoomReset'), shortcut: shortcutText('0'), onClick: () => updateViewport({ scale: 1 }) },
   ]
 
   return (
@@ -59,15 +62,15 @@ export function BottomBar() {
         <button
           className="flex items-center gap-1 px-1.5 py-0.5 -mx-1.5 rounded hover:bg-[#e8e8e8] transition-colors text-[#333] max-w-[200px]"
           onClick={() => setRenameOpen(true)}
-          title="点击重命名文件"
+          title={t('draw.status.renameHint')}
         >
           <Pencil size={11} className="flex-shrink-0 text-[#999]" />
           <span className="truncate">{fileTitle}</span>
         </button>
-        <span>图形: {elementCount}</span>
-        <span>页面: {effectivePageSize(document.page).width}×{effectivePageSize(document.page).height}</span>
+        <span>{t('draw.status.elements', { count: elementCount })}</span>
+        <span>{t('draw.status.page', { size: `${effectivePageSize(document.page).width}×${effectivePageSize(document.page).height}` })}</span>
         <span className={isDirty ? 'text-orange-500' : ''}>
-          {isDirty ? '● 未保存' : '✓ 已保存'}
+          {isDirty ? t('draw.status.unsaved') : t('draw.status.saved')}
         </span>
       </div>
 
@@ -76,7 +79,7 @@ export function BottomBar() {
         <button
           className="p-0.5 hover:bg-[#e0e0e0] rounded transition-colors"
           onClick={() => handleZoom(viewport.scale - 0.05)}
-          title="缩小"
+          title={t('draw.status.zoomOut')}
         >
           <Minus size={14} />
         </button>
@@ -87,12 +90,12 @@ export function BottomBar() {
           value={zoomPercent}
           onChange={(e) => handleZoom(Number(e.target.value) / 100)}
           className="w-28 h-1 accent-blue-500 cursor-pointer"
-          title="缩放滑块"
+          title={t('draw.status.zoomSlider')}
         />
         <button
           className="p-0.5 hover:bg-[#e0e0e0] rounded transition-colors"
           onClick={() => handleZoom(viewport.scale + 0.05)}
-          title="放大"
+          title={t('draw.status.zoomIn')}
         >
           <Plus size={14} />
         </button>
@@ -112,7 +115,7 @@ export function BottomBar() {
         <button
           className="p-0.5 hover:bg-[#e0e0e0] rounded transition-colors"
           onClick={() => updateViewport({ scale: 1 })}
-          title="重置缩放"
+          title={t('draw.status.resetZoom')}
         >
           <LocateFixed size={14} />
         </button>
@@ -120,7 +123,7 @@ export function BottomBar() {
         <button
           className="p-0.5 hover:bg-[#e0e0e0] rounded transition-colors"
           onClick={() => setFocusMode(!focusMode)}
-          title={focusMode ? '退出专注模式 (Esc)' : '进入专注模式'}
+          title={focusMode ? t('draw.status.exitFocus') : t('draw.status.enterFocus')}
         >
           <Expand size={14} />
         </button>
@@ -128,7 +131,7 @@ export function BottomBar() {
       {/* 重命名浮层 */}
       {renameOpen && (
         <PromptDialog
-          title="重命名文件"
+          title={t('draw.dialog.renameFile')}
           defaultValue={fileTitle}
           onSubmit={(v) => {
             const trimmed = v.trim()

@@ -5,6 +5,7 @@
 //   - 连线跟随：update_element 改变位置时，调用 routeAttachedLinkers 重路由
 //   - 历史批量：beginBatch / commitBatch 将整批动作打包为一个撤销单元
 import type { AIAction, AddElementAction, AddLinkerAction, UpdateElementAction, DeleteElementAction } from './types'
+import { drawT } from '@/i18n/runtime'
 import type { ElementInstance, LinkerInstance, ShapeDefinition } from '@/types'
 import { routeAttachedLinkers, type LiveShapeState } from '@/core/editor/documentOps'
 import {
@@ -339,7 +340,7 @@ export class ActionExecutor {
       ]
         .filter(Boolean)
         .join('、')
-      result.skipped.push({ action, reason: `连线端点未解析（${missing}）` })
+      result.skipped.push({ action, reason: drawT('draw.err.linkerEndpointsUnresolved', { missing }) })
       return
     }
 

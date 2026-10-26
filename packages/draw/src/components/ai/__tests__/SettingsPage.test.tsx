@@ -4,6 +4,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { SettingsPage } from '../SettingsPage'
 import { settingsStore } from '../../../ai/db'
 
+
 // Mock settingsStore
 vi.mock('../../../ai/db', () => ({
   settingsStore: {

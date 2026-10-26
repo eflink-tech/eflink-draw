@@ -1,6 +1,7 @@
 import type { ShapeDefinition, ElementInstance } from '@/types'
 import { DEFAULT_FONT_SIZE, DEFAULT_LINE_WIDTH } from '@/types'
 import { DEFAULT_FONT_VALUE } from '@/core/editor/fontMap'
+import { translateTitle } from '@/i18n'
 
 // 默认锚点 上、下、左、右；默认文本区 {x:10, y:0, w:w-20, h:h}
 
@@ -91,9 +92,10 @@ export class ShapeRegistry {
         underline: schema.fontStyle?.underline ?? false,
         orientation: schema.fontStyle?.orientation ?? 'horizontal',
       },
+      // 默认文案按当前 locale 落地（素材标题是中文原文，文档内容跟随创建时的语言）
       textBlock: (schema.textBlock ?? [
         { position: { x: 10, y: 0, w: 'w-20', h: 'h' }, text: '' },
-      ]).map((b) => ({ ...b, position: { ...b.position } })),
+      ]).map((b) => ({ ...b, position: { ...b.position }, text: translateTitle(b.text) })),
       anchors: (schema.anchors ?? [
         { x: 'w/2', y: 0 },
         { x: 'w/2', y: 'h' },

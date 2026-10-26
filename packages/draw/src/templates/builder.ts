@@ -1,6 +1,7 @@
 // 模板构建器：TemplateSpec → 原生 DocumentData
 // 全程使用编辑器自身 API（registry/linker/swimlane/seqMessage），保证形状、锚点、
 // 路由与手动绘制后的文档完全同构；模板 ID 仅存在于 spec 内，落成文档时替换为真实 ID。
+import { translateTitle } from '@/i18n'
 import { shapeRegistry } from '@/core/schema/registry'
 import {
   createLinkerInstance,
@@ -48,9 +49,9 @@ function applyNodeSpec(inst: ElementInstance, node: TemplateNodeSpec, fallbackZ:
       }),
     )
   }
-  if (node.text != null && inst.textBlock[0]) inst.textBlock[0].text = node.text
+  if (node.text != null && inst.textBlock[0]) inst.textBlock[0].text = translateTitle(node.text)
   node.texts?.forEach((text, i) => {
-    if (inst.textBlock[i]) inst.textBlock[i].text = text
+    if (inst.textBlock[i]) inst.textBlock[i].text = translateTitle(text)
   })
 }
 
@@ -92,7 +93,7 @@ function applyLinkStyle(lk: LinkerInstance, link: TemplateLinkSpec): void {
 }
 
 function applyLinkText(lk: LinkerInstance, link: TemplateLinkSpec, defaultNormal?: number): void {
-  if (link.text) lk.text = link.text
+  if (link.text) lk.text = translateTitle(link.text)
   const offset =
     link.textOffset ?? (link.text && defaultNormal != null ? { t: 0.5, normal: defaultNormal } : undefined)
   if (offset) lk.textOffset = offset
@@ -166,7 +167,7 @@ function buildLinker(
  * 按 spec 构建完整文档（元素 ID 全新生成；可直接写入画布/存储）
  */
 export function buildTemplateDocument(spec: TemplateSpec): DocumentData {
-  const doc = createEmptyDocument(spec.title)
+  const doc = createEmptyDocument(translateTitle(spec.title))
   doc.page = { ...doc.page, width: spec.page.width, height: spec.page.height }
 
   const elements: Record<string, ElementInstance | LinkerInstance> = {}

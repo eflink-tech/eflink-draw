@@ -1,5 +1,6 @@
 // src/ai/aiService.ts
 import OpenAI from 'openai'
+import { drawT } from '@/i18n/runtime'
 import type { AISettings, AIResponse } from './types'
 import { parseAIResponse } from './jsonParser'
 import { AIError } from './types'
@@ -69,17 +70,17 @@ export function assertValidBaseUrl(baseUrl: string): void {
   try {
     url = new URL(baseUrl)
   } catch {
-    throw new AIError('Base URL 格式不正确，请检查设置', 'invalid_settings')
+    throw new AIError(drawT('draw.err.baseUrlInvalid'), 'invalid_settings')
   }
   if (url.username || url.password) {
-    throw new AIError('Base URL 不应包含用户名或密码', 'invalid_settings')
+    throw new AIError(drawT('draw.err.baseUrlCredentials'), 'invalid_settings')
   }
   const isLocalHttp =
     url.protocol === 'http:' &&
     (url.hostname === 'localhost' || url.hostname === '127.0.0.1')
   if (url.protocol !== 'https:' && !isLocalHttp) {
     throw new AIError(
-      '出于安全考虑，Base URL 必须使用 HTTPS（本机调试可使用 http://localhost）',
+      drawT('draw.err.baseUrlHttps'),
       'invalid_settings',
     )
   }
@@ -223,13 +224,13 @@ function classifyError(error: unknown): AIError {
     const status = (error as { status: number }).status
 
     if (status === 401) {
-      return new AIError('API 密钥无效', 'api_unauthorized')
+      return new AIError(drawT('draw.err.apiUnauthorized'), 'api_unauthorized')
     }
     if (status === 429) {
-      return new AIError('请求太频繁', 'api_ratelimit')
+      return new AIError(drawT('draw.err.apiRatelimit'), 'api_ratelimit')
     }
     if (status === 500) {
-      return new AIError('服务器错误', 'api_server')
+      return new AIError(drawT('draw.err.apiServer'), 'api_server')
     }
   }
 
@@ -237,10 +238,10 @@ function classifyError(error: unknown): AIError {
     const code = (error as { code: string }).code
 
     if (code === 'ECONNREFUSED' || code === 'ENOTFOUND') {
-      return new AIError('网络连接失败', 'api_network')
+      return new AIError(drawT('draw.err.apiNetwork'), 'api_network')
     }
   }
 
   const message = error instanceof Error ? error.message : String(error)
-  return new AIError(`未知错误: ${message}`, 'api_server')
+  return new AIError(drawT('draw.err.apiUnknown', { message }), 'api_server')
 }

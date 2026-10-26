@@ -1,6 +1,7 @@
 // src/components/layout/AppLayout.tsx
 import type { ReactNode } from 'react'
 import { Shrink } from 'lucide-react'
+import { useI18n } from '@eflink-tech/office-kit'
 import { useUIStore } from '@/store/uiStore'
 import { RightToolbar } from './RightToolbar'
 import { ContextMenu } from '@/components/menus/ContextMenu'
@@ -20,6 +21,7 @@ interface AppLayoutProps {
  * 中间区域从左到右：左面板 → 画布 → 属性面板(260px) → AI 面板(380px) → 竖排工具栏(40px)
  */
 export function AppLayout({ topBar, leftPanel, canvas, rightPanel, bottomBar, aiPanel }: AppLayoutProps) {
+  const { t } = useI18n()
   const leftVisible = useUIStore((s) => s.leftPanelVisible)
   const rightVisible = useUIStore((s) => s.rightPanelVisible)
   const aiVisible = useUIStore((s) => s.aiPanelVisible)
@@ -36,10 +38,10 @@ export function AppLayout({ topBar, leftPanel, canvas, rightPanel, bottomBar, ai
           <button
             className="absolute right-3 top-3 z-50 flex items-center gap-1.5 rounded-md border border-[#d5d5d5] bg-white px-2.5 py-1.5 text-xs text-[#555] shadow-md hover:bg-[#f0f0f0]"
             onClick={() => setFocusMode(false)}
-            title="退出专注模式 (Esc)"
+            title={t('draw.status.exitFocus')}
           >
             <Shrink size={14} />
-            <span>退出专注</span>
+            <span>{t('draw.focus.exit')}</span>
           </button>
         </main>
       </div>

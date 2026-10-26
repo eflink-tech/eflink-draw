@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { useI18n } from '@eflink-tech/office-kit'
 import { X } from 'lucide-react'
 import { useEditorStore } from '@/store/editorStore'
 import { useUIStore } from '@/store/uiStore'
@@ -9,6 +10,7 @@ import { TextSection } from '@/components/panels/sections/TextSection'
 import { PageSection } from '@/components/panels/sections/PageSection'
 
 export function RightPanel() {
+  const { t } = useI18n()
   const selectedIds = useEditorStore((s) => s.selectedIds)
   const elements = useEditorStore((s) => s.document.elements)
   const toggleRightPanel = useUIStore((s) => s.toggleRightPanel)
@@ -22,11 +24,11 @@ export function RightPanel() {
     <div className="flex flex-col h-full text-xs">
       {/* 面板头部 */}
       <div className="flex items-center justify-between px-3 py-2 border-b border-[#e0e0e0] bg-[#fafafa]">
-        <span className="font-medium text-[#333]">属性</span>
+        <span className="font-medium text-[#333]">{t('draw.panel.properties')}</span>
         <button
           className="p-1 rounded text-[#999] hover:bg-[#f0f0f0] hover:text-[#333]"
           onClick={toggleRightPanel}
-          title="关闭属性面板"
+          title={t('draw.panel.closeProperties')}
         >
           <X size={16} />
         </button>

@@ -1,5 +1,6 @@
 // 纯预设色板（灰阶 12 + 9×12 彩色矩阵，共 120 色）+ HEX 输入 + 透明按钮；
 import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from 'react'
+import { useI18n } from '@eflink-tech/office-kit'
 import { rgbToHex } from '@/core/utils/color'
 import { ColorGrid } from '@/components/common/ColorGrid'
 
@@ -76,6 +77,7 @@ interface ColorButtonProps {
 
 /** 色块 + 下拉按钮组合（左侧色块，右侧灰色下拉箭头区域） */
 export function ColorButton({ value, onSelect, transparent = false, disabled = false }: ColorButtonProps) {
+  const { t } = useI18n()
   const [open, setOpen] = useState(false)
   const btnRef = useRef<HTMLButtonElement>(null)
 
@@ -88,7 +90,7 @@ export function ColorButton({ value, onSelect, transparent = false, disabled = f
         style={{ width: 42, height: 24 }}
         onMouseDown={(e) => e.preventDefault()}
         onClick={() => setOpen((v) => !v)}
-        title={value ? rgbToHex(value) : '透明'}
+        title={value ? rgbToHex(value) : t('draw.color.transparent')}
       >
         {/* 左侧色块 */}
         <div className="flex-1 h-full flex items-center justify-center px-[3px]">

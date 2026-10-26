@@ -1,5 +1,6 @@
 // src/components/ai/MessageBubble.tsx
 import { useEffect, useRef, useState } from 'react'
+import { useI18n } from '@eflink-tech/office-kit'
 import type { ConversationMessage } from '../../ai/types'
 import { ACCENT_COLOR } from './theme'
 
@@ -15,6 +16,7 @@ interface MessageBubbleProps {
  * 默认折叠为固定高度可滚动区域（自动滚动到最新内容），点击切换展开/折叠。
  */
 export const MessageBubble = ({ message, streaming = false }: MessageBubbleProps) => {
+  const { t } = useI18n()
   const isUser = message.role === 'user'
   const hasReasoning = !isUser && message.reasoning && message.reasoning.length > 0
   const hasContent = message.content && message.content.length > 0
@@ -88,7 +90,7 @@ export const MessageBubble = ({ message, streaming = false }: MessageBubbleProps
             }}
           >
             <span style={{ fontSize: '14px' }}>{reasoningExpanded ? '▼' : '▶'}</span>
-            <span> 思考过程</span>
+            <span> {t('draw.ai.reasoning')}</span>
           </button>
 
           {/* 内容区域：默认展开，固定高度滚动显示，流式期间自动跟随最新内容 */}
@@ -125,7 +127,7 @@ export const MessageBubble = ({ message, streaming = false }: MessageBubbleProps
             color: '#8a94a6',
           }}
         >
-          💭 思考中
+          💭 {t('draw.ai.thinking')}
           <span style={{ display: 'inline-flex', marginLeft: '4px' }}>
             <span style={{ animation: 'dotPulse 1.4s infinite', animationDelay: '0s' }}>.</span>
             <span style={{ animation: 'dotPulse 1.4s infinite', animationDelay: '0.2s' }}>.</span>
@@ -155,7 +157,7 @@ export const MessageBubble = ({ message, streaming = false }: MessageBubbleProps
             animation: 'generatingPulse 2.4s ease-in-out infinite',
           }}
         >
-          正在生成
+          {t('draw.ai.generating')}
           <span style={{ display: 'inline-flex', marginLeft: '4px' }}>
             <span style={{ animation: 'dotPulse 1.4s infinite', animationDelay: '0s' }}>.</span>
             <span style={{ animation: 'dotPulse 1.4s infinite', animationDelay: '0.2s' }}>.</span>
@@ -180,7 +182,7 @@ export const MessageBubble = ({ message, streaming = false }: MessageBubbleProps
             <a key={i} href={img.dataUrl} target="_blank" rel="noreferrer">
               <img
                 src={img.dataUrl}
-                alt={`消息图片 ${i + 1}`}
+                alt={t('draw.ai.messageImageAlt', { index: i + 1 })}
                 style={{
                   maxHeight: '120px',
                   maxWidth: '200px',

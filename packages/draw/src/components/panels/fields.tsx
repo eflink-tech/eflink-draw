@@ -18,8 +18,9 @@ export function Section({ title, children }: { title: string; children: React.Re
 export function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex items-center gap-2">
-      <span className="w-12 text-gray-500 flex-shrink-0">{label}</span>
-      <div className="flex-1">{children}</div>
+      {/* 拉丁语标签明显长于中文，固定 80px 才不会截断 */}
+      <span className="w-20 flex-shrink-0 leading-tight text-gray-500">{label}</span>
+      <div className="min-w-0 flex-1">{children}</div>
     </div>
   )
 }
@@ -177,7 +178,7 @@ export function SliderField({
         step={step}
         disabled={disabled}
         onChange={(e) => onChange(Number.parseFloat(e.target.value))}
-        className="panel-slider flex-1 cursor-pointer disabled:opacity-50"
+        className="panel-slider min-w-0 flex-1 cursor-pointer disabled:opacity-50"
         style={{
           background: `linear-gradient(to right, #833 0%, #833 ${percent}%, #e4e4e4 ${percent}%, #e4e4e4 100%)`,
         }}
