@@ -14,6 +14,8 @@ import { useEditorStore } from '@/store/editorStore'
 import { loadDocumentFromStorage, loadFromRemote, STORAGE_KEY } from '@/core/editor/persistence'
 import { DRAW_MESSAGES } from '@/i18n/messages'
 import { setDrawLocale } from '@/i18n/runtime'
+import { builtinEditorBrand, type EditorBrandId } from '@/brand'
+import type { OfficeHeaderBrand } from '@eflink-tech/office-kit'
 
 /** 品牌区配置：顶栏左上角的 logo 与产品名 */
 export interface DrawEditorBrand {
@@ -24,8 +26,18 @@ export interface DrawEditorBrand {
 export interface DrawEditorProps {
   /** 界面语言（zh-CN / en / es / pt-BR），默认 zh-CN */
   locale?: OfficeLocale | string;
-  /** 品牌区（logo + 产品名）；不传则用默认「DocuLuma Draw」 */
-  branding?: DrawEditorBrand | false;
+  /**
+   * 品牌区：'doculuma' | 'eflink' 选内置品牌，传对象完全自定义，false 隐藏品牌区。
+   * 缺省 'doculuma'。
+   */
+  branding?: DrawEditorBrand | false | EditorBrandId;
+}
+
+/** 品牌参数归一：字符串选内置品牌，对象原样使用，缺省 doculuma */
+function resolveBranding(branding: DrawEditorProps['branding']): OfficeHeaderBrand | false {
+  if (branding === false) return false;
+  if (branding === 'eflink' || branding === 'doculuma') return builtinEditorBrand(branding);
+  return branding ?? builtinEditorBrand('doculuma');
 }
 
 export function DrawEditor({ locale, branding }: DrawEditorProps) {
@@ -48,8 +60,10 @@ function DrawEditorInner({ branding }: Omit<DrawEditorProps, 'locale'>) {
       if (doc) useEditorStore.getState().loadDocument(doc)
     })
 
-    // 离页拦截 bridge：宿主（EditorLeaveGuard）通过它读取脏状态、触发保存、清理本地草稿
-    ;(window as unknown as Record<string, unknown>).__doculumaEditorBridge = {
+    // 离页拦截 bridge：宿主（EditorLeaveGuard）通过它读取脏状态、触发保存、清理本地草稿。
+    // __eflinkEditorBridge 是旧宿主的过渡期别名（同一对象），确认宿主全部改用新名后移除。
+    const bridgeRoot = window as unknown as Record<string, unknown>
+    bridgeRoot.__doculumaEditorBridge = {
       isDirty: () => useEditorStore.getState().isDirty,
       save: () => {
         useEditorStore.getState().saveDocument()
@@ -62,15 +76,19 @@ function DrawEditorInner({ branding }: Omit<DrawEditorProps, 'locale'>) {
         }
       },
     }
+    bridgeRoot.__eflinkEditorBridge = bridgeRoot.__doculumaEditorBridge
     return () => {
-      delete (window as unknown as Record<string, unknown>).__doculumaEditorBridge
+      delete bridgeRoot.__doculumaEditorBridge
+      delete bridgeRoot.__eflinkEditorBridge
     }
   }, [])
+
+  const resolvedBranding = resolveBranding(branding)
 
   return (
     <>
       <AppLayout
-        topBar={<TopBar branding={branding} />}
+        topBar={<TopBar branding={resolvedBranding} />}
         leftPanel={<LeftPanel />}
         canvas={<Canvas />}
         rightPanel={<RightPanel />}

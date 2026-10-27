@@ -1,7 +1,7 @@
 /** @eflink-tech/draw 对外导出面：编辑器组件 + store + 持久化辅助 */
 // 图形定义注册（形状 schema 侧-effects）必须先于组件执行
 import './core/schema/shapes'
-// 顶栏/菜单栏样式来自 office-kit：库构建会外部化该依赖，必须在此显式引入才会打进 dist/styles.css
+// 顶栏/菜单栏样式来自 office-kit：宿主只引入 dist/styles.css，必须在此显式引入才会打进产物
 import '@eflink-tech/office-kit/styles.css'
 import './styles.css'
 // 一次性迁移：efdraw:* 本地缓存 → doculuma:draw:*（必须早于任何读写新键的代码）
@@ -12,6 +12,10 @@ migrateLegacyLocalStorage()
 // 组件
 export { DrawEditor } from './DrawEditor'
 export type { DrawEditorProps, DrawEditorBrand } from './DrawEditor'
+
+// 品牌切换：'doculuma' | 'eflink' 内置品牌，或传对象自定义
+export { builtinEditorBrand, resolveEditorBrandId, EDITOR_BRAND_IDS } from './brand'
+export type { EditorBrandId } from './brand'
 export { setDrawRemoteStore } from './core/editor/persistence'
 export { setEditorBackHref } from './core/editor/chrome'
 export type { DrawRemoteStore } from './core/editor/persistence'

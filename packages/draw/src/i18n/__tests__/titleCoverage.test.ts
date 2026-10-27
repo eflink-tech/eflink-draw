@@ -5,6 +5,8 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { translateTitle } from '@/i18n'
+import { SHAPE_TITLE_I18N } from '@/i18n/shapeTitles'
+import { CONTENT_TITLE_I18N } from '@/i18n/contentTitles'
 import { shapeRegistry } from '@/core/schema/registry'
 import '@/core/schema/shapes'
 import { SHAPE_CATEGORIES } from '@/store/uiStore'
@@ -13,12 +15,18 @@ import { NET_GROUP_SHAPE_TITLES } from '@/core/schema/shapes/netIconTitles'
 import { DRAW_TEMPLATES, TEMPLATE_CATEGORIES } from '@/templates'
 
 const HAS_CJK = /[一-鿿]/
+const CHECK_LOCALES = ['en', 'es', 'pt-BR'] as const
 
-/** 未被查表翻译命中的中文串（translateTitle 原样返回即视为缺失） */
+/** 未被查表翻译命中的中文串（translateTitle 原样返回即视为缺失），三语逐列检查 */
 function missingFrom(label: string, values: Array<string | undefined | null>, out: string[]) {
   for (const value of values) {
     if (!value || !HAS_CJK.test(value)) continue
-    if (translateTitle(value, 'en') === value) out.push(`${label}: ${value}`)
+    for (const locale of CHECK_LOCALES) {
+      if (translateTitle(value, locale) === value) {
+        out.push(`${label}[${locale}]: ${value}`)
+        break
+      }
+    }
   }
 }
 
@@ -30,6 +38,11 @@ function curatedPanelTitles(): string[] {
 }
 
 describe('素材标题本地化', () => {
+  it('shapeTitles 与 contentTitles 键不重复（重复时 index 合并会静默单边生效）', () => {
+    const duplicated = Object.keys(SHAPE_TITLE_I18N).filter((key) => key in CONTENT_TITLE_I18N)
+    expect(duplicated, `两表重复键：${duplicated.join(' / ')}`).toEqual([])
+  })
+
   it('图形库、分类、图标品类与模板全部有译文', () => {
     const missing: string[] = []
 

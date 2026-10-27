@@ -3,7 +3,8 @@ import { test, expect, type Page } from '@playwright/test'
 const picker = '[data-testid="template-picker"]'
 
 async function openPicker(page: Page) {
-  await page.getByRole('button', { name: '文件', exact: true }).click()
+  // office-kit 菜单按钮显式 role="menuitem"，不能用 getByRole('button')
+  await page.getByRole('menuitem', { name: '文件' }).click()
   await page.getByText('从模板新建…', { exact: true }).click()
   await expect(page.locator(picker)).toBeVisible()
 }

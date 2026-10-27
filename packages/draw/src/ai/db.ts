@@ -1,5 +1,5 @@
 import Dexie, { type Table } from 'dexie'
-import { readLegacyIndexedDb } from '@eflink-tech/office-kit'
+import { isLegacyImportDone, markLegacyImportDone, readLegacyIndexedDb } from '@eflink-tech/office-kit'
 import type { Conversation, ConversationMessage, AISettings, Template } from './types'
 import { BUILTIN_TEMPLATES } from './builtinTemplates'
 
@@ -44,17 +44,34 @@ async function importLegacyRows(): Promise<void> {
   const legacy = await readLegacyIndexedDb(LEGACY_DB_NAME, LEGACY_STORE_NAMES)
   if (!legacy) return
   await Promise.all([
-    importTable(db.conversations, legacy.conversations),
-    importTable(db.settings, legacy.settings),
-    importTable(db.templates, legacy.templates),
+    importTable(db.conversations, legacy.conversations, 'doculuma:draw:legacy-ai-imported:conversations'),
+    importTable(db.settings, legacy.settings, 'doculuma:draw:legacy-ai-imported:settings'),
+    importTable(db.templates, legacy.templates, 'doculuma:draw:legacy-ai-imported:templates'),
   ])
 }
 
-/** 目标表非空则跳过（本次会话/此前已有新数据，以新库为准） */
-async function importTable<T>(table: Table<T, string>, rows: unknown[] | undefined): Promise<void> {
-  if (!rows || rows.length === 0) return
-  if ((await table.count()) > 0) return
+/**
+ * 目标表非空则跳过（以新库为准）。
+ * 无论导入成功还是跳过都落一次性标记：否则用户删光对话后，
+ * 下次启动空表判据再次命中，旧数据会"复活"且永远删不干净。
+ * bulkPut 单事务原子写入，失败不落标记，下个会话自然重试。
+ */
+async function importTable<T>(
+  table: Table<T, string>,
+  rows: unknown[] | undefined,
+  markerKey: string,
+): Promise<void> {
+  if (isLegacyImportDone(markerKey)) return
+  if (!rows || rows.length === 0) {
+    markLegacyImportDone(markerKey)
+    return
+  }
+  if ((await table.count()) > 0) {
+    markLegacyImportDone(markerKey)
+    return
+  }
   await table.bulkPut(rows as T[])
+  markLegacyImportDone(markerKey)
 }
 
 /** 删除并重建数据库（仅测试用） */
@@ -98,6 +115,8 @@ export const settingsStore = {
 /** 对话历史的增删查改（消息以整条对话为单位落库） */
 export const conversationStore = {
   async createConversation(title: string): Promise<string> {
+    // 写入口也要等导入：抢先写入会让新表非空，旧对话被永久跳过
+    await ensureLegacyImport()
     const id = `conv-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
     const now = Date.now()
     const conv: Conversation = { id, title, messages: [], createdAt: now, updatedAt: now }
@@ -116,10 +135,12 @@ export const conversationStore = {
   },
 
   async deleteConversation(id: string): Promise<void> {
+    await ensureLegacyImport()
     await db.conversations.delete(id)
   },
 
   async appendMessage(conversationId: string, message: ConversationMessage): Promise<void> {
+    await ensureLegacyImport()
     await db.transaction('rw', db.conversations, async () => {
       const conv = await db.conversations.get(conversationId)
       if (!conv) throw new Error(`Conversation ${conversationId} not found`)

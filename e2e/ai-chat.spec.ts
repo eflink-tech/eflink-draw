@@ -6,7 +6,6 @@ import { test, expect } from '@playwright/test'
 
 const SEL = {
   // AI 面板已改为常驻停靠形态（显隐由 uiStore.aiPanelVisible 控制），无浮窗气泡
-  bubble: '[aria-label="AI 助手"]', // 停用：仅 TC2-TC8（fixme）尚引用，重写时移除
   collapse: '[aria-label="收起"]',
   send: '[aria-label="发送"]',
   input: '[aria-label="消息输入"]',
@@ -145,13 +144,6 @@ function overrideSettingsMockAsUnconfigured(page: Parameters<typeof test>[0]['pa
   })
 }
 
-/** 构造 Mock OpenAI chat/completions 响应 */
-function buildMockResponse(content: string) {
-  return JSON.stringify({
-    choices: [{ message: { content } }],
-  })
-}
-
 /**
  * 构造 OpenAI 流式（SSE）响应体。
  * aiService 现强制 stream:true，普通 JSON 响应体在流式解析下不会产生任何
@@ -267,11 +259,6 @@ async function getLinkerEndpoints(
 }
 
 /** 根据当前平台返回撤销快捷键（macOS 用 Meta+z，其他用 Control+z） */
-async function undoShortcut(page: Parameters<typeof test>[0]['page']): Promise<string> {
-  const isMac = await page.evaluate(() => navigator.platform.includes('Mac'))
-  return isMac ? 'Meta+z' : 'Control+z'
-}
-
 test.describe('AI 助手 E2E', () => {
   test.beforeEach(async ({ page }) => {
     await registerSettingsMock(page)
@@ -307,16 +294,16 @@ test.describe('AI 助手 E2E', () => {
     await expect(page.locator(SEL.input)).not.toBeVisible()
   })
 
-  test.fixme('TC2: 完整生成流程', async ({ page }) => {
-    // Mock OpenAI API
+  test('TC2: 完整生成流程', async ({ page }) => {
+    // Mock OpenAI API（aiService 强制流式，mock 须返回 SSE）
     await page.route('**/chat/completions', async (route) => {
       await route.fulfill({
         status: 200,
-        contentType: 'application/json',
+        contentType: 'text/event-stream',
         headers: {
           'Access-Control-Allow-Origin': '*',
         },
-        body: buildMockResponse(
+        body: buildStreamResponse(
           JSON.stringify({
             actions: [
               { type: 'add_element', refId: 'n1', schema: 'terminator', x: 100, y: 100, text: 'A' },
@@ -331,8 +318,8 @@ test.describe('AI 助手 E2E', () => {
 
     await page.goto('/')
 
-    // 展开聊天
-    await page.locator(SEL.bubble).click()
+    // 展开 AI 面板（旧聊天气泡按钮已随顶栏统一移除）
+    await openAiPanel(page)
 
     // 输入消息
     await page.locator(SEL.input).fill('画 A→B')
@@ -348,16 +335,16 @@ test.describe('AI 助手 E2E', () => {
     expect(elementCount).toBeGreaterThanOrEqual(3)
   })
 
-  test.fixme('TC3: 撤销 AI 操作', async ({ page }) => {
+  test('TC3: 撤销 AI 操作', async ({ page }) => {
     // Mock OpenAI API
     await page.route('**/chat/completions', async (route) => {
       await route.fulfill({
         status: 200,
-        contentType: 'application/json',
+        contentType: 'text/event-stream',
         headers: {
           'Access-Control-Allow-Origin': '*',
         },
-        body: buildMockResponse(
+        body: buildStreamResponse(
           JSON.stringify({
             actions: [
               { type: 'add_element', refId: 'n1', schema: 'terminator', x: 100, y: 100, text: 'A' },
@@ -370,8 +357,8 @@ test.describe('AI 助手 E2E', () => {
 
     await page.goto('/')
 
-    // 展开聊天并发送
-    await page.locator(SEL.bubble).click()
+    // 展开 AI 面板（旧聊天气泡按钮已随顶栏统一移除）
+    await openAiPanel(page)
     await page.locator(SEL.input).fill('画 A')
     await page.locator(SEL.send).click()
 
@@ -382,9 +369,17 @@ test.describe('AI 助手 E2E', () => {
     const beforeCount = await getElementCount(page)
     expect(beforeCount).toBeGreaterThanOrEqual(1)
 
-    // 按平台对应的撤销快捷键（macOS: Meta+z, 其他: Control+z）
-    const shortcut = await undoShortcut(page)
-    await page.keyboard.press(shortcut)
+    // 经「编辑」菜单撤销（工具栏按钮是自定义 Tooltip 无原生 title，
+    // 键盘快捷键会被仍持有焦点的 AI 输入框拦截）。
+    // 当前 AI 落图分两条历史（落图归位的移动 + 元素创建），最多撤销两次清空。
+    await expect(async () => {
+      const count = await getElementCount(page)
+      if (count >= beforeCount) {
+        await page.getByRole('menuitem', { name: '编辑' }).click()
+        await page.getByRole('menuitem', { name: '撤销' }).click()
+      }
+      expect(await getElementCount(page)).toBeLessThan(beforeCount)
+    }).toPass({ timeout: 8000 })
 
     // 轮询等待撤销生效，避免硬编码 waitForTimeout 导致 flaky
     await expect(async () => {
@@ -393,7 +388,7 @@ test.describe('AI 助手 E2E', () => {
     }).toPass({ timeout: 3000 })
   })
 
-  test.fixme('TC4: 增量修改 L2（含连线重路由）', async ({ page }) => {
+  test('TC4: 增量修改 L2（含连线重路由）', async ({ page }) => {
     // AI 响应：根据请求内容动态返回
     await page.route('**/chat/completions', async (route) => {
       const requestBody = route.request().postDataJSON() as {
@@ -407,11 +402,11 @@ test.describe('AI 助手 E2E', () => {
         // 第一次调用：添加 2 个节点 + 1 条连线
         await route.fulfill({
           status: 200,
-          contentType: 'application/json',
+          contentType: 'text/event-stream',
           headers: {
             'Access-Control-Allow-Origin': '*',
           },
-          body: buildMockResponse(
+          body: buildStreamResponse(
             JSON.stringify({
               actions: [
                 { type: 'add_element', refId: 'n1', schema: 'terminator', x: 100, y: 100, text: '原始文字' },
@@ -432,11 +427,11 @@ test.describe('AI 助手 E2E', () => {
 
         await route.fulfill({
           status: 200,
-          contentType: 'application/json',
+          contentType: 'text/event-stream',
           headers: {
             'Access-Control-Allow-Origin': '*',
           },
-          body: buildMockResponse(
+          body: buildStreamResponse(
             JSON.stringify({
               actions: [
                 { type: 'update_element', id: realId, text: '已更新文字' },
@@ -451,7 +446,7 @@ test.describe('AI 助手 E2E', () => {
     await page.goto('/')
 
     // 展开聊天并发送第一次消息（添加 2 节点 + 1 连线）
-    await page.locator(SEL.bubble).click()
+    await openAiPanel(page)
     await page.locator(SEL.input).fill('画两个节点并用连线连接')
     await page.locator(SEL.send).click()
 
@@ -495,7 +490,7 @@ test.describe('AI 助手 E2E', () => {
     expect(linkerEndpoints!.fromId).not.toBe(linkerEndpoints!.toId)
   })
 
-  test.fixme('TC5: 删除级联', async ({ page }) => {
+  test('TC5: 删除级联', async ({ page }) => {
     // AI 响应：根据请求内容动态返回
     await page.route('**/chat/completions', async (route) => {
       const requestBody = route.request().postDataJSON() as {
@@ -508,11 +503,11 @@ test.describe('AI 助手 E2E', () => {
         // 第一次调用：添加节点和连线
         await route.fulfill({
           status: 200,
-          contentType: 'application/json',
+          contentType: 'text/event-stream',
           headers: {
             'Access-Control-Allow-Origin': '*',
           },
-          body: buildMockResponse(
+          body: buildStreamResponse(
             JSON.stringify({
               actions: [
                 { type: 'add_element', refId: 'n1', schema: 'terminator', x: 100, y: 100, text: 'A' },
@@ -533,11 +528,11 @@ test.describe('AI 助手 E2E', () => {
 
         await route.fulfill({
           status: 200,
-          contentType: 'application/json',
+          contentType: 'text/event-stream',
           headers: {
             'Access-Control-Allow-Origin': '*',
           },
-          body: buildMockResponse(
+          body: buildStreamResponse(
             JSON.stringify({
               actions: [
                 { type: 'delete_element', id: realId },
@@ -552,7 +547,7 @@ test.describe('AI 助手 E2E', () => {
     await page.goto('/')
 
     // 展开聊天并发送第一次消息（添加节点和连线）
-    await page.locator(SEL.bubble).click()
+    await openAiPanel(page)
     await page.locator(SEL.input).fill('画 A→B')
     await page.locator(SEL.send).click()
 
@@ -578,18 +573,18 @@ test.describe('AI 助手 E2E', () => {
     expect(afterDelete).toBe(afterAdd - 2)
   })
 
-  test.fixme('TC6: 图片上传（含压缩验证）', async ({ page }) => {
+  test('TC6: 图片上传（含压缩验证）', async ({ page }) => {
     // 拦截 API 请求，捕获请求体
     let requestPayload: unknown = null
     await page.route('**/chat/completions', async (route) => {
       requestPayload = route.request().postDataJSON()
       await route.fulfill({
         status: 200,
-        contentType: 'application/json',
+        contentType: 'text/event-stream',
         headers: {
           'Access-Control-Allow-Origin': '*',
         },
-        body: buildMockResponse(
+        body: buildStreamResponse(
           JSON.stringify({
             actions: [],
             message: '已生成回复',
@@ -600,8 +595,8 @@ test.describe('AI 助手 E2E', () => {
 
     await page.goto('/')
 
-    // 展开聊天
-    await page.locator(SEL.bubble).click()
+    // 展开 AI 面板（旧聊天气泡按钮已随顶栏统一移除）
+    await openAiPanel(page)
 
     // 找到隐藏的文件输入框并上传图片
     const fileInput = page.locator('input[type="file"][aria-label="图片文件选择"]')
@@ -616,11 +611,9 @@ test.describe('AI 助手 E2E', () => {
       buffer: testImagePath,
     })
 
-    // 等待图片压缩完成（通过轮询 pendingImages 状态代替硬编码 waitForTimeout）
-    await expect.poll(
-      () => page.evaluate(() => (window as unknown as { _pendingImagesCount?: number })._pendingImagesCount ?? 0),
-      { timeout: 3000 },
-    ).toBe(1)
+    // 等待图片压缩完成：待发送缩略图渲染出来（用户可见行为；
+    // 不用 window._pendingImagesCount——它只在 DEV 构建挂载，e2e 跑的是生产构建）
+    await expect(page.getByRole('button', { name: '移除图片 1' })).toBeVisible({ timeout: 5000 })
 
     // 输入消息并发送
     await page.locator(SEL.input).fill('看看这张图')
@@ -659,12 +652,12 @@ test.describe('AI 助手 E2E', () => {
     expect(base64Data.length).toBeGreaterThan(0)
   })
 
-  test.fixme('TC7: API 错误处理（401 密钥无效）', async ({ page }) => {
+  test('TC7: API 错误处理（401 密钥无效）', async ({ page }) => {
     // Mock 401 Unauthorized 响应
     await page.route('**/chat/completions', async (route) => {
       await route.fulfill({
         status: 401,
-        contentType: 'application/json',
+        contentType: 'text/event-stream',
         headers: {
           'Access-Control-Allow-Origin': '*',
         },
@@ -678,7 +671,7 @@ test.describe('AI 助手 E2E', () => {
     const initialCount = await getElementCount(page)
 
     // 展开聊天面板
-    await page.locator(SEL.bubble).click()
+    await openAiPanel(page)
 
     // 输入消息并发送
     await page.locator(SEL.input).fill('画一个节点')
@@ -695,7 +688,7 @@ test.describe('AI 助手 E2E', () => {
     expect(afterCount).toBe(initialCount)
   })
 
-  test.fixme('TC8: 模板选择 → AI 生成流程', async ({ page }) => {
+  test('TC8: 模板选择 → AI 生成流程', async ({ page }) => {
     // Mock OpenAI API：返回订单处理流程（多节点 + 连线）
     await page.route('**/chat/completions', async (route) => {
       await route.fulfill({
@@ -724,7 +717,7 @@ test.describe('AI 助手 E2E', () => {
     await page.goto('/')
 
     // 先展开 AI 助手面板（回复文本渲染在面板内，收起时 toBeVisible 会超时）
-    await page.locator(SEL.bubble).click()
+    await openAiPanel(page)
 
     // 模板入口已从顶栏移除（暂时隐藏）：直接派发打开事件，走同一事件链路
     await page.evaluate(() => window.dispatchEvent(new CustomEvent('ai:open-templates')))

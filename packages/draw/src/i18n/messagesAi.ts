@@ -22,7 +22,7 @@ const ROWS = {
   ],
 
   // 欢迎区（问候语 + 拼接句 + 提示 + 示例指令）
-  'draw.ai.greeting.early': ['凌晨好', 'Early morning', 'Buenas madrugadas', 'Boa madrugada'],
+  'draw.ai.greeting.early': ['凌晨好', 'Hello', 'Buenas madrugadas', 'Boa madrugada'],
   'draw.ai.greeting.morning': ['上午好', 'Good morning', 'Buenos días', 'Bom dia'],
   'draw.ai.greeting.noon': ['中午好', 'Good afternoon', 'Buenas tardes', 'Boa tarde'],
   'draw.ai.greeting.afternoon': ['下午好', 'Good afternoon', 'Buenas tardes', 'Boa tarde'],
@@ -36,7 +36,7 @@ const ROWS = {
   'draw.ai.welcomeHint': [
     '点击下方提示词，快速生成流程图，或者截图粘贴图片，也可以描述您想要创建的内容',
     'Pick a prompt below to generate a flowchart, paste a screenshot to replicate it, or describe what you want to draw',
-    'Elige un indicación de abajo para generar un diagrama de flujo, pega una captura o describe lo que quieres dibujar',
+    'Elige una indicación de abajo para generar un diagrama de flujo, pega una captura o describe lo que quieres dibujar',
     'Escolha um prompt abaixo para gerar um fluxograma, cole uma captura de tela ou descreva o que você quer desenhar',
   ],
   'draw.ai.examplePrompt1': [
