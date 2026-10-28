@@ -549,11 +549,12 @@ export function LeftPanel() {
                     isActive ? 'bg-blue-50 text-blue-600 font-medium' : 'text-[#555]',
                   ].join(' ')}
                   onClick={() => onCategoryHeaderClick(cat)}
+                  title={tt(cat.name)}
                 >
-                  {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                  <Icon size={14} className="ml-1 mr-2" />
-                  <span>{tt(cat.name)}</span>
-                  <span className="ml-auto text-[10px] text-gray-400">{total}</span>
+                  {isExpanded ? <ChevronDown size={14} className="shrink-0" /> : <ChevronRight size={14} className="shrink-0" />}
+                  <Icon size={14} className="ml-1 mr-2 shrink-0" />
+                  <span className="truncate">{tt(cat.name)}</span>
+                  <span className="ml-auto pl-2 text-[10px] text-gray-400 shrink-0">{total}</span>
                 </button>
 
                 {isExpanded && (
@@ -597,12 +598,14 @@ export function LeftPanel() {
                       const loaded = !child.lazy || isNetworkGroupLoaded(child.id)
                       const open = isOpenChild(child)
                       const vendorName = vendors.find((v) => v.id === child.vendor)?.name ?? ''
+                      const childLabel = child.lazy ? shortGroupName(tt(child.name), tt(vendorName)) : tt(child.name)
                       const pinned = netIconPrefs.includes(child.id)
                       return (
                         <div key={child.id}>
                           <div className="flex items-center bg-[#fafafa] border-y border-[#f0f0f0]">
                             <button
                               data-group={child.id}
+                              title={childLabel}
                               className={[
                                 'flex items-center flex-1 min-w-0 px-3 py-1 pl-8 text-[11px] transition-colors text-left',
                                 'cursor-pointer hover:bg-[#f0f0f0]',
@@ -611,9 +614,7 @@ export function LeftPanel() {
                               onClick={() => toggleChild(child)}
                             >
                               {open ? <ChevronDown size={12} className="mr-1 shrink-0" /> : <ChevronRight size={12} className="mr-1 shrink-0" />}
-                              <span className="truncate">
-                                {child.lazy ? shortGroupName(tt(child.name), tt(vendorName)) : tt(child.name)}
-                              </span>
+                              <span className="truncate">{childLabel}</span>
                               <span
                                 className={[
                                   'ml-auto pl-1 text-[10px] shrink-0',
@@ -667,11 +668,12 @@ export function LeftPanel() {
                   setActiveCategory(cat.id)
                   toggleCategory(cat.id)
                 }}
+                title={tt(cat.name)}
               >
-                {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                <Icon size={14} className="ml-1 mr-2" />
-                <span>{tt(cat.name)}</span>
-                <span className="ml-auto text-[10px] text-gray-400">{catShapes.length}</span>
+                {isExpanded ? <ChevronDown size={14} className="shrink-0" /> : <ChevronRight size={14} className="shrink-0" />}
+                <Icon size={14} className="ml-1 mr-2 shrink-0" />
+                <span className="truncate">{tt(cat.name)}</span>
+                <span className="ml-auto pl-2 text-[10px] text-gray-400 shrink-0">{catShapes.length}</span>
               </button>
 
               {/* 分类下的图形列表 */}
