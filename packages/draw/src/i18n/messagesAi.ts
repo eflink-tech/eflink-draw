@@ -10,7 +10,7 @@ type Row = readonly [string, string, string, string];
 
 const ROWS = {
   'draw.ai.title': ['AI 智能助手', 'AI Assistant', 'Asistente de IA', 'Assistente de IA'],
-  'draw.ai.collapse': ['收起', 'Collapse panel', 'Ocultar panel', 'Recolher painel'],
+  'draw.ai.collapse': ['收起', 'Collapse panel', 'Contraer panel', 'Recolher painel'],
 
   // 未配置引导
   'draw.ai.notConfiguredTitle': ['尚未配置 AI 服务', 'AI is not set up yet', 'La IA aún no está configurada', 'A IA ainda não está configurada'],
@@ -22,7 +22,7 @@ const ROWS = {
   ],
 
   // 欢迎区（问候语 + 拼接句 + 提示 + 示例指令）
-  'draw.ai.greeting.early': ['凌晨好', 'Hello', 'Buenas madrugadas', 'Boa madrugada'],
+  'draw.ai.greeting.early': ['凌晨好', 'Hello', 'Buenas noches', 'Boa noite'],
   'draw.ai.greeting.morning': ['上午好', 'Good morning', 'Buenos días', 'Bom dia'],
   'draw.ai.greeting.noon': ['中午好', 'Good afternoon', 'Buenas tardes', 'Boa tarde'],
   'draw.ai.greeting.afternoon': ['下午好', 'Good afternoon', 'Buenas tardes', 'Boa tarde'],
@@ -36,7 +36,7 @@ const ROWS = {
   'draw.ai.welcomeHint': [
     '点击下方提示词，快速生成流程图，或者截图粘贴图片，也可以描述您想要创建的内容',
     'Pick a prompt below to generate a flowchart, paste a screenshot to replicate it, or describe what you want to draw',
-    'Elige una indicación de abajo para generar un diagrama de flujo, pega una captura o describe lo que quieres dibujar',
+    'Elige un prompt de abajo para generar un diagrama de flujo, pega una captura o describe lo que quieres dibujar',
     'Escolha um prompt abaixo para gerar um fluxograma, cole uma captura de tela ou descreva o que você quer desenhar',
   ],
   'draw.ai.examplePrompt1': [
@@ -124,7 +124,7 @@ const ROWS = {
   'draw.ai.serviceNotReady': [
     'AI 服务尚未就绪，请确认已在设置中正确配置',
     'The AI service is not ready yet. Make sure it is configured correctly in Settings.',
-    'El servicio de IA aún no está listo. Verifica que esté bien configurado en Configuración.',
+    'El servicio de IA aún no está listo. Verifica que la configuración de IA sea correcta.',
     'O serviço de IA ainda não está pronto. Confirme se ele está configurado corretamente em Configurações.',
   ],
   'draw.ai.imageProcessFailed': [
@@ -207,8 +207,8 @@ const ROWS = {
     'O desenho com IA depende da compreensão de imagens, então escolha um modelo multimodal com visão (como GPT-4o, Claude 3 Sonnet ou Qwen-VL).',
   ],
   'draw.ai.saving': ['保存中...', 'Saving…', 'Guardando…', 'Salvando…'],
-  'draw.ai.clearConfig': ['清空配置', 'Clear configuration', 'Borrar configuración', 'Limpar configuração'],
-  'draw.ai.clearing': ['清空中...', 'Clearing…', 'Borrando…', 'Limpando…'],
+  'draw.ai.clearConfig': ['清空配置', 'Clear configuration', 'Borrar configuración', 'Apagar configuração'],
+  'draw.ai.clearing': ['清空中...', 'Clearing…', 'Borrando…', 'Apagando…'],
 
   // AI 快捷指令（模板库）
   'draw.ai.commandTitle': ['AI 快捷指令', 'AI Quick Commands', 'Comandos rápidos de IA', 'Comandos rápidos de IA'],
