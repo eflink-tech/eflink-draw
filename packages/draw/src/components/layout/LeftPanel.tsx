@@ -40,6 +40,8 @@ import {
   // UML 图形扩展
   Folder, Server, X, Hourglass,
   Network, Waypoints, Link, Boxes, Smartphone,
+  // draw.io 移植批分类
+  Shapes, CircuitBoard, PanelsTopLeft,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
@@ -69,6 +71,11 @@ const CATEGORY_ICONS: Record<string, LucideIcon> = {
   // 网络拓扑 / 云服务图标（懒加载矢量图标）
   net_topo: Network,
   cloud_icons: Cloud,
+  // draw.io 移植批（通用素材 / 电气工程 / 机房机架 / Web 原型）
+  signs_icons: Shapes,
+  electrical: CircuitBoard,
+  rack: Server,
+  mockup: PanelsTopLeft,
 }
 
 /** 每个分类下的示例图形（Phase 1 用占位，Phase 2 从 registry 获取；懒加载分组的图形来自生成器面板数据） */

@@ -33,6 +33,8 @@ export interface IconRaw {
   ct?: 1
   /** 标题位置：缺省图形下方居中，'top' 为框内左上角 */
   tb?: 'top'
+  /** 预填文案（drawio stencil 唯一 <text> 节点映射，如图形内标签） */
+  tx?: string
 }
 
 function decodeCmds(str: string): PathAction[] {
@@ -57,8 +59,6 @@ function decodeCmds(str: string): PathAction[] {
   return out
 }
 
-const TEXT_BLOCK = [{ position: { x: 'w/2-70', y: 'h', w: 140, h: 28 }, text: '' }]
-
 /** 单色模式路径：带 evenodd 的子路径需升级为带样式对象才能携带 fillRule */
 function monoPath(segs: IconSegmentRaw[]) {
   return segs.map((s) => (s.fr ? { actions: decodeCmds(s.cmds), fillRule: 'evenodd' as const } : decodeCmds(s.cmds)))
@@ -66,11 +66,12 @@ function monoPath(segs: IconSegmentRaw[]) {
 
 export function buildIconShape(def: IconRaw): ShapeDefinition {
   let shape: ShapeDefinition
+  const textBelow = { position: { x: 'w/2-70', y: 'h', w: 140, h: 28 }, text: def.tx ?? '' }
   if (def.m === 'fill') {
     shape = {
       name: def.n, title: def.t, category: def.c,
       props: { w: def.w, h: def.h },
-      textBlock: TEXT_BLOCK,
+      textBlock: [textBelow],
       fillStyle: { type: 'solid', color: def.fc ?? '50,50,50' },
       lineStyle: { lineWidth: 0 },
       path: monoPath(def.segs),
@@ -79,7 +80,7 @@ export function buildIconShape(def: IconRaw): ShapeDefinition {
     shape = {
       name: def.n, title: def.t, category: def.c,
       props: { w: def.w, h: def.h },
-      textBlock: TEXT_BLOCK,
+      textBlock: [textBelow],
       fillStyle: { type: 'none' },
       lineStyle: { lineColor: def.lc ?? '50,50,50', lineWidth: def.lw ?? 1 },
       path: monoPath(def.segs),
@@ -88,7 +89,7 @@ export function buildIconShape(def: IconRaw): ShapeDefinition {
     shape = {
       name: def.n, title: def.t, category: def.c,
       props: { w: def.w, h: def.h },
-      textBlock: TEXT_BLOCK,
+      textBlock: [textBelow],
       fillStyle: { type: 'none' },
       lineStyle: { lineWidth: 0 },
       path: def.segs.map((s) => ({

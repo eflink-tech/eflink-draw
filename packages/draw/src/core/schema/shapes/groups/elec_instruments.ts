@@ -1,0 +1,13 @@
+// ═══════════════════════════════════════════
+// elec_instruments 矢量数据（自动生成，勿手改）
+// 生成: node scripts/gen-drawio-stencils.mjs
+// 来源: scripts/drawio-stencils/（jgraph/drawio stencil XML → IconRaw，Apache 2.0）
+// 运行时由 iconShape.buildIconShape 展开为 ShapeDefinition
+// 体积大，只允许 networkLoader 经 netIconChunks 动态 import（勿在主入口静态引用）
+// ═══════════════════════════════════════════
+import type { ShapeDefinition } from '@/types'
+import { buildIconShape, type IconRaw } from '../iconShape'
+
+const raw: IconRaw[] = [{"n":"elec_instruments_ampermeter","t":"Ampermeter","c":"elec_instruments","g":"elec_instruments","w":90,"h":90,"segs":[{"cmds":"M1000 500 C1000 776 776 1000 500 1000 C224 1000 0 776 0 500 C0 224 224 0 500 0 C776 0 1000 224 1000 500 Z","fill":"255,255,255","stroke":"0,0,0","sw":1},{"cmds":"M278 833 L722 167","fill":"none","stroke":"0,0,0","sw":1},{"cmds":"M578 278 L722 167 L683 339","fill":"255,255,255","stroke":"0,0,0","sw":1}],"m":"multi"},{"n":"elec_instruments_galvanometer","t":"Galvanometer","c":"elec_instruments","g":"elec_instruments","w":90,"h":90,"segs":[{"cmds":"M1000 500 C1000 776 776 1000 500 1000 C224 1000 0 776 0 500 C0 224 224 0 500 0 C776 0 1000 224 1000 500 Z","fill":"255,255,255","stroke":"0,0,0","sw":1},{"cmds":"M500 856 L500 144 M444 300 L500 144 L556 300","fill":"none","stroke":"0,0,0","sw":1}],"m":"multi"},{"n":"elec_instruments_oscilloscope","t":"Oscilloscope","c":"elec_instruments","g":"elec_instruments","w":90,"h":90,"segs":[{"cmds":"M1000 500 C1000 776 776 1000 500 1000 C224 1000 0 776 0 500 C0 224 224 0 500 0 C776 0 1000 224 1000 500 Z","fill":"255,255,255","stroke":"0,0,0","sw":1},{"cmds":"M111 611 L278 389 L278 611 L444 389 L444 611 L611 389 L611 611 L778 389 L778 611 L861 500","fill":"none","stroke":"0,0,0","sw":1}],"m":"multi"},{"n":"elec_instruments_signal_generator","t":"Signal Generator","c":"elec_instruments","g":"elec_instruments","w":90,"h":90,"segs":[{"cmds":"M1000 500 C1000 776 776 1000 500 1000 C224 1000 0 776 0 500 C0 224 224 0 500 0 C776 0 1000 224 1000 500 Z","fill":"255,255,255","stroke":"0,0,0","sw":1},{"cmds":"M333 833 L444 722 L444 833 L556 722 L556 833 L667 722 L667 833 M333 222 C346 187 380 164 417 164 C454 164 487 187 500 222 C513 257 546 280 583 280 C620 280 654 257 667 222 M333 500 L333 389 L500 389 L500 611 L667 611 L667 500","fill":"none","stroke":"0,0,0","sw":1}],"m":"multi"},{"n":"elec_instruments_voltmeter","t":"Voltmeter","c":"elec_instruments","g":"elec_instruments","w":90,"h":90,"segs":[{"cmds":"M1000 500 C1000 776 776 1000 500 1000 C224 1000 0 776 0 500 C0 224 224 0 500 0 C776 0 1000 224 1000 500 Z","fill":"255,255,255","stroke":"0,0,0","sw":1}],"tx":"V","m":"multi"}]
+
+export const shapes: ShapeDefinition[] = raw.map(buildIconShape)

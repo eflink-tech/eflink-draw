@@ -35,6 +35,36 @@
       "name": "阿里云",
       "schemaCategory": "network_aliyun",
       "panel": "cloud_icons"
+    },
+    {
+      "id": "signs",
+      "name": "通用素材",
+      "schemaCategory": "",
+      "panel": "signs_icons"
+    },
+    {
+      "id": "elec",
+      "name": "电气工程",
+      "schemaCategory": "",
+      "panel": "electrical"
+    },
+    {
+      "id": "rack",
+      "name": "机房机架",
+      "schemaCategory": "",
+      "panel": "rack"
+    },
+    {
+      "id": "mk",
+      "name": "Web 原型",
+      "schemaCategory": "",
+      "panel": "mockup"
+    },
+    {
+      "id": "aws2023",
+      "name": "AWS 2023",
+      "schemaCategory": "",
+      "panel": "cloud_icons"
     }
   ],
   "groups": [
@@ -337,6 +367,468 @@
       "vendor": "aliyun",
       "name": "阿里云 存储与 CDN",
       "count": 4
+    },
+    {
+      "id": "signs_animals",
+      "vendor": "signs",
+      "name": "动物",
+      "file": "signs__animals.xml",
+      "count": 0
+    },
+    {
+      "id": "signs_food",
+      "vendor": "signs",
+      "name": "餐饮食品",
+      "file": "signs__food.xml",
+      "count": 0
+    },
+    {
+      "id": "signs_healthcare",
+      "vendor": "signs",
+      "name": "医疗健康",
+      "file": "signs__healthcare.xml",
+      "count": 0
+    },
+    {
+      "id": "signs_nature",
+      "vendor": "signs",
+      "name": "自然天体",
+      "file": "signs__nature.xml",
+      "count": 0
+    },
+    {
+      "id": "signs_people",
+      "vendor": "signs",
+      "name": "人物",
+      "file": "signs__people.xml",
+      "count": 0
+    },
+    {
+      "id": "signs_safety",
+      "vendor": "signs",
+      "name": "安全警示",
+      "file": "signs__safety.xml",
+      "count": 0
+    },
+    {
+      "id": "signs_science",
+      "vendor": "signs",
+      "name": "科研",
+      "file": "signs__science.xml",
+      "count": 0
+    },
+    {
+      "id": "signs_sports",
+      "vendor": "signs",
+      "name": "体育场馆",
+      "file": "signs__sports.xml",
+      "count": 0
+    },
+    {
+      "id": "signs_tech",
+      "vendor": "signs",
+      "name": "科技",
+      "file": "signs__tech.xml",
+      "count": 0
+    },
+    {
+      "id": "signs_transportation",
+      "vendor": "signs",
+      "name": "交通运输",
+      "file": "signs__transportation.xml",
+      "count": 0
+    },
+    {
+      "id": "signs_travel",
+      "vendor": "signs",
+      "name": "旅行导向",
+      "file": "signs__travel.xml",
+      "count": 0
+    },
+    {
+      "id": "elec_abstract",
+      "vendor": "elec",
+      "name": "抽象模块",
+      "file": "electrical__abstract.xml",
+      "count": 0
+    },
+    {
+      "id": "elec_capacitors",
+      "vendor": "elec",
+      "name": "电容器",
+      "file": "electrical__capacitors.xml",
+      "count": 0
+    },
+    {
+      "id": "elec_diodes",
+      "vendor": "elec",
+      "name": "二极管",
+      "file": "electrical__diodes.xml",
+      "count": 0
+    },
+    {
+      "id": "elec_electro_mech",
+      "vendor": "elec",
+      "name": "机电与开关",
+      "file": "electrical__electro-mechanical.xml",
+      "count": 0
+    },
+    {
+      "id": "elec_iec417",
+      "vendor": "elec",
+      "name": "IEC 设备符号",
+      "file": "electrical__iec417.xml",
+      "count": 0
+    },
+    {
+      "id": "elec_iec_logic_gates",
+      "vendor": "elec",
+      "name": "IEC 逻辑门",
+      "file": "electrical__iec_logic_gates.xml",
+      "count": 0
+    },
+    {
+      "id": "elec_inductors",
+      "vendor": "elec",
+      "name": "电感与变压器",
+      "file": "electrical__inductors.xml",
+      "count": 0
+    },
+    {
+      "id": "elec_instruments",
+      "vendor": "elec",
+      "name": "测量仪表",
+      "file": "electrical__instruments.xml",
+      "count": 0
+    },
+    {
+      "id": "elec_logic_gates",
+      "vendor": "elec",
+      "name": "逻辑门",
+      "file": "electrical__logic_gates.xml",
+      "count": 0
+    },
+    {
+      "id": "elec_misc",
+      "vendor": "elec",
+      "name": "杂项元件",
+      "file": "electrical__miscellaneous.xml",
+      "count": 0
+    },
+    {
+      "id": "elec_mosfets1",
+      "vendor": "elec",
+      "name": "MOSFET 一",
+      "file": "electrical__mosfets1.xml",
+      "count": 0
+    },
+    {
+      "id": "elec_mosfets2",
+      "vendor": "elec",
+      "name": "MOSFET 二",
+      "file": "electrical__mosfets2.xml",
+      "count": 0
+    },
+    {
+      "id": "elec_op_amps",
+      "vendor": "elec",
+      "name": "运算放大电路",
+      "file": "electrical__op_amps.xml",
+      "count": 0
+    },
+    {
+      "id": "elec_opto_electronics",
+      "vendor": "elec",
+      "name": "光电元件",
+      "file": "electrical__opto_electronics.xml",
+      "count": 0
+    },
+    {
+      "id": "elec_plc_ladder",
+      "vendor": "elec",
+      "name": "PLC 梯形图",
+      "file": "electrical__plc_ladder.xml",
+      "count": 0
+    },
+    {
+      "id": "elec_power_semicond",
+      "vendor": "elec",
+      "name": "功率半导体",
+      "file": "electrical__power_semiconductors.xml",
+      "count": 0
+    },
+    {
+      "id": "elec_radio",
+      "vendor": "elec",
+      "name": "射频与天线",
+      "file": "electrical__radio.xml",
+      "count": 0
+    },
+    {
+      "id": "elec_resistors",
+      "vendor": "elec",
+      "name": "电阻器",
+      "file": "electrical__resistors.xml",
+      "count": 0
+    },
+    {
+      "id": "elec_rot_mech",
+      "vendor": "elec",
+      "name": "旋转机构",
+      "file": "electrical__rot_mech.xml",
+      "count": 0
+    },
+    {
+      "id": "elec_signal_sources",
+      "vendor": "elec",
+      "name": "信号源",
+      "file": "electrical__signal_sources.xml",
+      "count": 0
+    },
+    {
+      "id": "elec_thermionic",
+      "vendor": "elec",
+      "name": "电真空器件",
+      "file": "electrical__thermionic_devices.xml",
+      "count": 0
+    },
+    {
+      "id": "elec_transistors",
+      "vendor": "elec",
+      "name": "晶体管",
+      "file": "electrical__transistors.xml",
+      "count": 0
+    },
+    {
+      "id": "elec_transmission",
+      "vendor": "elec",
+      "name": "传输线路",
+      "file": "electrical__transmission.xml",
+      "count": 0
+    },
+    {
+      "id": "elec_waveforms",
+      "vendor": "elec",
+      "name": "波形图",
+      "file": "electrical__waveforms.xml",
+      "count": 0
+    },
+    {
+      "id": "rack_apc",
+      "vendor": "rack",
+      "name": "APC",
+      "file": "rack__apc.xml",
+      "count": 0
+    },
+    {
+      "id": "rack_cisco",
+      "vendor": "rack",
+      "name": "Cisco 机架",
+      "file": "rack__cisco.xml",
+      "count": 0
+    },
+    {
+      "id": "rack_dell",
+      "vendor": "rack",
+      "name": "戴尔 PowerEdge",
+      "file": "rack__dell.xml",
+      "count": 0
+    },
+    {
+      "id": "rack_f5",
+      "vendor": "rack",
+      "name": "F5",
+      "file": "rack__f5.xml",
+      "count": 0
+    },
+    {
+      "id": "rack_general",
+      "vendor": "rack",
+      "name": "通用机架",
+      "file": "rack__general.xml",
+      "count": 0
+    },
+    {
+      "id": "rack_hp",
+      "vendor": "rack",
+      "name": "HP",
+      "file": "rack__hp.xml",
+      "count": 0
+    },
+    {
+      "id": "rack_hpe_gateways",
+      "vendor": "rack",
+      "name": "HPE Aruba 网关控制器",
+      "file": "rack__hpe_aruba__gateways_controllers.xml",
+      "count": 0
+    },
+    {
+      "id": "rack_hpe_security",
+      "vendor": "rack",
+      "name": "HPE Aruba 安全",
+      "file": "rack__hpe_aruba__security.xml",
+      "count": 0
+    },
+    {
+      "id": "rack_hpe_switches",
+      "vendor": "rack",
+      "name": "HPE Aruba 交换机",
+      "file": "rack__hpe_aruba__switches.xml",
+      "count": 0
+    },
+    {
+      "id": "rack_ibm",
+      "vendor": "rack",
+      "name": "IBM",
+      "file": "rack__ibm.xml",
+      "count": 0
+    },
+    {
+      "id": "rack_oracle",
+      "vendor": "rack",
+      "name": "甲骨文",
+      "file": "rack__oracle.xml",
+      "count": 0
+    },
+    {
+      "id": "mk_advertising",
+      "vendor": "mk",
+      "name": "广告位",
+      "file": "mockup__advertising.xml",
+      "count": 0
+    },
+    {
+      "id": "mk_calendars",
+      "vendor": "mk",
+      "name": "日历",
+      "file": "mockup__calendars.xml",
+      "count": 0
+    },
+    {
+      "id": "mk_carousel",
+      "vendor": "mk",
+      "name": "轮播",
+      "file": "mockup__carousel.xml",
+      "count": 0
+    },
+    {
+      "id": "mk_charts_tables",
+      "vendor": "mk",
+      "name": "图表与表格",
+      "file": "mockup__charts_and_tables.xml",
+      "count": 0
+    },
+    {
+      "id": "mk_controls",
+      "vendor": "mk",
+      "name": "控件",
+      "file": "mockup__controls.xml",
+      "count": 0
+    },
+    {
+      "id": "mk_form_elements",
+      "vendor": "mk",
+      "name": "表单元素",
+      "file": "mockup__form_elements.xml",
+      "count": 0
+    },
+    {
+      "id": "mk_menus_buttons",
+      "vendor": "mk",
+      "name": "菜单与按钮",
+      "file": "mockup__menus_and_buttons.xml",
+      "count": 0
+    },
+    {
+      "id": "mk_misc",
+      "vendor": "mk",
+      "name": "通用元素",
+      "file": "mockup__misc.xml",
+      "count": 0
+    },
+    {
+      "id": "mk_tabs",
+      "vendor": "mk",
+      "name": "选项卡",
+      "file": "mockup__tabs.xml",
+      "count": 0
+    },
+    {
+      "id": "ali2_a_e",
+      "vendor": "aliyun",
+      "name": "阿里云 A–E",
+      "file": "alibaba_cloud.xml",
+      "count": 0
+    },
+    {
+      "id": "ali2_f_m",
+      "vendor": "aliyun",
+      "name": "阿里云 F–M",
+      "file": "alibaba_cloud.xml",
+      "count": 0
+    },
+    {
+      "id": "ali2_n_s",
+      "vendor": "aliyun",
+      "name": "阿里云 N–S",
+      "file": "alibaba_cloud.xml",
+      "count": 0
+    },
+    {
+      "id": "ali2_t_z",
+      "vendor": "aliyun",
+      "name": "阿里云 T–Z",
+      "file": "alibaba_cloud.xml",
+      "count": 0
+    },
+    {
+      "id": "aws4_a_b",
+      "vendor": "aws2023",
+      "name": "AWS 2023 A–B",
+      "file": "aws4.xml",
+      "count": 0
+    },
+    {
+      "id": "aws4_c",
+      "vendor": "aws2023",
+      "name": "AWS 2023 C",
+      "file": "aws4.xml",
+      "count": 0
+    },
+    {
+      "id": "aws4_d_f",
+      "vendor": "aws2023",
+      "name": "AWS 2023 D–F",
+      "file": "aws4.xml",
+      "count": 0
+    },
+    {
+      "id": "aws4_g_i",
+      "vendor": "aws2023",
+      "name": "AWS 2023 G–I",
+      "file": "aws4.xml",
+      "count": 0
+    },
+    {
+      "id": "aws4_j_m",
+      "vendor": "aws2023",
+      "name": "AWS 2023 J–M",
+      "file": "aws4.xml",
+      "count": 0
+    },
+    {
+      "id": "aws4_n_r",
+      "vendor": "aws2023",
+      "name": "AWS 2023 N–R",
+      "file": "aws4.xml",
+      "count": 0
+    },
+    {
+      "id": "aws4_s_z",
+      "vendor": "aws2023",
+      "name": "AWS 2023 S–Z",
+      "file": "aws4.xml",
+      "count": 0
     }
   ]
 }
