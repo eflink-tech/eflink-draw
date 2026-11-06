@@ -1,8 +1,15 @@
 // src/components/layout/TopBar.tsx
 import { useState, useRef, useEffect } from 'react'
 import {
-  Undo2, Redo2, Bold, Italic, Underline,
-  Paintbrush as FormatBrush, Lock, Unlock, Link2, Share2, MessageCircle, Sparkles,
+  AlignCenterHorizontal, AlignCenterVertical, AlignEndHorizontal, AlignEndVertical,
+  AlignCenter, AlignHorizontalSpaceAround, AlignHorizontalSpaceBetween,
+  AlignStartHorizontal, AlignStartVertical, AlignVerticalSpaceBetween,
+  ArrowDownToLine, ArrowLeftRight, ArrowUpDown, ArrowUpToLine,
+  Bold, BringToFront, ClipboardPaste, Copy, CopyPlus, Download, Expand,
+  FilePlus2, Group, Image, ImagePlus, Italic, Keyboard, LayoutTemplate, Link2,
+  Lock, Maximize, MessageCircle, MousePointerSquareDashed, PanelLeft, Pencil,
+  Paintbrush as FormatBrush, Redo2, Scissors, SendToBack, Share2, SlidersHorizontal, Scaling,
+  Sparkles, Spline, Trash2, Type, Undo2, Ungroup, Unlock, Upload, Underline, ZoomIn, ZoomOut,
 } from 'lucide-react'
 import { OfficeHeader, useI18n, type OfficeHeaderBrand, type OfficeMenu } from '@eflink-tech/office-kit'
 import { displayDocTitle } from '@/i18n'
@@ -623,19 +630,21 @@ export function TopBar({ branding }: { branding?: OfficeHeaderBrand | false } = 
       key: 'file',
       label: t('draw.menu.file'),
       items: [
-        [{ key: 'rename', label: t('draw.file.rename'), onSelect: () => setRenameOpen(true) }],
+        [{ key: 'rename', label: t('draw.file.rename'), icon: <Pencil size={16} />, onSelect: () => setRenameOpen(true) }],
         [
           {
             key: 'new',
             label: t('draw.file.new'),
+            icon: <FilePlus2 size={16} />,
             onSelect: () => {
               if (window.confirm(t('draw.file.newConfirm'))) useEditorStore.getState().newDocument()
             },
           },
-          { key: 'template', label: t('draw.file.fromTemplate'), onSelect: () => setTemplatePickerOpen(true) },
+          { key: 'template', label: t('draw.file.fromTemplate'), icon: <LayoutTemplate size={16} />, onSelect: () => setTemplatePickerOpen(true) },
           {
             key: 'import',
             label: t('draw.file.import'),
+            icon: <Upload size={16} />,
             onSelect: () => {
               if (fileInputRef.current) fileInputRef.current.accept = '.efd.json,.json'
               fileInputRef.current?.click()
@@ -644,6 +653,7 @@ export function TopBar({ branding }: { branding?: OfficeHeaderBrand | false } = 
           {
             key: 'download',
             label: t('draw.file.download'),
+            icon: <Download size={16} />,
             onSelect: () => {
               const st = useEditorStore.getState()
               const json = serializeDocumentFile(st.document)
@@ -656,7 +666,7 @@ export function TopBar({ branding }: { branding?: OfficeHeaderBrand | false } = 
             },
           },
         ],
-        [{ key: 'png', label: t('draw.file.downloadPng'), onSelect: handleExport }],
+        [{ key: 'png', label: t('draw.file.downloadPng'), icon: <Image size={16} />, onSelect: handleExport }],
       ],
     },
     {
@@ -664,19 +674,19 @@ export function TopBar({ branding }: { branding?: OfficeHeaderBrand | false } = 
       label: t('draw.menu.edit'),
       items: [
         [
-          { key: 'undo', label: t('action.undo'), shortcut: shortcutText('Z'), disabled: !canUndo(), onSelect: handleUndo },
-          { key: 'redo', label: t('action.redo'), shortcut: shortcutText('Z', true), disabled: !canRedo(), onSelect: handleRedo },
+          { key: 'undo', label: t('action.undo'), icon: <Undo2 size={16} />, shortcut: shortcutText('Z'), disabled: !canUndo(), onSelect: handleUndo },
+          { key: 'redo', label: t('action.redo'), icon: <Redo2 size={16} />, shortcut: shortcutText('Z', true), disabled: !canRedo(), onSelect: handleRedo },
         ],
         [
-          { key: 'cut', label: t('action.cut'), shortcut: shortcutText('X'), disabled: selectedIds.size === 0, onSelect: () => { const st = useEditorStore.getState(); st.copySelectedElements(); st.deleteElements([...st.selectedIds]) } },
-          { key: 'copy', label: t('action.copy'), shortcut: shortcutText('C'), disabled: selectedIds.size === 0, onSelect: () => useEditorStore.getState().copySelectedElements() },
-          { key: 'paste', label: t('action.paste'), shortcut: shortcutText('V'), disabled: !useEditorStore.getState().clipboard, onSelect: () => useEditorStore.getState().pasteElements() },
-          { key: 'duplicate', label: t('draw.edit.duplicate'), shortcut: shortcutText('D'), disabled: selectedIds.size === 0, onSelect: () => { useEditorStore.getState().copySelectedElements(); useEditorStore.getState().pasteElements() } },
-          { key: 'brush', label: t('draw.edit.formatBrush'), shortcut: shortcutText('B', true), disabled: selectedIds.size === 0, onSelect: handleBrush },
+          { key: 'cut', label: t('action.cut'), icon: <Scissors size={16} />, shortcut: shortcutText('X'), disabled: selectedIds.size === 0, onSelect: () => { const st = useEditorStore.getState(); st.copySelectedElements(); st.deleteElements([...st.selectedIds]) } },
+          { key: 'copy', label: t('action.copy'), icon: <Copy size={16} />, shortcut: shortcutText('C'), disabled: selectedIds.size === 0, onSelect: () => useEditorStore.getState().copySelectedElements() },
+          { key: 'paste', label: t('action.paste'), icon: <ClipboardPaste size={16} />, shortcut: shortcutText('V'), disabled: !useEditorStore.getState().clipboard, onSelect: () => useEditorStore.getState().pasteElements() },
+          { key: 'duplicate', label: t('draw.edit.duplicate'), icon: <CopyPlus size={16} />, shortcut: shortcutText('D'), disabled: selectedIds.size === 0, onSelect: () => { useEditorStore.getState().copySelectedElements(); useEditorStore.getState().pasteElements() } },
+          { key: 'brush', label: t('draw.edit.formatBrush'), icon: <FormatBrush size={16} />, shortcut: shortcutText('B', true), disabled: selectedIds.size === 0, onSelect: handleBrush },
         ],
         [
-          { key: 'selectAll', label: t('action.selectAll'), shortcut: shortcutText('A'), onSelect: () => useEditorStore.getState().selectIds(Object.keys(useEditorStore.getState().document.elements), 'replace') },
-          { key: 'delete', label: t('action.delete'), shortcut: '⌦', disabled: selectedIds.size === 0, onSelect: () => useEditorStore.getState().deleteElements([...useEditorStore.getState().selectedIds]) },
+          { key: 'selectAll', label: t('action.selectAll'), icon: <MousePointerSquareDashed size={16} />, shortcut: shortcutText('A'), onSelect: () => useEditorStore.getState().selectIds(Object.keys(useEditorStore.getState().document.elements), 'replace') },
+          { key: 'delete', label: t('action.delete'), icon: <Trash2 size={16} />, shortcut: '⌦', disabled: selectedIds.size === 0, onSelect: () => useEditorStore.getState().deleteElements([...useEditorStore.getState().selectedIds]) },
         ],
       ],
     },
@@ -685,8 +695,8 @@ export function TopBar({ branding }: { branding?: OfficeHeaderBrand | false } = 
       label: t('draw.menu.view'),
       items: [
         [
-          { key: 'zoomIn', label: t('action.zoomIn'), shortcut: shortcutText('+'), onSelect: () => zoomStep('in') },
-          { key: 'zoomOut', label: t('action.zoomOut'), shortcut: shortcutText('-'), onSelect: () => zoomStep('out') },
+          { key: 'zoomIn', label: t('action.zoomIn'), icon: <ZoomIn size={16} />, shortcut: shortcutText('+'), onSelect: () => zoomStep('in') },
+          { key: 'zoomOut', label: t('action.zoomOut'), icon: <ZoomOut size={16} />, shortcut: shortcutText('-'), onSelect: () => zoomStep('out') },
         ],
         [0.5, 0.75, 1, 1.5, 2].map((v) => ({
           key: `zoom${v}`,
@@ -694,11 +704,11 @@ export function TopBar({ branding }: { branding?: OfficeHeaderBrand | false } = 
           checked: scale === v,
           onSelect: () => zoom(v),
         })),
-        [{ key: 'zoomReset', label: t('action.zoomReset'), shortcut: shortcutText('0'), onSelect: () => zoom(1) }],
+        [{ key: 'zoomReset', label: t('action.zoomReset'), icon: <Maximize size={16} />, shortcut: shortcutText('0'), onSelect: () => zoom(1) }],
         [
-          { key: 'shapes', label: t('draw.view.showShapes'), checked: uiVisible, onSelect: () => useUIStore.getState().toggleLeftPanel() },
-          { key: 'properties', label: t('draw.view.showProperties'), checked: uiVisibleRight, onSelect: () => useUIStore.getState().toggleRightPanel() },
-          { key: 'ai', label: t('draw.view.showAi'), checked: aiPanelVisible, onSelect: () => useUIStore.getState().toggleAiPanel() },
+          { key: 'shapes', label: t('draw.view.showShapes'), icon: <PanelLeft size={16} />, checked: uiVisible, onSelect: () => useUIStore.getState().toggleLeftPanel() },
+          { key: 'properties', label: t('draw.view.showProperties'), icon: <SlidersHorizontal size={16} />, checked: uiVisibleRight, onSelect: () => useUIStore.getState().toggleRightPanel() },
+          { key: 'ai', label: t('draw.view.showAi'), icon: <Sparkles size={16} />, checked: aiPanelVisible, onSelect: () => useUIStore.getState().toggleAiPanel() },
         ],
       ],
     },
@@ -707,9 +717,9 @@ export function TopBar({ branding }: { branding?: OfficeHeaderBrand | false } = 
       label: t('draw.menu.insert'),
       items: [
         [
-          { key: 'text', label: t('draw.insert.text'), shortcut: 'T', onSelect: () => { const s = useEditorStore.getState(); s.setTool(s.currentTool === 'text' ? 'select' : 'text') } },
-          { key: 'linker', label: t('draw.insert.linker'), shortcut: 'L', onSelect: () => { const s = useEditorStore.getState(); s.setTool(s.currentTool === 'linker' ? 'select' : 'linker') } },
-          { key: 'image', label: t('draw.insert.image'), shortcut: 'I', disabled: true },
+          { key: 'text', label: t('draw.insert.text'), icon: <Type size={16} />, shortcut: 'T', onSelect: () => { const s = useEditorStore.getState(); s.setTool(s.currentTool === 'text' ? 'select' : 'text') } },
+          { key: 'linker', label: t('draw.insert.linker'), icon: <Spline size={16} />, shortcut: 'L', onSelect: () => { const s = useEditorStore.getState(); s.setTool(s.currentTool === 'linker' ? 'select' : 'linker') } },
+          { key: 'image', label: t('draw.insert.image'), icon: <ImagePlus size={16} />, shortcut: 'I', disabled: true },
         ],
       ],
     },
@@ -723,7 +733,7 @@ export function TopBar({ branding }: { branding?: OfficeHeaderBrand | false } = 
             label: t('draw.arrange.front'),
             shortcut: layerShortcutText(']'),
             disabled: !canArrange,
-            icon: <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 3L3 6L8 9L13 6L8 3Z" fill="#333"/><path d="M3 9L8 12.5L13 9" stroke="#999" strokeWidth="1.5" strokeLinecap="round"/></svg>,
+            icon: <BringToFront size={16} />,
             onSelect: () => handleLayer('front'),
           },
           {
@@ -731,65 +741,68 @@ export function TopBar({ branding }: { branding?: OfficeHeaderBrand | false } = 
             label: t('draw.arrange.back'),
             shortcut: layerShortcutText('['),
             disabled: !canArrange,
-            icon: <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 3L3 6L8 9L13 6L8 3Z" fill="#ccc"/><path d="M3 9L8 12.5L13 9" stroke="#999" strokeWidth="1.5" strokeLinecap="round"/></svg>,
+            icon: <SendToBack size={16} />,
             onSelect: () => handleLayer('back'),
           },
-          { key: 'forward', label: t('draw.arrange.forward'), shortcut: layerShortcutText(']', true), disabled: !canArrange, onSelect: () => handleLayer('forward') },
-          { key: 'backward', label: t('draw.arrange.backward'), shortcut: layerShortcutText('[', true), disabled: !canArrange, onSelect: () => handleLayer('backward') },
+          { key: 'forward', label: t('draw.arrange.forward'), icon: <ArrowUpToLine size={16} />, shortcut: layerShortcutText(']', true), disabled: !canArrange, onSelect: () => handleLayer('forward') },
+          { key: 'backward', label: t('draw.arrange.backward'), icon: <ArrowDownToLine size={16} />, shortcut: layerShortcutText('[', true), disabled: !canArrange, onSelect: () => handleLayer('backward') },
         ],
         [
           {
             key: 'align',
             label: t('draw.arrange.align'),
+            icon: <AlignCenter size={16} />,
             children: [
               [
-                { key: 'alignLeft', label: t('draw.align.left'), icon: <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="4" cy="5" r="2.5" fill="#333"/><rect x="8" y="3.5" width="6" height="3" fill="#999"/><circle cx="4" cy="11" r="2.5" fill="#333"/><rect x="8" y="9.5" width="6" height="3" fill="#999"/><line x1="9" y1="2" x2="9" y2="14" stroke="#4a7fde" strokeWidth="1.5"/></svg>, disabled: arrangeEligible < 2, onSelect: () => useEditorStore.getState().alignShapes([...selectedIds], 'left') },
-                { key: 'alignCenter', label: t('draw.align.centerH'), disabled: arrangeEligible < 2, onSelect: () => useEditorStore.getState().alignShapes([...selectedIds], 'center') },
-                { key: 'alignRight', label: t('draw.align.right'), disabled: arrangeEligible < 2, onSelect: () => useEditorStore.getState().alignShapes([...selectedIds], 'right') },
+                { key: 'alignLeft', label: t('draw.align.left'), icon: <AlignStartHorizontal size={16} />, disabled: arrangeEligible < 2, onSelect: () => useEditorStore.getState().alignShapes([...selectedIds], 'left') },
+                { key: 'alignCenter', label: t('draw.align.centerH'), icon: <AlignCenterHorizontal size={16} />, disabled: arrangeEligible < 2, onSelect: () => useEditorStore.getState().alignShapes([...selectedIds], 'center') },
+                { key: 'alignRight', label: t('draw.align.right'), icon: <AlignEndHorizontal size={16} />, disabled: arrangeEligible < 2, onSelect: () => useEditorStore.getState().alignShapes([...selectedIds], 'right') },
               ],
               [
-                { key: 'alignTop', label: t('draw.align.top'), disabled: arrangeEligible < 2, onSelect: () => useEditorStore.getState().alignShapes([...selectedIds], 'top') },
-                { key: 'alignMiddle', label: t('draw.align.middle'), disabled: arrangeEligible < 2, onSelect: () => useEditorStore.getState().alignShapes([...selectedIds], 'middle') },
-                { key: 'alignBottom', label: t('draw.align.bottom'), disabled: arrangeEligible < 2, onSelect: () => useEditorStore.getState().alignShapes([...selectedIds], 'bottom') },
+                { key: 'alignTop', label: t('draw.align.top'), icon: <AlignStartVertical size={16} />, disabled: arrangeEligible < 2, onSelect: () => useEditorStore.getState().alignShapes([...selectedIds], 'top') },
+                { key: 'alignMiddle', label: t('draw.align.middle'), icon: <AlignCenterVertical size={16} />, disabled: arrangeEligible < 2, onSelect: () => useEditorStore.getState().alignShapes([...selectedIds], 'middle') },
+                { key: 'alignBottom', label: t('draw.align.bottom'), icon: <AlignEndVertical size={16} />, disabled: arrangeEligible < 2, onSelect: () => useEditorStore.getState().alignShapes([...selectedIds], 'bottom') },
               ],
             ],
           },
           {
             key: 'distribute',
             label: t('draw.arrange.distribute'),
+            icon: <AlignHorizontalSpaceAround size={16} />,
             children: [
               [
-                { key: 'distH', label: t('draw.distribute.horizontal'), disabled: arrangeEligible < 3, onSelect: () => useEditorStore.getState().distributeShapes([...selectedIds], 'horizontal') },
-                { key: 'distV', label: t('draw.distribute.vertical'), disabled: arrangeEligible < 3, onSelect: () => useEditorStore.getState().distributeShapes([...selectedIds], 'vertical') },
+                { key: 'distH', label: t('draw.distribute.horizontal'), icon: <AlignHorizontalSpaceBetween size={16} />, disabled: arrangeEligible < 3, onSelect: () => useEditorStore.getState().distributeShapes([...selectedIds], 'horizontal') },
+                { key: 'distV', label: t('draw.distribute.vertical'), icon: <AlignVerticalSpaceBetween size={16} />, disabled: arrangeEligible < 3, onSelect: () => useEditorStore.getState().distributeShapes([...selectedIds], 'vertical') },
               ],
             ],
           },
           {
             key: 'matchSize',
             label: t('draw.arrange.matchSize'),
+            icon: <Scaling size={16} />,
             children: [
               [
-                { key: 'matchW', label: t('draw.matchSize.width'), disabled: arrangeEligible < 2, onSelect: () => useEditorStore.getState().matchSize([...selectedIds], { w: true }) },
-                { key: 'matchH', label: t('draw.matchSize.height'), disabled: arrangeEligible < 2, onSelect: () => useEditorStore.getState().matchSize([...selectedIds], { h: true }) },
-                { key: 'matchBoth', label: t('draw.matchSize.both'), disabled: arrangeEligible < 2, onSelect: () => useEditorStore.getState().matchSize([...selectedIds], { w: true, h: true }) },
+                { key: 'matchW', label: t('draw.matchSize.width'), icon: <ArrowLeftRight size={16} />, disabled: arrangeEligible < 2, onSelect: () => useEditorStore.getState().matchSize([...selectedIds], { w: true }) },
+                { key: 'matchH', label: t('draw.matchSize.height'), icon: <ArrowUpDown size={16} />, disabled: arrangeEligible < 2, onSelect: () => useEditorStore.getState().matchSize([...selectedIds], { h: true }) },
+                { key: 'matchBoth', label: t('draw.matchSize.both'), icon: <Expand size={16} />, disabled: arrangeEligible < 2, onSelect: () => useEditorStore.getState().matchSize([...selectedIds], { w: true, h: true }) },
               ],
             ],
           },
         ],
         [
-          { key: 'lock', label: t('draw.arrange.lock'), shortcut: shortcutText('L'), disabled: !canArrange, onSelect: handleLock },
-          { key: 'unlock', label: t('draw.arrange.unlock'), shortcut: shortcutText('L', true), disabled: !canArrange, onSelect: handleUnlock },
+          { key: 'lock', label: t('draw.arrange.lock'), icon: <Lock size={16} />, shortcut: shortcutText('L'), disabled: !canArrange, onSelect: handleLock },
+          { key: 'unlock', label: t('draw.arrange.unlock'), icon: <Unlock size={16} />, shortcut: shortcutText('L', true), disabled: !canArrange, onSelect: handleUnlock },
         ],
         [
-          { key: 'group', label: t('draw.arrange.group'), shortcut: shortcutText('G'), disabled: arrangeEligible < 2, onSelect: () => useEditorStore.getState().groupSelected() },
-          { key: 'ungroup', label: t('draw.arrange.ungroup'), shortcut: shortcutText('G', true), disabled: !canArrange, onSelect: () => useEditorStore.getState().ungroupSelected() },
+          { key: 'group', label: t('draw.arrange.group'), icon: <Group size={16} />, shortcut: shortcutText('G'), disabled: arrangeEligible < 2, onSelect: () => useEditorStore.getState().groupSelected() },
+          { key: 'ungroup', label: t('draw.arrange.ungroup'), icon: <Ungroup size={16} />, shortcut: shortcutText('G', true), disabled: !canArrange, onSelect: () => useEditorStore.getState().ungroupSelected() },
         ],
       ],
     },
     {
       key: 'help',
       label: t('draw.menu.help'),
-      items: [[{ key: 'shortcuts', label: t('action.shortcuts'), onSelect: () => setHotkeyOpen(true) }]],
+      items: [[{ key: 'shortcuts', label: t('action.shortcuts'), icon: <Keyboard size={16} />, onSelect: () => setHotkeyOpen(true) }]],
     },
   ]
 
@@ -980,52 +993,28 @@ export function TopBar({ branding }: { branding?: OfficeHeaderBrand | false } = 
               shortcut: layerShortcutText(']'),
               onClick: () => handleLayer('front'),
               disabled: selectedIds.size === 0,
-              icon: (
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                  <path d="M10 4L4 7.5L10 11L16 7.5L10 4Z" fill="#333" />
-                  <path d="M4 10L10 13.5L16 10" stroke="#999" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M4 13L10 16.5L16 13" stroke="#ccc" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              ),
+              icon: <BringToFront size={16} />,
             },
             {
               label: t('draw.arrange.back'),
               shortcut: layerShortcutText('['),
               onClick: () => handleLayer('back'),
               disabled: selectedIds.size === 0,
-              icon: (
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                  <path d="M10 4L4 7.5L10 11L16 7.5L10 4Z" fill="#ccc" />
-                  <path d="M4 10L10 13.5L16 10" stroke="#999" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M4 13L10 16.5L16 13" fill="#333" />
-                </svg>
-              ),
+              icon: <SendToBack size={16} />,
             },
             {
               label: t('draw.arrange.forward'),
               shortcut: layerShortcutText(']', true),
               onClick: () => handleLayer('forward'),
               disabled: selectedIds.size === 0,
-              icon: (
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                  <path d="M10 5L5 8L10 11L15 8L10 5Z" fill="#333" />
-                  <path d="M5 13L10 16L15 13" stroke="#999" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  <text x="13" y="18" fontSize="7" fill="#999" fontWeight="bold">1</text>
-                </svg>
-              ),
+              icon: <ArrowUpToLine size={16} />,
             },
             {
               label: t('draw.arrange.backward'),
               shortcut: layerShortcutText('[', true),
               onClick: () => handleLayer('backward'),
               disabled: selectedIds.size === 0,
-              icon: (
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                  <path d="M10 14L5 11L10 8L15 11L10 14Z" fill="#333" />
-                  <path d="M5 6L10 3L15 6" stroke="#999" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  <text x="13" y="7" fontSize="7" fill="#999" fontWeight="bold">1</text>
-                </svg>
-              ),
+              icon: <ArrowDownToLine size={16} />,
             },
           ]}
         />
