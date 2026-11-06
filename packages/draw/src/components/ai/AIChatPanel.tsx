@@ -1,9 +1,10 @@
 // src/components/ai/AIChatPanel.tsx
 import { useEffect, useRef, useState } from 'react'
-import { Settings, X } from 'lucide-react'
+import { History, Settings, Sparkles, Trash2, X } from 'lucide-react'
 import { settingsStore, conversationStore } from '../../ai/db'
 import { MessageBubble } from './MessageBubble'
 import { HistoryDialog } from './HistoryDialog'
+import { SettingsPage } from './SettingsPage'
 import { ACCENT_COLOR } from './theme'
 import type { ConversationMessage, MessageImage, Template } from '../../ai/types'
 import { AIService, isAbortError, type ChatMessage } from '../../ai/aiService'
@@ -17,7 +18,7 @@ import { useUIStore } from '@/store/uiStore'
 import { compressImage } from '../../ai/imageCompressor'
 import { stripJsonBlocks } from '../../ai/stripJsonBlocks'
 import { computeFitToPage } from '../../ai/fitToPage'
-import { AI_TEMPLATE_SELECTED, AI_OPEN_SETTINGS } from '@/ai/events'
+import { AI_TEMPLATE_SELECTED } from '@/ai/events'
 import { useI18n } from '@eflink-tech/office-kit'
 import { drawT } from '@/i18n/runtime'
 
@@ -133,6 +134,9 @@ function getGreeting(): string {
   return drawT('draw.ai.greeting.evening')
 }
 
+/** 面板内视图：与其余办公编辑器统一，设置/历史不再用弹层覆盖 */
+type PanelView = 'chat' | 'settings' | 'history'
+
 export const AIChatPanel = () => {
   const { t } = useI18n()
   const [isConfigured, setIsConfigured] = useState(true)
@@ -141,7 +145,7 @@ export const AIChatPanel = () => {
   const [messages, setMessages] = useState<ConversationMessage[]>([])
   const [sending, setSending] = useState(false)
   const [pendingImages, setPendingImages] = useState<MessageImage[]>([])
-  const [historyOpen, setHistoryOpen] = useState(false)
+  const [view, setView] = useState<PanelView>('chat')
   const aiServiceRef = useRef<AIService | null>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -490,10 +494,19 @@ export const AIChatPanel = () => {
       }
       applyConversationId(conv.id)
       setMessages(conv.messages)
-      setHistoryOpen(false)
+      setView('chat')
     } catch (error: unknown) {
       pushNotice(t('draw.ai.loadConversationFailed', { reason: getUserErrorMessage(error) }))
     }
+  }
+
+  /** 新会话：清空当前视图消息与对话 id（历史仍保留在 IndexedDB 中） */
+  const handleNewChat = () => {
+    abortControllerRef.current?.abort()
+    setMessages([])
+    setPendingImages([])
+    applyConversationId(null)
+    setView('chat')
   }
 
   const handleSend = async () => {
@@ -557,343 +570,339 @@ export const AIChatPanel = () => {
     t('draw.ai.examplePrompt3'),
   ]
 
-  // 纯内容面板（由 AppLayout 控制显示/隐藏）
+  // 纯内容面板（由 AppLayout 的 .efk-ai-slot 控制显示/隐藏）
   return (
     <div
+      data-testid="ai-panel"
       style={{
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
+        width: '320px',
         position: 'relative',
+        backgroundColor: '#fff',
+      }}
+      // Esc 只收起面板：绑定在面板根节点，焦点在面板内才生效，不会抢画布的 Esc 快捷键
+      onKeyDown={(e) => {
+        if (e.key === 'Escape') {
+          e.stopPropagation()
+          useUIStore.getState().toggleAiPanel()
+        }
       }}
     >
-      {/* 标题栏（紧凑高度，与属性面板头部对齐；右侧：AI 设置 + 收起） */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '8px 12px',
-          borderBottom: '1px solid #eee',
-          backgroundColor: '#fafafa',
-        }}
-      >
-        <span style={{ fontWeight: 600, fontSize: '14px', color: '#333' }}>
+      {/* 标题栏（紧凑高度，与属性面板头部对齐；右侧：历史/设置/新会话/收起） */}
+      <div className="flex h-10 shrink-0 items-center justify-between border-b border-black/[0.08] px-3">
+        <span className="flex items-center gap-1 text-sm font-medium text-[#333]">
+          <Sparkles size={15} style={{ color: ACCENT_COLOR }} />
           {t('draw.ai.title')}
         </span>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div className="flex items-center gap-0.5">
           <button
-            onClick={() => window.dispatchEvent(new CustomEvent(AI_OPEN_SETTINGS))}
+            type="button"
+            className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+            title={t('draw.ai.history')}
+            aria-label={t('draw.ai.history')}
+            onClick={() => setView(view === 'history' ? 'chat' : 'history')}
+          >
+            <History size={15} />
+          </button>
+          <button
+            type="button"
+            className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+            title={t('draw.panel.aiSettings')}
             aria-label={t('draw.panel.aiSettings')}
-            style={{
-              border: 'none',
-              background: 'none',
-              cursor: 'pointer',
-              color: '#999',
-              padding: '4px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: '4px',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#f0f0f0'
-              e.currentTarget.style.color = '#333'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent'
-              e.currentTarget.style.color = '#999'
-            }}
+            onClick={() => setView(view === 'settings' ? 'chat' : 'settings')}
           >
-            <Settings size={16} />
+            <Settings size={15} />
           </button>
           <button
-            onClick={() => useUIStore.getState().toggleAiPanel()}
-            aria-label={t('draw.ai.collapse')}
-            style={{
-              border: 'none',
-              background: 'none',
-              cursor: 'pointer',
-              color: '#999',
-              padding: '4px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: '4px',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#f0f0f0'
-              e.currentTarget.style.color = '#333'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent'
-              e.currentTarget.style.color = '#999'
-            }}
+            type="button"
+            className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+            title={t('draw.ai.newChat')}
+            aria-label={t('draw.ai.newChat')}
+            onClick={handleNewChat}
           >
-            <X size={16} />
+            <Trash2 size={15} />
+          </button>
+          <button
+            type="button"
+            className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+            title={t('draw.ai.close')}
+            aria-label={t('draw.ai.close')}
+            onClick={() => useUIStore.getState().toggleAiPanel()}
+          >
+            <X size={15} />
           </button>
         </div>
       </div>
 
-      {/* 内容区 */}
-      <div
-        ref={chatContainerRef}
-        style={{ flex: 1, overflowY: 'auto', padding: '20px' }}
-      >
-        {!isConfigured ? (
-          <div
-            style={{
-              padding: '16px',
-              backgroundColor: '#fff3cd',
-              border: '1px solid #ffc107',
-              borderRadius: '8px',
-              fontSize: '13px',
-              lineHeight: '1.5',
-            }}
-          >
-            <strong>{t('draw.ai.notConfiguredTitle')}</strong>
-            <p style={{ margin: '8px 0 0', fontSize: '12px' }}>
-              {t('draw.ai.notConfiguredHint')}
-            </p>
-          </div>
-        ) : messages.length === 0 ? (
-          <>
-            {/* 欢迎区域 */}
-            <div style={{ textAlign: 'center', padding: '32px 0 24px' }}>
-              <div style={{ fontSize: '48px', marginBottom: '16px' }}>✨</div>
-              <h2 style={{ fontSize: '20px', fontWeight: 600, color: '#333', marginBottom: '12px' }}>
-                {t('draw.ai.welcome', { greeting: getGreeting() })}
-              </h2>
-              <p style={{ fontSize: '13px', color: '#888', lineHeight: '1.6' }}>
-                {t('draw.ai.welcomeHint')}
-              </p>
-            </div>
-
-            {/* 示例提示 */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '24px' }}>
-              {examplePrompts.map((prompt) => (
-                <button
-                  key={prompt}
-                  onClick={() => setInputText(prompt)}
-                  style={{
-                    padding: '12px 16px',
-                    border: '1px solid #e8e8e8',
-                    borderRadius: '8px',
-                    backgroundColor: '#fff',
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    color: '#333',
-                    textAlign: 'left',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    transition: 'all 0.2s',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = ACCENT_COLOR
-                    e.currentTarget.style.backgroundColor = '#f0f7ff'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = '#e8e8e8'
-                    e.currentTarget.style.backgroundColor = '#fff'
-                  }}
-                >
-                  <span style={{ fontSize: '16px' }}></span>
-                  {prompt}
-                </button>
-              ))}
-            </div>
-          </>
-        ) : (
-          messages.map((msg) => (
-            <MessageBubble
-              key={msg.id}
-              message={msg}
-              streaming={sending && msg.id === streamingMsgId}
-            />
-          ))
-        )}
-      </div>
-
-      {/* 服务初始化失败的显式反馈条 */}
-      {isConfigured && serviceError && (
-        <div
-          role="alert"
-          style={{
-            margin: '0 20px 8px',
-            padding: '8px 10px',
-            backgroundColor: '#f8d7da',
-            border: '1px solid #dc3545',
-            borderRadius: '6px',
-            fontSize: '12px',
-            color: '#721c24',
-          }}
-        >
-          {serviceError}
+      {view === 'settings' ? (
+        <div className="flex-1 overflow-y-auto" data-testid="ai-settings">
+          <SettingsPage />
         </div>
-      )}
-
-      {/* 输入区 */}
-      {isConfigured && (
-        <div
-          style={{
-            padding: '16px 20px',
-            borderTop: '1px solid #eee',
-            backgroundColor: '#fafafa',
-          }}
-        >
-          <div
-            style={{
-              padding: '12px 16px',
-              border: '1px solid #e0e0e0',
-              borderRadius: '12px',
-              backgroundColor: '#fff',
-            }}
-          >
-            <textarea
-              aria-label={t('draw.ai.inputAria')}
-              placeholder={t('draw.ai.inputPlaceholder')}
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              onPaste={handlePaste}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault()
-                  void handleSend()
-                }
-              }}
-              rows={2}
-              style={{
-                display: 'block',
-                width: '100%',
-                border: 'none',
-                background: 'none',
-                outline: 'none',
-                resize: 'none',
-                fontSize: '14px',
-                lineHeight: '1.5',
-                fontFamily: 'inherit',
-                color: '#333',
-              }}
-            />
-            {pendingImages.length > 0 && (
-              <div
-                data-testid="pending-images"
-                style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', margin: '8px 0 4px' }}
-              >
-                {pendingImages.map((img, i) => (
-                  <div key={`${i}-${img.dataUrl.slice(-12)}`} style={{ position: 'relative' }}>
-                    <img
-                      src={img.dataUrl}
-                      alt={t('draw.ai.pendingImageAlt', { index: i + 1 })}
-                      style={{
-                        height: '40px',
-                        borderRadius: '6px',
-                        display: 'block',
-                        border: '1px solid #e0e0e0',
-                      }}
-                    />
-                    <button
-                      aria-label={t('draw.ai.removeImage', { index: i + 1 })}
-                      onClick={() => setPendingImages((prev) => prev.filter((_, j) => j !== i))}
-                      style={{
-                        position: 'absolute',
-                        top: '-6px',
-                        right: '-6px',
-                        width: '18px',
-                        height: '18px',
-                        borderRadius: '50%',
-                        border: 'none',
-                        backgroundColor: 'rgba(0,0,0,0.6)',
-                        color: '#fff',
-                        fontSize: '11px',
-                        lineHeight: '17px',
-                        cursor: 'pointer',
-                        padding: 0,
-                      }}
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleImageUpload}
-              style={{ display: 'none' }}
-              aria-label={t('draw.ai.filePickerAria')}
-            />
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginTop: '4px',
-              }}
-            >
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                aria-label={t('draw.ai.uploadImage')}
-                style={{
-                  border: 'none',
-                  background: 'none',
-                  cursor: 'pointer',
-                  fontSize: '18px',
-                  padding: '4px',
-                }}
-              >
-                ⊕
-              </button>
-              <button
-                onClick={() => void handleSend()}
-                aria-label={t('draw.ai.send')}
-                disabled={sending}
-                style={{
-                  border: 'none',
-                  backgroundColor: ACCENT_COLOR,
-                  color: '#fff',
-                  cursor: sending ? 'not-allowed' : 'pointer',
-                  fontSize: '16px',
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  opacity: sending ? 0.6 : 1,
-                }}
-              >
-                ➤
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 历史对话浮层 */}
-      {historyOpen && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label={t('draw.ai.history')}
-          style={{
-            position: 'absolute',
-            inset: 0,
-            backgroundColor: '#fff',
-            zIndex: 5,
-            display: 'flex',
-          }}
-        >
+      ) : view === 'history' ? (
+        <div className="flex-1 overflow-hidden" data-testid="ai-history">
           <HistoryDialog
             currentId={conversationId}
             onSelect={(id) => void handleSelectConversation(id)}
-            onClose={() => setHistoryOpen(false)}
+            onClose={() => setView('chat')}
           />
         </div>
+      ) : (
+        <>
+          <div
+            ref={chatContainerRef}
+            style={{ flex: 1, overflowY: 'auto', padding: '20px' }}
+          >
+            {!isConfigured ? (
+              <div
+                style={{
+                  padding: '16px',
+                  backgroundColor: '#fff3cd',
+                  border: '1px solid #ffc107',
+                  borderRadius: '8px',
+                  fontSize: '13px',
+                  lineHeight: '1.5',
+                }}
+              >
+                <strong>{t('draw.ai.notConfiguredTitle')}</strong>
+                <p style={{ margin: '8px 0 0', fontSize: '12px' }}>
+                  {t('draw.ai.notConfiguredHint')}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setView('settings')}
+                  style={{
+                    marginTop: '12px',
+                    padding: '6px 12px',
+                    border: 'none',
+                    borderRadius: '4px',
+                    backgroundColor: ACCENT_COLOR,
+                    color: '#fff',
+                    fontSize: '12px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {t('draw.ai.goSettings')}
+                </button>
+              </div>
+            ) : messages.length === 0 ? (
+              <>
+                {/* 欢迎区域 */}
+                <div style={{ textAlign: 'center', padding: '32px 0 24px' }}>
+                  <div style={{ fontSize: '48px', marginBottom: '16px' }}>✨</div>
+                  <h2 style={{ fontSize: '20px', fontWeight: 600, color: '#333', marginBottom: '12px' }}>
+                    {t('draw.ai.welcome', { greeting: getGreeting() })}
+                  </h2>
+                  <p style={{ fontSize: '13px', color: '#888', lineHeight: '1.6' }}>
+                    {t('draw.ai.welcomeHint')}
+                  </p>
+                </div>
+
+                {/* 示例提示 */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '24px' }}>
+                  {examplePrompts.map((prompt) => (
+                    <button
+                      key={prompt}
+                      onClick={() => setInputText(prompt)}
+                      style={{
+                        padding: '12px 16px',
+                        border: '1px solid #e8e8e8',
+                        borderRadius: '8px',
+                        backgroundColor: '#fff',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                        color: '#333',
+                        textAlign: 'left',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        transition: 'all 0.2s',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = ACCENT_COLOR
+                        e.currentTarget.style.backgroundColor = '#f0f7ff'
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = '#e8e8e8'
+                        e.currentTarget.style.backgroundColor = '#fff'
+                      }}
+                    >
+                      <span style={{ fontSize: '16px' }}></span>
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
+              </>
+            ) : (
+              messages.map((msg) => (
+                <MessageBubble
+                  key={msg.id}
+                  message={msg}
+                  streaming={sending && msg.id === streamingMsgId}
+                />
+              ))
+            )}
+          </div>
+
+          {/* 服务初始化失败的显式反馈条 */}
+          {isConfigured && serviceError && (
+            <div
+              role="alert"
+              style={{
+                margin: '0 20px 8px',
+                padding: '8px 10px',
+                backgroundColor: '#f8d7da',
+                border: '1px solid #dc3545',
+                borderRadius: '6px',
+                fontSize: '12px',
+                color: '#721c24',
+              }}
+            >
+              {serviceError}
+            </div>
+          )}
+
+          {/* 输入区 */}
+          <div
+            style={{
+              padding: '16px 20px',
+              borderTop: '1px solid #eee',
+              backgroundColor: '#fafafa',
+            }}
+          >
+            <div
+              style={{
+                padding: '12px 16px',
+                border: '1px solid #e0e0e0',
+                borderRadius: '12px',
+                backgroundColor: '#fff',
+              }}
+            >
+              <textarea
+                aria-label={t('draw.ai.inputAria')}
+                placeholder={t('draw.ai.inputPlaceholder')}
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                onPaste={handlePaste}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault()
+                    void handleSend()
+                  }
+                }}
+                rows={2}
+                style={{
+                  display: 'block',
+                  width: '100%',
+                  border: 'none',
+                  background: 'none',
+                  outline: 'none',
+                  resize: 'none',
+                  fontSize: '14px',
+                  lineHeight: '1.5',
+                  fontFamily: 'inherit',
+                  color: '#333',
+                }}
+              />
+              {pendingImages.length > 0 && (
+                <div
+                  data-testid="pending-images"
+                  style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', margin: '8px 0 4px' }}
+                >
+                  {pendingImages.map((img, i) => (
+                    <div key={`${i}-${img.dataUrl.slice(-12)}`} style={{ position: 'relative' }}>
+                      <img
+                        src={img.dataUrl}
+                        alt={t('draw.ai.pendingImageAlt', { index: i + 1 })}
+                        style={{
+                          height: '40px',
+                          borderRadius: '6px',
+                          display: 'block',
+                          border: '1px solid #e0e0e0',
+                        }}
+                      />
+                      <button
+                        aria-label={t('draw.ai.removeImage', { index: i + 1 })}
+                        onClick={() => setPendingImages((prev) => prev.filter((_, j) => j !== i))}
+                        style={{
+                          position: 'absolute',
+                          top: '-6px',
+                          right: '-6px',
+                          width: '18px',
+                          height: '18px',
+                          borderRadius: '50%',
+                          border: 'none',
+                          backgroundColor: 'rgba(0,0,0,0.6)',
+                          color: '#fff',
+                          fontSize: '11px',
+                          lineHeight: '17px',
+                          cursor: 'pointer',
+                          padding: 0,
+                        }}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleImageUpload}
+                style={{ display: 'none' }}
+                aria-label={t('draw.ai.filePickerAria')}
+              />
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginTop: '4px',
+                }}
+              >
+                <button
+                  data-testid="ai-attach"
+                  onClick={() => fileInputRef.current?.click()}
+                  aria-label={t('draw.ai.uploadImage')}
+                  style={{
+                    border: 'none',
+                    background: 'none',
+                    cursor: 'pointer',
+                    fontSize: '18px',
+                    padding: '4px',
+                  }}
+                >
+                  ⊕
+                </button>
+                <button
+                  onClick={() => void handleSend()}
+                  aria-label={t('draw.ai.send')}
+                  disabled={sending}
+                  style={{
+                    border: 'none',
+                    backgroundColor: ACCENT_COLOR,
+                    color: '#fff',
+                    cursor: sending ? 'not-allowed' : 'pointer',
+                    fontSize: '16px',
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    opacity: sending ? 0.6 : 1,
+                  }}
+                >
+                  ➤
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
       )}
     </div>
   )

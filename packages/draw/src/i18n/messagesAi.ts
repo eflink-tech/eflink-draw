@@ -10,7 +10,8 @@ type Row = readonly [string, string, string, string];
 
 const ROWS = {
   'draw.ai.title': ['AI 智能助手', 'AI Assistant', 'Asistente de IA', 'Assistente de IA'],
-  'draw.ai.collapse': ['收起', 'Collapse panel', 'Contraer panel', 'Recolher painel'],
+  'draw.ai.close': ['收起面板', 'Collapse panel', 'Contraer panel', 'Recolher painel'],
+  'draw.ai.newChat': ['新会话', 'New chat', 'Nueva conversación', 'Nova conversa'],
 
   // 未配置引导
   'draw.ai.notConfiguredTitle': ['尚未配置 AI 服务', 'AI is not set up yet', 'La IA aún no está configurada', 'A IA ainda não está configurada'],
@@ -20,6 +21,7 @@ const ROWS = {
     'Abre la configuración y añade tu clave de API y demás datos para empezar.',
     'Abra as configurações e adicione sua chave de API e outros dados para começar.',
   ],
+  'draw.ai.goSettings': ['前往设置', 'Open settings', 'Ir a configuración', 'Abrir configurações'],
 
   // 欢迎区（问候语 + 拼接句 + 提示 + 示例指令）
   'draw.ai.greeting.early': ['凌晨好', 'Hello', 'Buenas noches', 'Boa noite'],
@@ -135,7 +137,7 @@ const ROWS = {
   ],
 
   // 历史对话
-  'draw.ai.history': ['历史对话', 'Chat history', 'Historial de chats', 'Histórico de conversas'],
+  'draw.ai.history': ['会话历史', 'Chat history', 'Historial de chats', 'Histórico de conversas'],
   'draw.ai.closeHistory': ['关闭历史', 'Close history', 'Cerrar historial', 'Fechar histórico'],
   'draw.ai.loading': ['加载中...', 'Loading…', 'Cargando…', 'Carregando…'],
   'draw.ai.historyEmpty': ['暂无历史对话', 'No conversations yet', 'Aún no hay conversaciones', 'Nenhuma conversa ainda'],

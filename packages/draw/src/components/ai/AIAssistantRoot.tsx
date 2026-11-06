@@ -1,10 +1,9 @@
 // src/components/ai/AIAssistantRoot.tsx
 import { useEffect, useRef, useState } from 'react'
 import { useI18n } from '@eflink-tech/office-kit'
-import { SettingsPage } from './SettingsPage'
 import { TemplateLibrary } from './TemplateLibrary'
 import type { Template } from '@/ai/types'
-import { AI_OPEN_SETTINGS, AI_OPEN_TEMPLATES, AI_TEMPLATE_SELECTED } from '@/ai/events'
+import { AI_OPEN_TEMPLATES, AI_TEMPLATE_SELECTED } from '@/ai/events'
 
 /**
  * 模态覆盖层封装
@@ -59,23 +58,19 @@ function Modal({
 
 /**
  * AI 助手根容器
- * - SettingsPage / TemplateLibrary 以模态覆盖层形式按需显示
- * - 通过 window CustomEvent 接收 TopBar 按钮触发
- * - ESC 键关闭任一已打开的模态
+ * - TemplateLibrary 以模态覆盖层形式按需显示（AI 设置已改为面板内视图，不再走这里）
+ * - 通过 window CustomEvent 接收打开事件
+ * - ESC 键关闭已打开的模态
  * - AIChatPanel 由 AppLayout 作为 aiPanel 渲染
  */
 export function AIAssistantRoot() {
-  const [settingsOpen, setSettingsOpen] = useState(false)
   const [templateOpen, setTemplateOpen] = useState(false)
 
-  // 监听 TopBar 派发的打开事件
+  // 监听打开事件
   useEffect(() => {
-    const onOpenSettings = () => setSettingsOpen(true)
     const onOpenTemplates = () => setTemplateOpen(true)
-    window.addEventListener(AI_OPEN_SETTINGS, onOpenSettings)
     window.addEventListener(AI_OPEN_TEMPLATES, onOpenTemplates)
     return () => {
-      window.removeEventListener(AI_OPEN_SETTINGS, onOpenSettings)
       window.removeEventListener(AI_OPEN_TEMPLATES, onOpenTemplates)
     }
   }, [])
@@ -83,16 +78,13 @@ export function AIAssistantRoot() {
   // ESC 关闭模态（与 HotkeyDialog / PromptDialog 约定一致）
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setSettingsOpen(false)
-        setTemplateOpen(false)
-      }
+      if (e.key === 'Escape') setTemplateOpen(false)
     }
-    if (settingsOpen || templateOpen) {
+    if (templateOpen) {
       document.addEventListener('keydown', onKey)
       return () => document.removeEventListener('keydown', onKey)
     }
-  }, [settingsOpen, templateOpen])
+  }, [templateOpen])
 
   const handleTemplateSelect = (template: Template) => {
     setTemplateOpen(false)
@@ -101,21 +93,8 @@ export function AIAssistantRoot() {
   }
 
   return (
-    <>
-      <Modal
-        open={settingsOpen}
-        onClose={() => setSettingsOpen(false)}
-        cardClassName="max-w-lg w-full"
-      >
-        <SettingsPage />
-      </Modal>
-      <Modal
-        open={templateOpen}
-        onClose={() => setTemplateOpen(false)}
-        cardClassName="max-w-2xl w-full"
-      >
-        <TemplateLibrary onSelect={handleTemplateSelect} />
-      </Modal>
-    </>
+    <Modal open={templateOpen} onClose={() => setTemplateOpen(false)} cardClassName="max-w-2xl w-full">
+      <TemplateLibrary onSelect={handleTemplateSelect} />
+    </Modal>
   )
 }

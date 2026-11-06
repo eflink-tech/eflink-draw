@@ -52,17 +52,33 @@ describe('AIChatPanel', () => {
     vi.mocked(settingsStore.isConfigured).mockResolvedValue(true)
   })
 
-  it('渲染停靠面板：标题栏含 AI 设置与收起按钮', () => {
+  it('渲染停靠面板：标题栏含历史/设置/新会话/收起四枚按钮', () => {
     render(<AIChatPanel />)
     expect(screen.getByText(/AI 智能助手/i)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '会话历史' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'AI 设置' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: '收起' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '新会话' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '收起面板' })).toBeInTheDocument()
   })
 
   it('收起按钮切换 uiStore 的 aiPanelVisible（显隐由 AppLayout 控制）', () => {
     render(<AIChatPanel />)
     const before = useUIStore.getState().aiPanelVisible
-    fireEvent.click(screen.getByRole('button', { name: '收起' }))
+    fireEvent.click(screen.getByRole('button', { name: '收起面板' }))
+    expect(useUIStore.getState().aiPanelVisible).toBe(!before)
+  })
+
+  it('设置按钮在面板内切换到设置视图，不再弹层覆盖', () => {
+    render(<AIChatPanel />)
+    expect(screen.queryByTestId('ai-settings')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'AI 设置' }))
+    expect(screen.getByTestId('ai-settings')).toBeInTheDocument()
+  })
+
+  it('焦点在面板内按 Esc 收起面板', () => {
+    render(<AIChatPanel />)
+    const before = useUIStore.getState().aiPanelVisible
+    fireEvent.keyDown(screen.getByTestId('ai-panel'), { key: 'Escape' })
     expect(useUIStore.getState().aiPanelVisible).toBe(!before)
   })
 

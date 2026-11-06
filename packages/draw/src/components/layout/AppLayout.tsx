@@ -74,16 +74,10 @@ export function AppLayout({ topBar, leftPanel, canvas, rightPanel, bottomBar, ai
           </aside>
         )}
 
-        {/* AI 助手面板（始终挂载以保留状态，通过 display 控制显示/隐藏） */}
-        <aside
-          className="relative z-10 flex-shrink-0 border-l border-[#e0e0e0] bg-[#fafafa] overflow-y-auto shadow-[-4px_0_10px_rgba(0,0,0,0.08)]"
-          style={{
-            width: aiVisible ? '380px' : '0px',
-            display: aiVisible ? 'block' : 'none',
-          }}
-        >
+        {/* AI 助手面板（常驻挂载以保留会话，靠 .efk-ai-slot 宽度过渡滑入滑出） */}
+        <div className="efk-ai-slot" data-open={aiVisible}>
           {aiPanel}
-        </aside>
+        </div>
 
         {/* 右侧竖排工具栏（始终贴窗口最右缘） */}
         <RightToolbar />

@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from 'react'
 import {
   Undo2, Redo2, Bold, Italic, Underline,
-  Paintbrush as FormatBrush, Lock, Unlock, Link2, Share2, MessageCircle,
+  Paintbrush as FormatBrush, Lock, Unlock, Link2, Share2, MessageCircle, Sparkles,
 } from 'lucide-react'
 import { OfficeHeader, useI18n, type OfficeHeaderBrand, type OfficeMenu } from '@eflink-tech/office-kit'
 import { displayDocTitle } from '@/i18n'
@@ -795,6 +795,23 @@ export function TopBar({ branding }: { branding?: OfficeHeaderBrand | false } = 
 
   const actions = (
     <>
+      {/* AI 助手入口（五端统一：顶栏 actions 区最左，图标+文字胶囊） */}
+      <button
+        type="button"
+        onClick={() => useUIStore.getState().toggleAiPanel()}
+        title={t('draw.panel.ai')}
+        aria-label={t('draw.panel.ai')}
+        aria-pressed={aiPanelVisible}
+        data-testid="ai-toggle"
+        className={`flex h-7 shrink-0 items-center gap-1 rounded-md px-2 text-xs transition-colors ${
+          aiPanelVisible
+            ? 'bg-[#e6f2ff] text-[#007bff]'
+            : 'text-[#4c5158] hover:bg-black/[0.06] hover:text-[#1f2329]'
+        }`}
+      >
+        <Sparkles size={13} />
+        {t('draw.panel.ai')}
+      </button>
       {getDrawShareHandler() !== null && (
         <>
           <button
