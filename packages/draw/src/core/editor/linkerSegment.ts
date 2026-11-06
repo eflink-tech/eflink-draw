@@ -15,7 +15,7 @@ import { useEditorStore } from '@/store/editorStore'
 import { applyLiveLinker } from './liveLinker'
 import { STUB_R, type Point } from './linker'
 import { simplifyOrthogonalPoints } from './manualRoute'
-import { projectToSegment, resolveJunctionLinkers } from './linkerJunction'
+import { projectToSegment, resolveJunctionLinkers, nearestPointOnLinker } from './linkerJunction'
 import { rectGetterOf } from './documentOps'
 
 /** 轴对齐判定阈值（世界像素，浮点容差） */
@@ -70,6 +70,30 @@ export function hitLinkerSegment(
 
 export function isMiddleSegment(l: LinkerInstance, segIndex: number): boolean {
   return segIndex > 1 && segIndex <= l.points.length
+}
+
+/**
+ * 指针下的最近连线：端点手柄（10px）与锚点命中区（7px）可能盖住极短连线的整条线身，
+ * 双层命中后仍按真实路径兜底判定，避免双击落空。
+ */
+export function nearestLinkerAt(
+  linkers: LinkerInstance[],
+  wx: number,
+  wy: number,
+  scale: number,
+): { linker: LinkerInstance; segIndex: number } | null {
+  const tol = 6 / scale
+  let best: { linker: LinkerInstance; segIndex: number; dist: number } | null = null
+  for (const l of linkers) {
+    const p = nearestPointOnLinker(l, wx, wy)
+    if (p.dist > tol || (best && p.dist >= best.dist)) continue
+    best = {
+      linker: l,
+      segIndex: hitLinkerSegment(l, wx, wy, scale)?.segIndex ?? 0,
+      dist: p.dist,
+    }
+  }
+  return best ? { linker: best.linker, segIndex: best.segIndex } : null
 }
 
 /**

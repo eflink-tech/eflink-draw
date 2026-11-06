@@ -47,12 +47,12 @@ describe('resolveLinkerStart（L 连线工具起点）', () => {
     expect(r.y).toBe(200)
   })
 
-  it('命中图形内部非锚点 → 吸附最近轮廓点（顶边投影，非锚点）', () => {
+  it('命中图形内部非锚点 → 吸附距按下点最近的锚点（默认从节点起线）', () => {
     const el = shape(100, 200, 100, 60)
-    // 点击 (130, 205)：距顶边 5px、距左边 30px → 轮廓点 (130,200)
+    // 点击 (130, 205)：最近锚点为顶边中点 (150,200)（非轮廓投影点 (130,200)）
     const r = resolveLinkerStart([el], 130, 205, 1)
     expect(r.id).toBe(el.id)
-    expect(r.x).toBe(130)
+    expect(r.x).toBe(150)
     expect(r.y).toBe(200)
     expect(r.angle).toBeCloseTo(Math.PI / 2, 6)
   })
@@ -66,20 +66,30 @@ describe('resolveLinkerStart（L 连线工具起点）', () => {
     expect(r.angle).toBeCloseTo(Math.PI / 2, 6)
   })
 
-  it('锚点容差随 scale 缩小（scale=4 时 3 世界px 超容差走轮廓点）', () => {
+  it('锚点容差随 scale 缩小：超出直中容差仍吸附最近锚点', () => {
     const el = shape(100, 200, 100, 60)
-    const r = resolveLinkerStart([el], 150, 203, 4) // tol = 7/4 = 1.75 < 3 → 轮廓
+    // tol = 7/4 = 1.75 < 3 → 不直中 (150,360)，但最近锚点仍是 (150,200)
+    const r = resolveLinkerStart([el], 150, 203, 4)
     expect(r.id).toBe(el.id)
     expect(r.x).toBe(150)
     expect(r.y).toBe(200)
   })
 
-  it('锚点优先层与轮廓投影可区分（点击偏离锚点法线方向）', () => {
+  it('点击偏离锚点法线方向 → 不落成轮廓点，吸附最近锚点（不同缩放一致）', () => {
     const el = shape(100, 200, 100, 60)
-    // (154,203)：|dx|=4≤7、|dy|=3≤7 → 锚点命中 x 吸回 150（禁用锚点层则投影为 154）
-    expect(resolveLinkerStart([el], 154, 203, 1).x).toBe(150)
-    // scale=4：tol=1.75 < |dx|=4 → 投影 (154,200)（tol 误为 7*scale=28 则吸回 150）
-    expect(resolveLinkerStart([el], 154, 203, 4).x).toBe(154)
+    // (190,232)：最近锚点为右边中点 (200,230)（轮廓投影为 (200,232)）
+    expect(resolveLinkerStart([el], 190, 232, 1)).toMatchObject({ x: 200, y: 230 })
+    expect(resolveLinkerStart([el], 190, 232, 4)).toMatchObject({ x: 200, y: 230 })
+  })
+
+  it('无锚点图形 → 回退轮廓最近点', () => {
+    const el = shape(100, 200, 100, 60)
+    el.anchors = []
+    // 无锚点：点击 (130,205) 投影到顶边 (130,200)
+    const r = resolveLinkerStart([el], 130, 205, 1)
+    expect(r.id).toBe(el.id)
+    expect(r.x).toBe(130)
+    expect(r.y).toBe(200)
   })
 })
 
@@ -126,6 +136,36 @@ describe('自由连线工具（junction 吸附集成）', () => {
     expect(created!.to.id).toBeNull()
     expect(created!.to.junction).toEqual({ linkerId: host.id, t: 0.25 })
     expect(created!.to).toMatchObject({ x: 10, y: 40 })
+  })
+
+  it('图形内部起线 → 起点挂节点，拖拽中换到面向指针的锚点', () => {
+    const el = shape(100, 200, 100, 60)
+    useEditorStore.getState().addElement(el)
+    beginFreeLinker(130, 205) // 内部非锚点 → 最近锚点 (150,200)
+    moveFreeLinker(400, 500, null) // 拖向右下 → 起点换成右下方向的锚点
+    endFreeLinker()
+
+    const created = Object.values(useEditorStore.getState().document.elements).find(
+      (e): e is LinkerInstance => isLinker(e),
+    )
+    expect(created).toBeDefined()
+    expect(created!.from.id).toBe(el.id)
+    expect(created!.from.x).toBe(200) // 右边中点（面向指针）
+    expect(created!.from.y).toBe(230)
+  })
+
+  it('按在锚点上起线 → 起点锁定该锚点，拖拽中不换边', () => {
+    const el = shape(100, 200, 100, 60)
+    useEditorStore.getState().addElement(el)
+    beginFreeLinker(150, 200) // 顶边中点直中
+    moveFreeLinker(400, 500, null)
+    endFreeLinker()
+
+    const created = Object.values(useEditorStore.getState().document.elements).find(
+      (e): e is LinkerInstance => isLinker(e),
+    )
+    expect(created).toBeDefined()
+    expect(created!.from).toMatchObject({ id: el.id, x: 150, y: 200 })
   })
 
   it('空白处结束拖拽 → 普通自由连线（无 junction）', () => {

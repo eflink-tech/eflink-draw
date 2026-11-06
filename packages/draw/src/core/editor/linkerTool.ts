@@ -32,6 +32,8 @@ interface FreeLinkerDrag {
   from: LinkerEndpoint
   /** mousedown 世界坐标（误触判定基准） */
   start: { x: number; y: number }
+  /** 按下时精确点中锚点（7px）→ 起点锁定该锚点，不随拖拽方向换边 */
+  anchorLocked: boolean
 }
 
 let drag: FreeLinkerDrag | null = null
@@ -45,7 +47,8 @@ export function isFreeLinkerDragging(): boolean {
  * 起点解析（纯函数，便于测试）：
  * 1. 包围盒（±10px，屏幕像素）覆盖光标的可连线图形为候选
  * 2. 候选中距轮廓最近的图形承载起点；其锚点 7px（屏幕像素）内锚点优先
- * 3. 否则起点 = 轮廓最近点（任意边点）；空白/锁定 → 自由端点
+ * 3. 否则吸附该图形最近的锚点（默认从节点起线，拖拽中随方向换边）
+ * 4. 无锚点的图形回退轮廓最近点；空白/锁定 → 自由端点
  */
 export function resolveLinkerStart(
   shapes: ElementInstance[],
@@ -75,14 +78,36 @@ export function resolveLinkerStart(
   }
   if (!host || !hostHit) return { id: null, x: worldX, y: worldY, angle: 0 }
 
-  // 锚点优先（直接复用端点吸附阈值）
-  const tol = ANCHOR_HIT_PX / scale
-  const ap = getAnchorPoints(host).find(
-    (a) => Math.abs(a.x - worldX) <= tol && Math.abs(a.y - worldY) <= tol,
-  )
-  if (ap) return { id: host.id, x: ap.x, y: ap.y, angle: ap.angle }
+  const anchors = getAnchorPoints(host)
+  if (anchors.length > 0) {
+    // 锚点优先：先按 7px 命中，否则取距按下点最近的锚点（节点）
+    const tol = ANCHOR_HIT_PX / scale
+    const direct = anchors.find(
+      (a) => Math.abs(a.x - worldX) <= tol && Math.abs(a.y - worldY) <= tol,
+    )
+    const pick = direct ?? nearestAnchorOf(anchors, worldX, worldY)
+    return { id: host.id, x: pick.x, y: pick.y, angle: pick.angle }
+  }
 
   return { id: host.id, x: hostHit.x, y: hostHit.y, angle: hostHit.angle }
+}
+
+/** 距 (x,y) 最近的锚点 */
+function nearestAnchorOf(
+  anchors: Array<{ x: number; y: number; angle: number }>,
+  x: number,
+  y: number,
+): { x: number; y: number; angle: number } {
+  let best = anchors[0]!
+  let bestDist = Infinity
+  for (const a of anchors) {
+    const dist = (a.x - x) ** 2 + (a.y - y) ** 2
+    if (dist < bestDist) {
+      bestDist = dist
+      best = a
+    }
+  }
+  return best
 }
 
 /** 由 from/to 构造连线草稿（线型/样式取连线样式记忆；angle 归 0） */
@@ -106,8 +131,17 @@ function buildDraft(from: LinkerEndpoint, to: LinkerEndpoint): LinkerDraft {
 /** mousedown：开始拖拽，置初始草稿 */
 export function beginFreeLinker(worldX: number, worldY: number): void {
   const st = useEditorStore.getState()
-  const from = resolveLinkerStart(allShapes(), worldX, worldY, st.viewport.scale)
-  drag = { from, start: { x: worldX, y: worldY } }
+  const shapes = allShapes()
+  const from = resolveLinkerStart(shapes, worldX, worldY, st.viewport.scale)
+  // 按下点已在锚点容差内 → 用户明确指定了该节点，拖拽途中不再换边
+  const host = from.id != null ? shapes.find((s) => s.id === from.id) : undefined
+  const tol = ANCHOR_HIT_PX / st.viewport.scale
+  const anchorLocked =
+    host != null &&
+    getAnchorPoints(host).some(
+      (a) => Math.abs(a.x - worldX) <= tol && Math.abs(a.y - worldY) <= tol,
+    )
+  drag = { from, start: { x: worldX, y: worldY }, anchorLocked }
   st.setLinkerDraft(buildDraft(from, from))
 }
 
@@ -123,15 +157,29 @@ export function moveFreeLinker(
   const d = drag
   if (!d) return
   const st = useEditorStore.getState()
+  const shapes = allShapes()
+  // 起点默认挂在节点上：拖拽方向确定后，换到起始图形上面向指针的锚点
+  //（按下时精确点中锚点则保持用户选择）
+  let from = d.from
+  if (from.id != null && !d.anchorLocked) {
+    const host = shapes.find((s) => s.id === from.id)
+    const anchors = host ? getAnchorPoints(host) : []
+    if (anchors.length > 0) {
+      const pick = nearestAnchorOf(anchors, worldX, worldY)
+      from = { id: from.id, x: pick.x, y: pick.y, angle: pick.angle }
+    }
+  }
   // 候选宿主：全部连线（草稿尚未入库，无自身可排除；selfLinkerId 传 null）
   const linkers = Object.values(st.document.elements).filter(isLinker)
   const r = snapLinkerEndpoint({
-    shapes: allShapes(),
+    shapes,
     hitShapeId,
     worldX,
     worldY,
     scale: st.viewport.scale,
-    otherEnd: d.from,
+    otherEnd: from,
+    // 创建口径：落点默认吸附图形锚点（节点），而非任意轮廓点
+    preferAnchors: true,
     linkers,
     elements: st.document.elements,
     selfLinkerId: null,
@@ -149,7 +197,7 @@ export function moveFreeLinker(
     hideEndpointPreview()
   }
   const to = { ...r.endpoint, angle: r.endpoint.angle ?? 0 }
-  st.setLinkerDraft(buildDraft(d.from, to))
+  st.setLinkerDraft(buildDraft(from, to))
 }
 
 /** mouseup：误触判定 + 创建连线（保持连线工具激活） */

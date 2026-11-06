@@ -1,5 +1,5 @@
-// 验证任意边线连线：选择模式边线拖出（非锚点起点）→ 目标边线任意点吸附；
-// 连线工具按图形内部拖出 → 起点为轮廓最近点。
+// 验证边线与节点连线：选择模式边线拖出（非锚点起点）→ 目标吸附节点；
+// 连线工具按图形内部拖出 → 起止点都吸附形状节点（锚点）。
 // 断言走 window.__store 的文档状态（与 segment-handle.spec 同模式）。
 import { test, expect, type Page } from '@playwright/test'
 
@@ -135,7 +135,7 @@ async function linkersOf(page: Page): Promise<LinkerLike[]> {
   })
 }
 
-test('选择模式：边线任意点拖出 → 目标边线任意点吸附', async ({ page }) => {
+test('选择模式：边线任意点拖出 → 目标吸附节点', async ({ page }) => {
   const { toScreen, realErrors } = await setupBase(page)
   // sh-a 底边 25% 处（非锚点）：(200+30, 280)
   const from = toScreen(230, 280)
@@ -158,8 +158,9 @@ test('选择模式：边线任意点拖出 → 目标边线任意点吸附', asy
   expect(lk.from.x).toBeCloseTo(230, 0) // 边线拖出点保持（±0.5px）
   expect(lk.from.y).toBeCloseTo(280, 0)
   expect(lk.to.id).toBe('sh-b')
-  expect(lk.to.x).toBeCloseTo(648, 0) // 轮廓带吸附点 = 光标投影
-  expect(lk.to.y).toBeCloseTo(400, 0)
+  // 创建口径吸附节点：sh-b 距起点最近的左中点 (600,440)（非光标投影 (648,400)）
+  expect(lk.to.x).toBeCloseTo(600, 0)
+  expect(lk.to.y).toBeCloseTo(440, 0)
   expect(realErrors()).toEqual([])
 })
 
@@ -188,12 +189,12 @@ test('选择模式：图形内部按下 → 移动图形（不被边带劫持）
   expect(realErrors()).toEqual([])
 })
 
-test('连线工具：图形内部按下拖出 → 起点为轮廓最近点', async ({ page }) => {
+test('连线工具：图形内部按下拖出 → 两端吸附形状节点', async ({ page }) => {
   const { toScreen, realErrors } = await setupBase(page)
   await page.keyboard.press('l') // 切到连线工具（useEditorShortcuts）
-  // sh-a 内部 (220, 210)：距顶边 10px、距左边 20px → 轮廓点 (220, 200)
+  // sh-a 内部 (220, 210) 起笔，拖向右下 → 起点换到面向指针的右中点 (320,240)
   const from = toScreen(220, 210)
-  const to = toScreen(660, 440) // sh-b 中心（深处 → 面向另一端锚点）
+  const to = toScreen(660, 440) // sh-b 中心 → 吸附距起点最近的左中点 (600,440)
   await page.mouse.move(from.sx, from.sy)
   await page.mouse.down()
   await page.mouse.move(to.sx, to.sy, { steps: 12 })
@@ -204,8 +205,10 @@ test('连线工具：图形内部按下拖出 → 起点为轮廓最近点', asy
   expect(linkers.length).toBe(1)
   const lk = linkers[0]!
   expect(lk.from.id).toBe('sh-a')
-  expect(lk.from.x).toBeCloseTo(220, 0)
-  expect(lk.from.y).toBeCloseTo(200, 0) // 顶边投影
+  expect(lk.from.x).toBeCloseTo(320, 0) // 右中点锚点
+  expect(lk.from.y).toBeCloseTo(240, 0)
   expect(lk.to.id).toBe('sh-b')
+  expect(lk.to.x).toBeCloseTo(600, 0) // 左中点锚点
+  expect(lk.to.y).toBeCloseTo(440, 0)
   expect(realErrors()).toEqual([])
 })

@@ -180,6 +180,13 @@ function SegmentHandles({ linker }: { linker: LinkerInstance }) {
             startSegmentDrag(linker, segIndex, stage)
             e.target.getLayer()?.batchDraw()
           }}
+          onDblClick={(e) => {
+            e.cancelBubble = true
+            // 句柄位于段中点：极短连线的端点手柄盖住线身时，双击这里同样进入该段文字编辑
+            const st = useEditorStore.getState()
+            st.selectElement(linker.id)
+            st.setTextEdit({ id: linker.id, block: -1, seg: segIndex })
+          }}
           onMouseEnter={(e) => {
             e.cancelBubble = true
             ;(e.target as Konva.Shape).fill('#4096ff')

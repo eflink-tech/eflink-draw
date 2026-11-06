@@ -308,7 +308,9 @@ function Editor({ id, block, seg }: { id: string; block: number; seg?: number })
           WebkitAppearance: 'none',
         }}
       />
-      {/* 隐藏标尺：div 与 textarea 等宽同字体，测折行后真实高度 */}
+      {/* 隐藏标尺：div 与 textarea 等宽同字体，测折行后真实高度。
+          换行口径必须与 textarea / 预览层一致（pre-wrap）：默认 normal 会把 \n
+          折成空格，多行文字按单行测高 → paddingTop 偏大 → 编辑态文字下坠 */}
       <div
         ref={rulerRef}
         style={{
@@ -320,6 +322,8 @@ function Editor({ id, block, seg }: { id: string; block: number; seg?: number })
           width: `${worldW}px`,
           overflow: 'hidden',
           pointerEvents: 'none',
+          whiteSpace: 'pre-wrap',
+          wordBreak: 'break-word',
         }}
       >
         {value}

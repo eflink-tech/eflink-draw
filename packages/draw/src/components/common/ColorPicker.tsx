@@ -1,5 +1,6 @@
 // 纯预设色板（灰阶 12 + 9×12 彩色矩阵，共 120 色）+ HEX 输入 + 透明按钮；
 import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from 'react'
+import { createPortal } from 'react-dom'
 import { useI18n } from '@eflink-tech/office-kit'
 import { rgbToHex } from '@/core/utils/color'
 import { ColorGrid } from '@/components/common/ColorGrid'
@@ -57,14 +58,17 @@ export function ColorPicker({
     }
   }, [onClose, anchorRef])
 
-  return (
+  // 挂到 body：属性面板/右侧工具栏各自是 z-10 层叠上下文，弹层留在面板内会被
+  // 右侧 40px 工具栏（同为 z-10、DOM 更靠后）盖住，出现右侧被裁掉一截的观感
+  return createPortal(
     <div
       ref={popRef}
       className="fixed z-50 bg-white border border-[#a0a0a0] rounded shadow-lg"
       style={{ left: pos.left, top: pos.top }}
     >
       <ColorGrid value={value} onSelect={onSelect} transparent={transparent} onLiveSelect={onLiveSelect} />
-    </div>
+    </div>,
+    document.body,
   )
 }
 

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import type { LinkerInstance } from '@/types'
 import { createLinkerInstance } from '../linker'
-import { hitLinkerSegment, isMiddleSegment, isSegmentDraggable, segmentDragPoints } from '../linkerSegment'
+import { hitLinkerSegment, isMiddleSegment, isSegmentDraggable, nearestLinkerAt, segmentDragPoints } from '../linkerSegment'
 import { simplifyOrthogonalPoints } from '../manualRoute'
 
 /** from(0,0)→p(0,40)→p(100,40)→to(100,100) 的折线 */
@@ -60,6 +60,32 @@ describe('hitLinkerSegment', () => {
     const hit = hitLinkerSegment(l, 24, 26, 1)
     expect(hit).not.toBeNull()
     expect(hit!.axisAligned).toBeNull()
+  })
+})
+
+describe('nearestLinkerAt（命中区遮挡时的兜底判定）', () => {
+  it('返回指针下的连线与所在段', () => {
+    expect(nearestLinkerAt([brokenLinker(PTS)], 50, 41, 1)).toMatchObject({ segIndex: 2 })
+  })
+
+  it('容差外返回 null（6px 世界像素）', () => {
+    expect(nearestLinkerAt([brokenLinker(PTS)], 50, 47, 1)).toBeNull()
+  })
+
+  it('多条连线时取最近的一条', () => {
+    const a = brokenLinker(PTS)
+    const b: LinkerInstance = {
+      ...createLinkerInstance(
+        { id: null, x: 10, y: 0, angle: 0 },
+        { id: null, x: 10, y: 10, angle: 0 },
+        0,
+      ),
+      linkerType: 'line',
+      points: [],
+    }
+    const near = nearestLinkerAt([a, b], 10, 8, 1)
+    expect(near?.linker).toBe(b)
+    expect(near?.segIndex).toBe(1)
   })
 })
 

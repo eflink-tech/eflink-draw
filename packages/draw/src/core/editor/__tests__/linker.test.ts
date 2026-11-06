@@ -647,6 +647,52 @@ describe('snapLinkerEndpoint', () => {
     expect(r.endpoint.id).toBeNull()
   })
 
+  // 创建口径（preferAnchors）：落点优先图形锚点（节点），不落成任意轮廓点
+  it('preferAnchors：悬停图形内部 → 吸附距另一端最近的锚点（非轮廓点）', () => {
+    const target = shape(100, 300, 100, 60)
+    const other = shape(100, 100, 100, 60)
+    const r = snapLinkerEndpoint({
+      shapes: [other, target],
+      hitShapeId: target.id,
+      worldX: 130, // 顶边 30% 处（非锚点）
+      worldY: 340,
+      scale: 1,
+      otherEnd: { id: other.id, x: 150, y: 160 },
+      preferAnchors: true,
+    })
+    expect(r.endpoint).toMatchObject({ id: target.id, x: 150, y: 300 }) // 顶部锚点
+    expect(r.snapAnchor).toEqual({ x: 150, y: 300 })
+  })
+
+  it('preferAnchors：轮廓带内 → 也吸附该图形距另一端最近的锚点', () => {
+    const target = shape(100, 300, 100, 60)
+    const other = shape(100, 100, 100, 60)
+    const r = snapLinkerEndpoint({
+      shapes: [other, target],
+      hitShapeId: null,
+      worldX: 130, // 顶边 30% 处
+      worldY: 308, // 轮廓带内（≤12px）
+      scale: 1,
+      otherEnd: { id: other.id, x: 150, y: 160 },
+      preferAnchors: true,
+    })
+    expect(r.endpoint).toMatchObject({ id: target.id, x: 150, y: 300 })
+  })
+
+  it('preferAnchors：落在另一端所属图形上 → 脱附为自由点', () => {
+    const el = shape(100, 100, 100, 60)
+    const r = snapLinkerEndpoint({
+      shapes: [el],
+      hitShapeId: el.id,
+      worldX: 130,
+      worldY: 120,
+      scale: 1,
+      otherEnd: { id: el.id, x: 150, y: 100 },
+      preferAnchors: true,
+    })
+    expect(r.endpoint).toEqual({ id: null, x: 130, y: 120, angle: null })
+  })
+
   it('锁定图形轮廓不吸附', () => {
     const target = shape(100, 300, 100, 60)
     target.locked = true

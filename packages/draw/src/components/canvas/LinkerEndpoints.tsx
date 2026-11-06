@@ -8,7 +8,7 @@
 // 本实现：端点平时不可见（仅 hover 光标变化；全面可视化增强——单选该连线时
 // 显示可见圆点手柄），置于最上层 Layer；拖动走 liveLinker 直操通道，
 // mouseup 一次性 updateLinker 提交。
-import { useCallback, useMemo, useRef } from 'react'
+import { useCallback, useLayoutEffect, useMemo, useRef } from 'react'
 import { Circle, Group, Rect } from 'react-konva'
 import type Konva from 'konva'
 import type { LinkerInstance } from '@/types'
@@ -23,6 +23,7 @@ import {
   showEndpointPreview,
 } from '@/core/editor/uiOverlay'
 import { isSeqMessage } from '@/core/editor/seqMessage'
+import { hitLinkerSegment } from '@/core/editor/linkerSegment'
 import { allShapes, hitElementId, makeStoreRectGetter, pointerWorld } from '@/core/editor/interaction'
 
 const ENDPOINT_HIT_PX = 10
@@ -185,9 +186,23 @@ function EndpointHandle({ linker, which }: { linker: LinkerInstance; which: 'fro
     [linker.id, ep.x, ep.y, setSnapHost],
   )
 
+  // 让位只改 listening：Konva 命中画布不会自动重画，而事件派发不会向下层穿透——
+  // 残留命中会让整次点击落到舞台空白。同帧同步重绘命中画布（batchDraw 会晚一帧）
+  const groupRef = useRef<Konva.Group>(null)
+  const listenedRef = useRef(!deferToAnchor)
+  useLayoutEffect(() => {
+    const g = groupRef.current
+    const listened = !deferToAnchor
+    if (!g || listenedRef.current === listened) return
+    listenedRef.current = listened
+    g.listening(listened)
+    g.getLayer()?.draw()
+  }, [deferToAnchor])
+
   const half = ENDPOINT_HIT_PX / scale
   return (
     <Group
+      ref={groupRef}
       x={ep.x}
       y={ep.y}
       listening={!deferToAnchor}
@@ -220,6 +235,21 @@ function EndpointHandle({ linker, which }: { linker: LinkerInstance; which: 'fro
       onDragStart={handleDragStart}
       onDragMove={handleDragMove}
       onDragEnd={handleDragEnd}
+      onDblClick={(e) => {
+        e.cancelBubble = true
+        // 极短连线的两个端点命中区（10px）会盖住整条线身，双击只能落在手柄上；
+        // 按指针所在段进入该线文字编辑（与线身双击同口径）
+        const stage = e.target.getStage()
+        const pw = stage ? pointerWorld(stage) : null
+        const st = useEditorStore.getState()
+        let seg = 0
+        if (pw) {
+          const hit = hitLinkerSegment(linker, pw.x, pw.y, st.viewport.scale)
+          if (hit) seg = hit.segIndex
+        }
+        st.selectElement(linker.id)
+        st.setTextEdit({ id: linker.id, block: -1, seg })
+      }}
     >
       <Rect x={-half} y={-half} width={half * 2} height={half * 2} fill="#000" opacity={0} />
       {linkerSelected && (

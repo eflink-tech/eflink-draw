@@ -51,6 +51,7 @@ import {
 import { nearestContourPoint } from '@/core/editor/shapeContour'
 import { SEQ_LOOP_H, SEQ_LOOP_W, barEdgeX, resolveSeqDrop, selfLoopPoints } from '@/core/editor/seqMessage'
 import { hitTextBlock, evalTextBlockRect } from '@/core/editor/textEdit'
+import { nearestLinkerAt } from '@/core/editor/linkerSegment'
 import { fontFamilyCSS } from '@/core/editor/fontMap'
 import { layoutVerticalText } from '@/core/editor/verticalText'
 import { rotateCursor } from '@/core/editor/rotateCursor'
@@ -840,6 +841,8 @@ export const ElementRenderer = memo(function ElementRenderer({ element, textEngi
       worldY: pw.y,
       scale: st.viewport.scale,
       otherEnd: { id: from.id, x: from.x, y: from.y },
+      // 创建口径：落在图形上/贴近边线时吸附锚点（节点），不取任意轮廓点
+      preferAnchors: true,
     })
     // 悬停图形显示锚点 / 吸附点大圆预览（旧 showAnchors + showLinkPoint）
     st.setHoveredId(hitId)
@@ -1415,11 +1418,31 @@ export const ElementRenderer = memo(function ElementRenderer({ element, textEngi
               if (container) container.style.cursor = 'default'
             }}
             onMouseDown={(e) => {
+              // 连线工具下让事件冒泡到舞台，由 beginFreeLinker 从锚点起笔
+              if (currentTool === 'linker') return
               // 锚点命中区盖在本体之上，舞台 mousedown 认不到 name='element'——补选中
               e.cancelBubble = true
               useEditorStore
                 .getState()
                 .selectElement(element.id, e.evt.ctrlKey || e.evt.metaKey || e.evt.shiftKey)
+            }}
+            onDblClick={(e) => {
+              // 极短连线的整条线身都可能被锚点命中区盖住：指针确实落在连线上时
+              // 进入连线文字编辑，而不是落空（图形文本命中会因线在图形外而为 -1）
+              const stage = e.target.getStage()
+              const pw = pointerWorld(stage)
+              if (!pw) return
+              const st = useEditorStore.getState()
+              const near = nearestLinkerAt(
+                Object.values(st.document.elements).filter(isLinker),
+                pw.x,
+                pw.y,
+                st.viewport.scale,
+              )
+              if (!near) return
+              e.cancelBubble = true
+              st.selectElement(near.linker.id)
+              st.setTextEdit({ id: near.linker.id, block: -1, seg: near.segIndex })
             }}
             onDragStart={(e) => {
               e.cancelBubble = true

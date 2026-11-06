@@ -111,7 +111,9 @@ export function useEditorShortcuts(refs: ShortcutRefs): void {
           e.preventDefault()
           const st = useEditorStore.getState()
           if (e.shiftKey) {
-            st.startBrush()
+            // ⇧⌘B 与工具栏同口径：已激活则关闭
+            if (st.brushData) st.cancelBrush()
+            else st.startBrush()
           } else {
             st.toggleFontStyle('bold')
           }

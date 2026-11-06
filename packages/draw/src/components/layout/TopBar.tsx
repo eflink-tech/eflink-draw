@@ -885,7 +885,8 @@ export function TopBar({ branding }: { branding?: OfficeHeaderBrand | false } = 
           title={t('draw.edit.formatBrush')}
           active={!!brushData}
           onClick={handleBrush}
-          disabled={selectedIds.size === 0 || firstSelected == null}
+          // 激活后必须始终可点关闭：应用样式时选区可能已被清空
+          disabled={!brushData && (selectedIds.size === 0 || firstSelected == null)}
         />
 
         <div className="w-px h-5 bg-[#ddd] mx-1" />

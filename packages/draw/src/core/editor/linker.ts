@@ -872,6 +872,11 @@ export interface EndpointSnapInput {
   scale: number
   /** 连线另一端（决定锚点选择；junction 用于同宿主双端判定） */
   otherEnd: { id: string | null; x: number; y: number; junction?: LinkerJunction }
+  /**
+   * 创建连线口径：光标在图形上或贴近其边线时，优先吸附图形锚点（节点），
+   * 而不是任意轮廓点。端点微调（拖动已有连线的端点）不传，保留沿边自由调整。
+   */
+  preferAnchors?: boolean
   /** 候选宿主连线（junction 吸附；不传则不做连线吸附，旧行为不变） */
   linkers?: LinkerInstance[]
   /** 文档元素表（junction 防环判定用，与 linkers 同时传入） */
@@ -885,22 +890,46 @@ export interface EndpointSnapResult {
   snapAnchor: { x: number; y: number } | null
 }
 
+/** 距目标点最近的锚点（锚点列表非空时调用） */
+function nearestAnchorTo(
+  anchors: Array<Point & { angle: number }>,
+  target: Point,
+): Point & { angle: number } {
+  let best = anchors[0]!
+  let bestDist = Infinity
+  for (const a of anchors) {
+    const dist = measureDistance(a, target)
+    if (dist < bestDist) {
+      bestDist = dist
+      best = a
+    }
+  }
+  return best
+}
+
+/** 锚点身份端点（id/坐标/内向角） */
+function anchorEndpoint(shapeId: string, a: Point & { angle: number }): LinkerEndpoint {
+  return { id: shapeId, x: a.x, y: a.y, angle: a.angle }
+}
+
 /**
  * 计算连线端点拖动/创建时的目标端点
  *
  * 1. 鼠标 7px 内命中悬停图形的具体锚点 → 直接选中该锚点
- * 2. 光标距任一图形轮廓 ≤12px（屏幕像素）→ 吸附轮廓最近点（任意边点，
- *    含图形内浅层与外侧近边，蓝点随光标沿边滑动）
- * 3. 悬停图形 == 另一端所属图形 → 脱附为自由点（不允许两端连同一图形）
- * 4. 悬停图形内部深处 → 吸附到距另一端最近的锚点
- * 5. 未命中图形但光标 20px 内有其他图形的锚点 → 邻近吸附该锚点
+ * 2. preferAnchors（创建口径）：悬停图形 → 吸附距另一端最近的锚点（节点）
+ * 3. 光标距任一图形轮廓 ≤12px（屏幕像素）→ 吸附轮廓最近点（任意边点，
+ *    含图形内浅层与外侧近边，蓝点随光标沿边滑动）；preferAnchors 时改为
+ *    吸附该图形距另一端最近的锚点（默认连到节点）
+ * 4. 悬停图形 == 另一端所属图形 → 脱附为自由点（不允许两端连同一图形）
+ * 5. 悬停图形内部深处 → 吸附到距另一端最近的锚点
+ * 6. 未命中图形但光标 20px 内有其他图形的锚点 → 邻近吸附该锚点
  *    （从外侧接近目标左/右侧时提前附着，箭头按锚点法向驶入而非保持朝下）
- * 6. 传入 linkers 且光标 10px 内落在其他连线的渲染路径上 → junction 附着
+ * 7. 传入 linkers 且光标 10px 内落在其他连线的渲染路径上 → junction 附着
  *    （端点 id 为 null、带 junction { linkerId, t }；跳过锁定/自身/成环宿主）
- * 7. 空白 → 自由点：图形边吸附（2px）后，±6px（屏幕像素）与另一端对齐拉直
+ * 8. 空白 → 自由点：图形边吸附（2px）后，±6px（屏幕像素）与另一端对齐拉直
  */
 export function snapLinkerEndpoint(input: EndpointSnapInput): EndpointSnapResult {
-  const { shapes, hitShapeId, worldX, worldY, scale, otherEnd } = input
+  const { shapes, hitShapeId, worldX, worldY, scale, otherEnd, preferAnchors } = input
   // 锁定或 linkable === false 的图形不可连线/吸附（与 findSnapAnchor 语义一致）
   const hit =
     hitShapeId != null
@@ -926,8 +955,21 @@ export function snapLinkerEndpoint(input: EndpointSnapInput): EndpointSnapResult
     }
   }
 
-  // 2. 轮廓带吸附：光标距任一图形轮廓 ≤12px（屏幕像素）→ 吸附轮廓最近点（任意边点）。
-  // 含图形内浅层与外侧近边，蓝点随光标沿边滑动；跳过锁定/不可连线/另一端宿主（防自连）
+  // 2. 创建口径：悬停图形上 → 吸附距另一端最近的锚点（节点），
+  //    避免在图形贴边处落成任意轮廓点（菱形斜边/矩形边缘中段）
+  if (preferAnchors && hit) {
+    if (hit.id === otherEnd.id) {
+      return { endpoint: { id: null, x: worldX, y: worldY, angle: null }, snapAnchor: null }
+    }
+    if (anchors.length > 0) {
+      const a = nearestAnchorTo(anchors, otherEnd)
+      return { endpoint: anchorEndpoint(hit.id, a), snapAnchor: { x: a.x, y: a.y } }
+    }
+  }
+
+  // 3. 轮廓带吸附：光标距任一图形轮廓 ≤12px（屏幕像素）→ 吸附轮廓最近点（任意边点）。
+  // 含图形内浅层与外侧近边，蓝点随光标沿边滑动；跳过锁定/不可连线/另一端宿主（防自连）。
+  // 创建口径改为吸附该图形距另一端最近的锚点（落点默认连到节点）
   const bandTol = CONTOUR_BAND_PX / scale
   let contourBest: { id: string; c: ContourHit } | null = null
   for (const s of shapes) {
@@ -940,35 +982,38 @@ export function snapLinkerEndpoint(input: EndpointSnapInput): EndpointSnapResult
   }
   if (contourBest) {
     const { id, c } = contourBest
+    if (preferAnchors) {
+      const host = shapes.find((s) => s.id === id)
+      const hostAnchors = host ? getAnchorPoints(host) : []
+      if (hostAnchors.length > 0) {
+        const a = nearestAnchorTo(hostAnchors, otherEnd)
+        return { endpoint: anchorEndpoint(id, a), snapAnchor: { x: a.x, y: a.y } }
+      }
+    }
     return {
       endpoint: { id, x: c.x, y: c.y, angle: c.angle },
       snapAnchor: { x: c.x, y: c.y },
     }
   }
 
-  // 3. 悬停图形 == 另一端所属图形 → 脱附为自由点（不允许两端连同一图形）
+  // 4. 悬停图形 == 另一端所属图形 → 脱附为自由点（不允许两端连同一图形）
   if (hit) {
     if (hit.id === otherEnd.id) {
       return { endpoint: { id: null, x: worldX, y: worldY, angle: null }, snapAnchor: null }
     }
 
-    // 4. 图形内部深处 → 吸附到距另一端最近的锚点（决定箭头驶入方向）
-    let best = anchors[0]
-    let bestDist = Infinity
-    for (const a of anchors) {
-      const dist = measureDistance(a, otherEnd)
-      if (dist < bestDist) {
-        bestDist = dist
-        best = a
-      }
+    // 5. 图形内部深处 → 吸附到距另一端最近的锚点（决定箭头驶入方向）
+    if (anchors.length === 0) {
+      return { endpoint: { id: null, x: worldX, y: worldY, angle: null }, snapAnchor: null }
     }
+    const best = nearestAnchorTo(anchors, otherEnd)
     return {
-      endpoint: { id: hit.id, x: best.x, y: best.y, angle: best.angle },
+      endpoint: anchorEndpoint(hit.id, best),
       snapAnchor: { x: best.x, y: best.y },
     }
   }
 
-  // 5. 邻近吸附：光标未进入任何图形本体时，20px（屏幕像素）内最近的锚点直接吸附
+  // 6. 邻近吸附：光标未进入任何图形本体时，20px（屏幕像素）内最近的锚点直接吸附
   const proxTol = ANCHOR_PROX_PX / scale
   let proxBest: LinkerEndpoint | null = null
   let proxDist = Infinity
@@ -990,7 +1035,7 @@ export function snapLinkerEndpoint(input: EndpointSnapInput): EndpointSnapResult
     return { endpoint: proxBest, snapAnchor: { x: proxBest.x, y: proxBest.y } }
   }
 
-  // 6. 邻近吸附：光标 10px（屏幕像素）内落在其他连线的渲染路径上 → junction 附着
+  // 7. 邻近吸附：光标 10px（屏幕像素）内落在其他连线的渲染路径上 → junction 附着
   if (input.linkers && input.linkers.length > 0) {
     const j = findJunctionSnap(input.linkers, worldX, worldY, scale, {
       selfId: input.selfLinkerId ?? null,
@@ -1011,7 +1056,7 @@ export function snapLinkerEndpoint(input: EndpointSnapInput): EndpointSnapResult
     }
   }
 
-  // 7. 自由点：图形边吸附（2px）后，±6px（屏幕像素）与另一端对齐拉直
+  // 8. 自由点：图形边吸附（2px）后，±6px（屏幕像素）与另一端对齐拉直
   let x = worldX
   let y = worldY
   const edge = snapLinkerLine(worldX, worldY, shapes)
