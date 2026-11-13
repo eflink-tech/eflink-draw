@@ -104,7 +104,8 @@ export const DrawViewer = forwardRef<DrawViewerHandle, DrawViewerProps>(function
     const scale = Math.max(0.02, Math.min(availW / cw, availH / ch, maxScale))
     const frame: ViewerFrame = {
       width: containerWidth,
-      height: Math.ceil(ch * scale + padding * 2),
+      // 交互查看固定为 maxHeight 视口，宽扁图形不会把弹层压成一条窄带；内嵌预览仍按内容高度
+      height: zoomable ? Math.ceil(Math.max(maxHeight, 1)) : Math.ceil(ch * scale + padding * 2),
       padding,
     }
     return { frame, transform: centerTransform(bounds, frame, scale) }
