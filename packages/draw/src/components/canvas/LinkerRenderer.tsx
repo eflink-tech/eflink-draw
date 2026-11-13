@@ -20,21 +20,32 @@ import { hitLinkerSegment, isSegmentDraggable, startSegmentDrag } from '@/core/e
 
 interface LinkerRendererProps {
   linker: LinkerInstance
+  /** 只读渲染（预览/缩略图）：不挂命中与拖拽 */
+  readOnly?: boolean
+  /** 只读渲染的视图缩放（影响选中光晕与命中宽度；缺省读 store） */
+  viewScale?: number
 }
 
 const HIT_WIDTH = 12
 /** 文字标签内边距（世界坐标） */
 const LABEL_PAD = 2
 
-export const LinkerRenderer = memo(function LinkerRenderer({ linker }: LinkerRendererProps) {
-  const selected = useEditorStore((s) => s.selectedIds.has(linker.id))
-  const scale = useEditorStore((s) => s.viewport.scale)
+export const LinkerRenderer = memo(function LinkerRenderer({
+  linker,
+  readOnly = false,
+  viewScale,
+}: LinkerRendererProps) {
+  const storeSelected = useEditorStore((s) => s.selectedIds.has(linker.id))
+  const storeScale = useEditorStore((s) => s.viewport.scale)
+  const selected = !readOnly && storeSelected
+  const scale = readOnly ? (viewScale ?? 1) : storeScale
   const shapeRef = useRef<Konva.Shape>(null)
 
   useEffect(() => {
+    if (readOnly) return
     registerLinkerNode(linker.id, shapeRef.current)
     return () => registerLinkerNode(linker.id, null)
-  }, [linker.id])
+  }, [linker.id, readOnly])
 
   const sceneFunc = useCallback(
     (context: unknown, shape: Konva.Shape) => {
@@ -82,6 +93,7 @@ export const LinkerRenderer = memo(function LinkerRenderer({ linker }: LinkerRen
         strokeWidth={linker.lineStyle.lineWidth ?? 2}
         hitStrokeWidth={HIT_WIDTH}
         perfectDrawEnabled={false}
+        listening={!readOnly}
         id={linker.id}
         name="linker"
         onMouseDown={(e) => {
@@ -141,7 +153,7 @@ export const LinkerRenderer = memo(function LinkerRenderer({ linker }: LinkerRen
       />
       {linker.text && (
         <LinkerLabel key="legacy" linker={linker} labelKey="legacy" text={linker.text}
-          pos={linkerTextAnchor(linker)} />
+          pos={linkerTextAnchor(linker)} readOnly={readOnly} />
       )}
       {(linker.segTexts ?? [])
         .filter((st) => st.text)
@@ -153,6 +165,7 @@ export const LinkerRenderer = memo(function LinkerRenderer({ linker }: LinkerRen
             seg={st.seg}
             text={st.text}
             pos={linkerTextAnchor(linker, st.seg)}
+            readOnly={readOnly}
           />
         ))}
     </Group>
@@ -199,12 +212,14 @@ function LinkerLabel({
   text,
   pos,
   seg,
+  readOnly = false,
 }: {
   linker: LinkerInstance
   labelKey: string
   text: string
   pos: { x: number; y: number }
   seg?: number
+  readOnly?: boolean
 }) {
   const font = { ...LINKER_FONT_DEFAULTS, ...linker.fontStyle }
   // 背景尺寸：Text 挂载后测量回填（首次渲染 0×0，layout effect 后立即修正，无闪烁）
@@ -218,9 +233,10 @@ function LinkerLabel({
   const dragCtxRef = useRef<{ pts: { x: number; y: number }[] } | null>(null)
 
   useEffect(() => {
+    if (readOnly) return
     registerLinkerLabelNode(linker.id, groupRef.current, labelKey)
     return () => registerLinkerLabelNode(linker.id, null, labelKey)
-  }, [linker.id, labelKey])
+  }, [linker.id, labelKey, readOnly])
 
   // 直操通道（applyLiveLinker）在拖线期间直接改节点位置，而 react-konva 仅在
   // props 值变化时才写节点：若锚点值恰好不变（如移动图形但文字所在段未动），
@@ -238,10 +254,10 @@ function LinkerLabel({
   }, [text, font.size, font.bold, font.italic, font.fontFamily])
 
   // 本标签编辑中 → 隐藏（由 TextEditorOverlay 呈现编辑框）
-  const editingThis = useEditorStore(
+  const storeEditingThis = useEditorStore(
     (s) => s.textEdit?.id === linker.id && (s.textEdit.seg ?? undefined) === seg,
   )
-  if (editingThis) return null
+  if (!readOnly && storeEditingThis) return null
 
   return (
     <Group
@@ -249,7 +265,8 @@ function LinkerLabel({
       x={pos.x}
       y={pos.y}
       name={seg != null ? `seg-${seg}` : undefined}
-      draggable={!linker.locked}
+      listening={!readOnly}
+      draggable={!readOnly && !linker.locked}
       onDragStart={(e) => {
         e.cancelBubble = true
         // 缓存折线点列：拖拽期间连线几何不变，避免每帧重复采样

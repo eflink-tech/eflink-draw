@@ -11,7 +11,13 @@ import { Canvas } from '@/components/canvas/Canvas'
 import { AIAssistantRoot } from '@/components/ai/AIAssistantRoot'
 import { AIChatPanel } from '@/components/ai/AIChatPanel'
 import { useEditorStore } from '@/store/editorStore'
-import { loadDocumentFromStorage, loadFromRemote, STORAGE_KEY } from '@/core/editor/persistence'
+import {
+  loadDocumentFromStorage,
+  loadFromRemote,
+  STORAGE_KEY,
+  suppressDocumentPersistence,
+} from '@/core/editor/persistence'
+import { createEmptyDocument, type DocumentData } from '@/types'
 import { DRAW_MESSAGES } from '@/i18n/messages'
 import { setDrawLocale } from '@/i18n/runtime'
 import { builtinEditorBrand, type EditorBrandId } from '@/brand'
@@ -31,6 +37,14 @@ export interface DrawEditorProps {
    * 缺省 'doculuma'。
    */
   branding?: DrawEditorBrand | false | EditorBrandId;
+  /**
+   * 嵌入式模式：不恢复/写入本地与远端文档，也不注册离页保存 bridge。
+   * 用于宿主临时编辑一份独立文档（如 Markdown 里内嵌的图表文档），
+   * 文档由宿主自行保存。缺省 false（独立工作区编辑器）。
+   */
+  embedded?: boolean;
+  /** 嵌入式模式的初始文档；缺省空文档 */
+  initialDocument?: DocumentData;
 }
 
 /** 品牌参数归一：字符串选内置品牌，对象原样使用，缺省 doculuma */
@@ -40,20 +54,31 @@ function resolveBranding(branding: DrawEditorProps['branding']): OfficeHeaderBra
   return branding ?? builtinEditorBrand('doculuma');
 }
 
-export function DrawEditor({ locale, branding }: DrawEditorProps) {
+export function DrawEditor({ locale, branding, embedded = false, initialDocument }: DrawEditorProps) {
   const resolved = normalizeLocale(locale);
   // 非 React 模块（store / AI / 文件操作）读取同一份语言
   setDrawLocale(resolved);
   return (
     <I18nProvider locale={resolved} messages={DRAW_MESSAGES}>
-      <DrawEditorInner branding={branding} />
+      <DrawEditorInner branding={branding} embedded={embedded} initialDocument={initialDocument} />
     </I18nProvider>
   );
 }
 
-function DrawEditorInner({ branding }: Omit<DrawEditorProps, 'locale'>) {
-  // 启动自动恢复：先载入本地缓存（即时），再异步拉取远端覆盖（远端为权威数据源）
+function DrawEditorInner({
+  branding,
+  embedded = false,
+  initialDocument,
+}: Omit<DrawEditorProps, 'locale'>) {
   useEffect(() => {
+    if (embedded) {
+      // 嵌入式：初始文档由宿主提供，整段编辑会话不触碰本地/远端存储
+      const release = suppressDocumentPersistence()
+      useEditorStore.getState().loadDocument(initialDocument ?? createEmptyDocument())
+      return release
+    }
+
+    // 启动自动恢复：先载入本地缓存（即时），再异步拉取远端覆盖（远端为权威数据源）
     const saved = loadDocumentFromStorage()
     if (saved) useEditorStore.getState().loadDocument(saved)
     void loadFromRemote().then((doc) => {
@@ -88,6 +113,7 @@ function DrawEditorInner({ branding }: Omit<DrawEditorProps, 'locale'>) {
   return (
     <>
       <AppLayout
+        contained={embedded}
         topBar={<TopBar branding={resolvedBranding} />}
         leftPanel={<LeftPanel />}
         canvas={<Canvas />}

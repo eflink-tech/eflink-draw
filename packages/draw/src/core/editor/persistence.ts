@@ -8,6 +8,28 @@ export const STORAGE_KEY = 'doculuma:draw:document:v1'
 /** 存储格式版本号 */
 const STORAGE_VERSION = 1
 
+/**
+ * 嵌入式编辑器（如 Markdown 预览里的侧车文档弹窗）只做内存编辑：
+ * 宿主负责保存，不能覆盖绘图工作区的本地/远端文档。计数式开关支持嵌套。
+ */
+let persistenceSuppression = 0
+
+/** 当前是否处于「不落存储」的嵌入式会话 */
+export function isDocumentPersistenceSuppressed(): boolean {
+  return persistenceSuppression > 0
+}
+
+/** 进入嵌入式会话，返回释放函数（幂等） */
+export function suppressDocumentPersistence(): () => void {
+  persistenceSuppression++
+  let released = false
+  return () => {
+    if (released) return
+    released = true
+    persistenceSuppression = Math.max(0, persistenceSuppression - 1)
+  }
+}
+
 /** 存储包装结构 */
 interface StoredDocument {
   version: number
@@ -19,6 +41,8 @@ interface StoredDocument {
  * 序列化/配额/隐私模式等异常一律静默返回 false，不打断编辑流程。
  */
 export function saveDocumentToStorage(doc: DocumentData): boolean {
+  // 嵌入式会话：视为已保存但不动共享存储键
+  if (persistenceSuppression > 0) return true
   try {
     const payload: StoredDocument = { version: STORAGE_VERSION, doc }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(payload))
@@ -79,6 +103,7 @@ export function setDrawRemoteStore(store: DrawRemoteStore | null): void {
 
 /** 内部使用：异步镜像到远端（静默失败，不打断编辑流程） */
 export function mirrorToRemote(doc: DocumentData): void {
+  if (persistenceSuppression > 0) return
   if (!remoteStore) return
   void remoteStore.save(doc).catch(() => {
     /* 远端不可用时保留本地副本 */

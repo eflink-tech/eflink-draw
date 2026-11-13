@@ -12,6 +12,8 @@ migrateLegacyLocalStorage()
 // 组件
 export { DrawEditor } from './DrawEditor'
 export type { DrawEditorProps, DrawEditorBrand } from './DrawEditor'
+export { DrawViewer } from './components/viewer/DrawViewer'
+export type { DrawViewerProps, DrawViewerHandle } from './components/viewer/DrawViewer'
 
 // 品牌切换：'doculuma' | 'eflink' 内置品牌，或传对象自定义
 export { builtinEditorBrand, resolveEditorBrandId, EDITOR_BRAND_IDS } from './brand'
@@ -35,6 +37,20 @@ export { useUIStore } from './store/uiStore'
 // 持久化（localStorage 快照，IndexedDB 见 ai/db）
 export { STORAGE_KEY, saveDocumentToStorage, loadDocumentFromStorage, isDocumentData } from './core/editor/persistence'
 
+// 离屏渲染：文档 → 图片（Markdown 导出/分享缩略图）
+export { renderDocumentToDataUrl } from './core/editor/renderDocumentImage'
+export type { RenderDocumentImageOptions } from './core/editor/renderDocumentImage'
+
+// 图形注册表：由 schema 创建元素实例（Markdown 转绘图等外部生成场景）
+export { shapeRegistry } from './core/schema/registry'
+// 连线几何：创建实例 + 计算折线路由（转换生成时一次性算好 points）
+export { createLinkerInstance, getAnchorPoints, getLinkerPoints, LINKER_DEFAULTS } from './core/editor/linker'
+
 // 数据模型
 export { createEmptyDocument } from './types'
-export type { DocumentData } from './types'
+export type {
+  DocumentData,
+  ElementInstance,
+  LinkerInstance,
+  PageConfig,
+} from './types'

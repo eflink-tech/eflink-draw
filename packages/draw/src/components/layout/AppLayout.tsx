@@ -14,13 +14,18 @@ interface AppLayoutProps {
   rightPanel: ReactNode
   bottomBar: ReactNode
   aiPanel?: ReactNode
+  /** 嵌入式：占满父容器而不是整个视口（宿主可把编辑器放进弹窗/面板） */
+  contained?: boolean
 }
 
 /**
  * 主布局容器：TopBar + 中间三栏 + BottomBar
  * 中间区域从左到右：左面板 → 画布 → 属性面板(260px) → AI 面板(380px) → 竖排工具栏(40px)
  */
-export function AppLayout({ topBar, leftPanel, canvas, rightPanel, bottomBar, aiPanel }: AppLayoutProps) {
+export function AppLayout({ topBar, leftPanel, canvas, rightPanel, bottomBar, aiPanel, contained = false }: AppLayoutProps) {
+  const rootClass = contained
+    ? 'flex flex-col h-full w-full overflow-hidden bg-[#f5f5f5]'
+    : 'flex flex-col h-screen w-screen overflow-hidden bg-[#f5f5f5]'
   const { t } = useI18n()
   const leftVisible = useUIStore((s) => s.leftPanelVisible)
   const rightVisible = useUIStore((s) => s.rightPanelVisible)
@@ -32,7 +37,7 @@ export function AppLayout({ topBar, leftPanel, canvas, rightPanel, bottomBar, ai
   // 专注模式：仅画布占满窗口，隐藏顶/底栏与左右面板；右上角浮动退出按钮
   if (focusMode) {
     return (
-      <div className="flex flex-col h-screen w-screen overflow-hidden bg-[#f5f5f5]">
+      <div className={rootClass}>
         <main className="relative flex-1 overflow-hidden bg-[#e8e8e8]">
           {canvas}
           <button
@@ -49,7 +54,7 @@ export function AppLayout({ topBar, leftPanel, canvas, rightPanel, bottomBar, ai
   }
 
   return (
-    <div className="flex flex-col h-screen w-screen overflow-hidden bg-[#f5f5f5]">
+    <div className={rootClass}>
       {/* 顶部栏 */}
       {topBar}
 

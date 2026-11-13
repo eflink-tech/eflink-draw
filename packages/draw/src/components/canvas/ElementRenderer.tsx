@@ -64,6 +64,10 @@ interface ElementRendererProps {
   element: ElementInstance
   /** 主画布用 html 覆盖层绘字；导出等离屏场景保持 konva */
   textEngine?: 'konva' | 'html'
+  /** 只读渲染（预览/缩略图）：不订阅选区态、不挂交互、不显示控件 */
+  readOnly?: boolean
+  /** 只读渲染的视图缩放（用于文字对齐与控件尺寸；缺省读 store） */
+  viewScale?: number
 }
 
 type HandleDir = 'tl' | 'tr' | 'br' | 'bl' | 'tm' | 'bm' | 'ml' | 'mr'
@@ -177,16 +181,25 @@ function paintRotateIcon(
   ctx.restore()
 }
 
-export const ElementRenderer = memo(function ElementRenderer({ element, textEngine = 'konva' }: ElementRendererProps) {
+export const ElementRenderer = memo(function ElementRenderer({
+  element,
+  textEngine = 'konva',
+  readOnly = false,
+  viewScale,
+}: ElementRendererProps) {
   const { props, path, fontStyle, textBlock, shapeStyle } = element
   const isCodeBlockElement = element.name === 'codeBlock'
-  const selected = useEditorStore((s) => s.selectedIds.has(element.id))
-  const hovered = useEditorStore((s) => s.hoveredId === element.id)
-  const scale = useEditorStore((s) => s.viewport.scale)
-  const currentTool = useEditorStore((s) => s.currentTool)
+  const storeSelected = useEditorStore((s) => s.selectedIds.has(element.id))
+  const storeHovered = useEditorStore((s) => s.hoveredId === element.id)
+  const storeScale = useEditorStore((s) => s.viewport.scale)
+  const storeTool = useEditorStore((s) => s.currentTool)
   const textEditState = useEditorStore((s) => s.textEdit)
+  const selected = !readOnly && storeSelected
+  const hovered = !readOnly && storeHovered
+  const scale = readOnly ? (viewScale ?? 1) : storeScale
+  const currentTool = readOnly ? 'select' : storeTool
   const editingBlock =
-    textEditState?.id === element.id ? textEditState.block : null
+    !readOnly && textEditState?.id === element.id ? textEditState.block : null
   const [rotHover, setRotHover] = useState(false)
 
   const groupRef = useRef<Konva.Group>(null)
@@ -198,9 +211,10 @@ export const ElementRenderer = memo(function ElementRenderer({ element, textEngi
   const anchorNodes = useRef<Record<string, Konva.Node | null>>({})
 
   useEffect(() => {
+    if (readOnly) return
     registerElementNode(element.id, groupRef.current)
     return () => registerElementNode(element.id, null)
-  }, [element.id])
+  }, [element.id, readOnly])
 
   // ===== 路径绘制（sceneFunc + hitFunc 共用） =====
   const tracePath = useCallback(
@@ -796,9 +810,9 @@ export const ElementRenderer = memo(function ElementRenderer({ element, textEngi
   // 当前填色目标的高亮框（与工具栏同一口径，未点击时回落第 1 条泳道）
   const activeTarget = useEditorStore((s) => s.activeTarget)
   const activeTargetRect = useMemo(() => {
-    if (!swimlaneEl || !selected || currentTool !== 'select') return null
+    if (readOnly || !swimlaneEl || !selected || currentTool !== 'select') return null
     return targetRectOf(swimlaneEl, resolveTarget(swimlaneEl, activeTarget))
-  }, [swimlaneEl, selected, currentTool, activeTarget])
+  }, [readOnly, swimlaneEl, selected, currentTool, activeTarget])
 
   // ===== 锚点/边线 → 连线创建（from 端点在 DragStart 捕获，两种起点共用管道） =====
   const linkerDragFrom = useRef<(LinkerEndpoint & { angle: number }) | null>(null)
@@ -944,7 +958,8 @@ export const ElementRenderer = memo(function ElementRenderer({ element, textEngi
       offset={{ x: w / 2, y: h / 2 }}
       rotation={rotation}
       opacity={shapeStyle.alpha}
-      draggable={!element.locked && currentTool !== 'linker'}
+      listening={!readOnly}
+      draggable={!readOnly && !element.locked && currentTool !== 'linker'}
       onDragStart={handleDragStart}
       onDragMove={handleDragMove}
       onDragEnd={handleDragEnd}
@@ -987,7 +1002,7 @@ export const ElementRenderer = memo(function ElementRenderer({ element, textEngi
 
       {/* 边线命中带：选择模式压边 ±4px 拖出连线（起点=轮廓最近点）；
           stroke 命中带跨轮廓内外各半，不拦截图形内部（按下=移动图形） */}
-      {currentTool === 'select' && !element.locked && element.attribute?.linkable !== false && (
+      {!readOnly && currentTool === 'select' && !element.locked && element.attribute?.linkable !== false && (
         <Shape
           ref={setAnchorNodeRef('edge-hit')}
           width={w}
@@ -1070,7 +1085,7 @@ export const ElementRenderer = memo(function ElementRenderer({ element, textEngi
       )}
 
       {/* 多块文本命中区：置于 Shape 之上，双击精确进入对应 textBlock（避免整图命中误开块 0） */}
-      {textBlock && textBlock.length > 1 && (
+      {!readOnly && textBlock && textBlock.length > 1 && (
         <Group>
           {textBlock.map((tb, i) => {
             if (editingBlock === i) return null
@@ -1247,7 +1262,7 @@ export const ElementRenderer = memo(function ElementRenderer({ element, textEngi
       })()}
 
       {/* UML 激活条左右缘热区：按下拖出时序消息 */}
-      {isActivation && currentTool === 'select' && !element.locked &&
+      {!readOnly && isActivation && currentTool === 'select' && !element.locked &&
         ([-1, 1] as const).map((dir) => (
           <Rect
             key={`seq-edge-${dir}`}
@@ -1393,7 +1408,8 @@ export const ElementRenderer = memo(function ElementRenderer({ element, textEngi
       ))}
 
       {/* 锚点命中区：始终渲染 7px 数学检测——不管是否选中/悬停都能从锚点拖出连线 */}
-      {!element.locked &&
+      {!readOnly &&
+        !element.locked &&
         getLocalAnchors(element).map((a, idx) => (
           <Rect
             key={`hit-${idx}`}

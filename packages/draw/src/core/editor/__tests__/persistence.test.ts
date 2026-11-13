@@ -1,7 +1,13 @@
 // @vitest-environment jsdom
 // 持久化测试：save/load 往返、坏 JSON、缺字段、版本不匹配 + store saveDocument/loadDocument
 import { describe, it, expect, beforeEach } from 'vitest'
-import { saveDocumentToStorage, loadDocumentFromStorage, STORAGE_KEY } from '../persistence'
+import {
+  saveDocumentToStorage,
+  loadDocumentFromStorage,
+  suppressDocumentPersistence,
+  isDocumentPersistenceSuppressed,
+  STORAGE_KEY,
+} from '../persistence'
 import { useEditorStore, historyManager } from '@/store/editorStore'
 import { createEmptyDocument } from '@/types'
 import { createLinkerInstance } from '../linker'
@@ -48,6 +54,32 @@ describe('saveDocumentToStorage / loadDocumentFromStorage', () => {
   it('存储内容非对象返回 null', () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify('a-string'))
     expect(loadDocumentFromStorage()).toBeNull()
+  })
+})
+
+describe('嵌入式会话（不落存储）', () => {
+  it('抑制期间不写 localStorage，但仍视为保存成功', () => {
+    const release = suppressDocumentPersistence()
+    try {
+      expect(isDocumentPersistenceSuppressed()).toBe(true)
+      expect(saveDocumentToStorage(createEmptyDocument('嵌入式'))).toBe(true)
+      expect(localStorage.getItem(STORAGE_KEY)).toBeNull()
+    } finally {
+      release()
+    }
+    expect(isDocumentPersistenceSuppressed()).toBe(false)
+    expect(saveDocumentToStorage(createEmptyDocument('恢复写'))).toBe(true)
+    expect(loadDocumentFromStorage()!.page.title).toBe('恢复写')
+  })
+
+  it('嵌套抑制按计数释放，重复释放幂等', () => {
+    const outer = suppressDocumentPersistence()
+    const inner = suppressDocumentPersistence()
+    inner()
+    inner()
+    expect(isDocumentPersistenceSuppressed()).toBe(true)
+    outer()
+    expect(isDocumentPersistenceSuppressed()).toBe(false)
   })
 })
 
