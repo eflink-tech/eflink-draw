@@ -1,0 +1,25 @@
+{
+  "title": "UML时序图",
+  "width": 1154,
+  "height": 800,
+  "nodes": [
+    { "id": "lifeS", "native": "lifeline", "x": 38, "y": 140, "w": 134, "h": 578, "text": "S", "fill": "255,255,255", "bold": true },
+    { "id": "lifeA", "native": "lifeline", "x": 318, "y": 140, "w": 134, "h": 578, "text": "A", "fill": "245,245,200", "bold": true },
+    { "id": "lifeB", "native": "lifeline", "x": 638, "y": 140, "w": 120, "h": 578, "text": "B", "fill": "245,245,200", "bold": true },
+    { "id": "lifeC", "native": "lifeline", "x": 942, "y": 140, "w": 120, "h": 578, "text": "C", "fill": "245,245,200", "bold": true },
+    { "id": "s1", "native": "activation", "x": 90, "y": 288, "w": 30, "h": 132, "fill": "255,255,255", "lineColor": "200,30,30", "lineWidth": 2 },
+    { "id": "s2", "native": "activation", "x": 90, "y": 660, "w": 30, "h": 58, "fill": "255,255,255", "lineColor": "200,30,30", "lineWidth": 2 },
+    { "id": "a1", "native": "activation", "x": 370, "y": 288, "w": 30, "h": 179, "fill": "255,255,255", "lineColor": "200,30,30", "lineWidth": 2 },
+    { "id": "a2", "native": "activation", "x": 370, "y": 533, "w": 30, "h": 185, "fill": "255,255,255", "lineColor": "200,30,30", "lineWidth": 2 },
+    { "id": "b1", "native": "activation", "x": 683, "y": 288, "w": 30, "h": 179, "fill": "255,255,255", "lineColor": "200,30,30", "lineWidth": 2 },
+    { "id": "c1", "native": "activation", "x": 987, "y": 533, "w": 30, "h": 185, "fill": "255,255,255", "lineColor": "200,30,30", "lineWidth": 2 }
+  ],
+  "links": [
+    { "from": "s1", "to": "a1", "text": "request", "seq": { "y": 354, "fromDir": 1, "toDir": -1 } },
+    { "from": "a1", "to": "b1", "text": "request", "seq": { "y": 390, "fromDir": 1, "toDir": -1 } },
+    { "from": "b1", "to": "a1", "text": "response", "lineStyle": "dashed", "seq": { "y": 432, "fromDir": -1, "toDir": 1 } },
+    { "from": "a2", "to": "c1", "text": "request", "seq": { "y": 575, "fromDir": 1, "toDir": -1 } },
+    { "from": "c1", "to": "a2", "text": "response", "lineStyle": "dashed", "seq": { "y": 645, "fromDir": -1, "toDir": 1 } },
+    { "from": "a2", "to": "s2", "text": "response", "lineStyle": "dashed", "seq": { "y": 685, "fromDir": -1, "toDir": 1 } }
+  ]
+}

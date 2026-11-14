@@ -1,0 +1,37 @@
+{
+  "title": "Vertical Cross Functional Template",
+  "width": 1100,
+  "height": 885,
+  "nodes": [
+    {
+      "id": "pool", "native": "swimlaneV",
+      "x": 38, "y": 38, "w": 1027, "h": 812,
+      "title": "<ProcessName>",
+      "headTexts": ["<Function>", "<Function>", "<Function>", "<Function>"],
+      "titleColor": "216,191,231",
+      "laneHeadColors": ["190,220,250", "240,140,190", "205,235,175", "250,205,155"],
+      "laneCount": 4, "z": 5
+    },
+    { "id": "start", "name": "round", "text": "Start", "x": 110, "y": 180, "w": 148, "h": 78, "fill": "170,225,120" },
+    { "id": "p1", "name": "process", "text": "Process", "x": 350, "y": 168, "w": 153, "h": 104, "fill": "90,230,240" },
+    { "id": "d1", "name": "decision", "text": "", "x": 625, "y": 165, "w": 133, "h": 110, "fill": "245,235,80" },
+    { "id": "p2", "name": "process", "text": "Process", "x": 613, "y": 333, "w": 152, "h": 104, "fill": "90,230,240" },
+    { "id": "p3", "name": "process", "text": "Process", "x": 870, "y": 333, "w": 150, "h": 104, "fill": "90,230,240" },
+    { "id": "p4", "name": "process", "text": "Process", "x": 870, "y": 508, "w": 150, "h": 105, "fill": "90,230,240" },
+    { "id": "d2", "name": "decision", "text": "", "x": 627, "y": 510, "w": 136, "h": 102, "fill": "245,235,80" },
+    { "id": "p5", "name": "process", "text": "Process", "x": 622, "y": 703, "w": 150, "h": 104, "fill": "90,230,240" },
+    { "id": "end", "name": "round", "text": "End", "x": 365, "y": 715, "w": 148, "h": 78, "fill": "90,225,90" }
+  ],
+  "links": [
+    { "from": "start", "to": "p1", "fromSide": "right", "toSide": "left" },
+    { "from": "p1", "to": "d1", "fromSide": "right", "toSide": "left" },
+    { "from": "d1", "to": "p3", "fromSide": "right", "toSide": "top" },
+    { "from": "d1", "to": "p2", "fromSide": "bottom", "toSide": "top" },
+    { "from": "p2", "to": "p3", "fromSide": "right", "toSide": "left" },
+    { "from": "p3", "to": "p4", "fromSide": "bottom", "toSide": "top" },
+    { "from": "p4", "to": "d2", "fromSide": "bottom", "toSide": "right" },
+    { "from": "d2", "to": "p5", "fromSide": "bottom", "toSide": "top" },
+    { "from": "p5", "to": "end", "fromSide": "left", "toSide": "right" },
+    { "from": "d2", "to": "end", "fromSide": "left", "toSide": "top" }
+  ]
+}

@@ -1,0 +1,4002 @@
+# 网络图标形状目录（native 直接用 shape 名，全库 3661 个）
+
+架构图/拓扑图/云部署图优先用这里的图标而不是矩形。用法：`{"id":"rds1","native":"RDS","text":"云数据库 RDS","x":..,"y":..}`（w/h 缺省用图标自带尺寸，text 显示在图标下方；检索本文件用 grep -i 关键词）。
+
+topo_zone_* 系分区框自带虚线边框+左上角组名，可直接当分组背景。draw.io 六套图形库（电气/机房机架/Web 原型/通用素材）的图标名均为 `<分类>_<英文原名>`，标题保留英文。
+
+## 阿里云 · 弹性计算（ali_elastic_calc）— 4 个
+
+- `ACE` — 云引擎 ACE
+- `ECS` — 云服务器 ECS
+- `ESS` — 弹性伸缩服务 ESS
+- `ROS` — 资源编排ROS
+
+## 阿里云 · 数据库（ali_database）— 8 个
+
+- `ADS` — 分析型数据库ADS
+- `datamanagement` — 数据管理datamanagement
+- `DTS` — 数据传输服务 DTS
+- `KVStore` — 键值存储 KVStore
+- `mongodb` — mongodb
+- `OCS` — 开放缓存服务 OCS
+- `OTS` — 开放结构化数据服务 OTS
+- `RDS` — 云数据库 RDS
+
+## 阿里云 · 存储与 CDN（ali_storage_cdn）— 4 个
+
+- `CDN` — 内容分发网络 CDN
+- `MNS` — 消息对列服务 MNS
+- `OAS` — 开放归档服务 OAS
+- `OSS` — 开放存储服务 OSS
+
+## 阿里云 · 网络（ali_network）— 5 个
+
+- `ACS_ali` — 容器服务 ACS
+- `havip` — havip
+- `HSA` — 高速通道 HSA
+- `SLB` — 负载均衡 SLB
+- `VPC` — 专有网络 VPC
+
+## 阿里云 · 安全（ali_security）— 14 个
+
+- `AGW` — 绿网
+- `APS` — 渗透测试服务 APS
+- `ATS` — DDoS专家服务 ATS
+- `AYD` — 云盾
+- `DDOS Basic` — DDOS防护 DDOS Basic
+- `DDOS IP` — DDOS高防IP
+- `ESN` — 弹性安全网络 ESN
+- `HSM` — 密码机 HSM
+- `MSS` — 安骑士云拖管服务 MSS
+- `MSS2` — 服务器安全托管 MSS
+- `SAS` — 态势感知 SAS
+- `SCAN` — 弱点分析 SCAN
+- `WAF` — 应用防火墙 WAF
+- `YPP` — 云盾先知计划
+
+## 阿里云 · 管理与监控（ali_manage_monitor）— 2 个
+
+- `CloudMonitoring` — 云监控
+- `RAM` — 资源访问管理服务 RAM
+
+## 阿里云 · 应用服务（ali_app_service）— 6 个
+
+- `CAS` — 移动加速 CAS
+- `MAS` — 移动数据分析 MAS
+- `MTS` — 多媒体转码服务 MTS
+- `OpenSearch` — 开放搜索服务 OpenSearch
+- `PTS` — 性能测试服务 PTS
+- `SLS` — 简单日志服务 SLS
+
+## 阿里云 · 互联网中间件（ali_internet_midd）— 3 个
+
+- `DRDS` — 分布式关系型数据库服务 DRDS
+- `EDAS` — 企业级分布式应用服务 EDAS
+- `ONS` — 开放消息服务 ONS
+
+## 阿里云 · 大规模计算（ali_large_scale_calc）— 4 个
+
+- `BCS` — 批量计算服务 BCS
+- `CDP` — 数据集成 CDP
+- `DPC` — 采云间 DPC
+- `ODPS` — 开放数据处理服务 ODPS
+
+## 阿里云 · 域名与网站（ali_domain_website）— 7 个
+
+- `ACM` — 云邮箱 ACM
+- `AEE` — 企业建站
+- `CVH` — 云虚拟主机
+- `DAW` — 域名与网站
+- `DNS` — 云解析 DNS
+- `FWH` — 弹性WEB托管
+- `Website` — 域名
+
+## 阿里云 · 行业云（ali_industry_cloud）— 12 个
+
+- `AFC` — 金融云 AFC
+- `AGC` — 政务云 AGC
+- `AMC` — 医疗云 AMC
+- `ARC` — 渲染云 ARC
+- `ASC` — 安全云 ASC
+- `AWC` — 移动云 AWC
+- `GAME` — 游戏云 GAME
+- `IOT` — 物联网云 IOT
+- `MULTIMEDIA` — 多媒体
+- `O2O` — O2O
+- `STORAGE` — 云存储 STORAGE
+- `WS` — 网站 WS
+
+## 阿里云 · 移动服务（ali_mobile_service）— 1 个
+
+- `CPS` — 云推动 CPS
+
+## 阿里云 · 其他产品（ali_other_products）— 5 个
+
+- `DPA` — 无线开发平台 DPA
+- `ResilientNetworkIP` — 弹性网络IP
+- `SAC` — 可用性中心 SAC
+- `Tools Image` — 工具与镜像 Tools Image
+- `YSF` — 御膳房 YSF
+
+## 阿里云 · 开发者资源（ali_devel_resource）— 4 个
+
+- `API` — 阿里云API
+- `CLI` — 云推送 CLI
+- `Plugin Eclipse` — 插件 Eclipse
+- `Plugin Visual Studio` — 插件 Visual Studio
+
+## 阿里云 2023 · A–E（ali2_a_e）— 133 个
+
+- `ali2_a_e_abap_business_application_platform` — ABAP Business Application Platform
+- `ali2_a_e_acms_application_configuration_manangement` — ACMS Application Configuration Manangement
+- `ali2_a_e_acr_cloud_container_registry` — ACR Cloud Container Registry
+- `ali2_a_e_actiontrail` — ActionTrail
+- `ali2_a_e_adam_advanced_database_and_application_migration` — ADAM Advanced Database and Application Migration
+- `ali2_a_e_adb_analyticdb_for_mysql` — ADB AnalyticDB for MySQL
+- `ali2_a_e_address_purification` — Address Purification
+- `ali2_a_e_afs_fraud_service` — AFS Fraud Service
+- `ali2_a_e_agw_aligateway` — AGW AliGateWay
+- `ali2_a_e_ahas_application_high_availability_service` — AHAS Application High Availability Service
+- `ali2_a_e_airec_artificial_intelligence_recommendation` — AIRec Artificial Intelligence Recommendation
+- `ali2_a_e_alb_application_load_balancer_01` — ALB Application Load Balancer 01
+- `ali2_a_e_alb_application_load_balancer_02` — ALB Application Load Balancer 02
+- `ali2_a_e_alibaba_cloud_logo` — Alibaba Cloud Logo
+- `ali2_a_e_alibaba_cloud_logo_chinese` — Alibaba Cloud Logo Chinese
+- `ali2_a_e_alibaba_cloud_logo_english` — Alibaba Cloud Logo English
+- `ali2_a_e_alimail` — AliMail
+- `ali2_a_e_alimt_machine_translation` — AliMT Machine Translation
+- `ali2_a_e_aliyun_linux` — Aliyun Linux
+- `ali2_a_e_amqp_advanced_message_queuing_protocol` — AMQP Advanced Message Queuing Protocol
+- `ali2_a_e_amscloudapp` — AMSCloudApp
+- `ali2_a_e_analyticdb_for_postgresql` — AnalyticDB for PostgreSQL
+- `ali2_a_e_antibot` — AntiBot
+- `ali2_a_e_apigateway` — APIGateway
+- `ali2_a_e_apsara_file_storage_for_hdfs` — Apsara File Storage for HDFS
+- `ali2_a_e_apsaravideo_vod` — ApsaraVideo VOD
+- `ali2_a_e_arms_application_real_time_monitoring_service` — ARMS Application Real-Time Monitoring Service
+- `ali2_a_e_ask_ack_container_service_for_kubernetes` — ASK ACK Container Service for Kubernetes
+- `ali2_a_e_asm_service_mesh` — ASM Service Mesh
+- `ali2_a_e_assettech` — AssetTech
+- `ali2_a_e_avds_vulnerability_db_scanning` — AVDS Vulnerability DB Scanning
+- `ali2_a_e_baas_blockchain_as_a_service` — BaaS Blockchain as a Service
+- `ali2_a_e_bandwidth_bag` — Bandwidth Bag
+- `ali2_a_e_bastionhost` — BastionHost
+- `ali2_a_e_batchcompute` — BatchCompute
+- `ali2_a_e_bccluster` — BCCluster
+- `ali2_a_e_beebot` — BeeBot
+- `ali2_a_e_beian` — Beian
+- `ali2_a_e_bizdevops` — BizDevOps
+- `ali2_a_e_bizworks` — BizWorks
+- `ali2_a_e_bpstudio` — BPStudio
+- `ali2_a_e_cas_ssl_central_authentication_service` — CAS SSL Central Authentication Service
+- `ali2_a_e_cassandra_wide_column_database_01` — Cassandra Wide-Column Database 01
+- `ali2_a_e_cassandra_wide_column_database_02` — Cassandra Wide-Column Database 02
+- `ali2_a_e_ccc_cloud_call_center` — CCC Cloud Call Center
+- `ali2_a_e_ccn_cloud_connect_network` — CCN Cloud Connect Network
+- `ali2_a_e_ccs_customer_service_01` — CCS Customer Service 01
+- `ali2_a_e_ccs_customer_service_02` — CCS Customer Service 02
+- `ali2_a_e_cddc_cloud_database_dedicated_cluster` — CDDC Cloud Database Dedicated Cluster
+- `ali2_a_e_cdn_content_distribution_network` — CDN Content Distribution Network
+- `ali2_a_e_cdp_cloudera_cdp` — CDP Cloudera CDP
+- `ali2_a_e_cdt_cloud_datatransfer` — CDT Cloud DataTransfer
+- `ali2_a_e_cen_cloud_enterprise_network` — CEN Cloud Enterprise Network
+- `ali2_a_e_cfw_cloud_firewall` — CFW Cloud Firewall
+- `ali2_a_e_cityvisual` — CityVisual
+- `ali2_a_e_clb_classic_load_balancer_01` — CLB Classic Load Balancer 01
+- `ali2_a_e_clb_classic_load_balancer_02` — CLB Classic Load Balancer 02
+- `ali2_a_e_clickhouse` — ClickHouse
+- `ali2_a_e_cloud_auth` — Cloud Auth
+- `ali2_a_e_cloud_config` — Cloud Config
+- `ali2_a_e_cloud_display` — Cloud Display
+- `ali2_a_e_cloud_governance_center` — Cloud Governance Center
+- `ali2_a_e_cloud_security_center` — Cloud Security Center
+- `ali2_a_e_cloud_shield` — Cloud Shield
+- `ali2_a_e_cloudap` — CloudAP
+- `ali2_a_e_cloudbox` — CloudBox
+- `ali2_a_e_clouddesktop` — CloudDesktop
+- `ali2_a_e_clouddev` — CloudDev
+- `ali2_a_e_cloudphoto` — CloudPhoto
+- `ali2_a_e_cloudproc` — CloudProc
+- `ali2_a_e_cloudshell` — CloudShell
+- `ali2_a_e_cmn_cloud_managed_network` — CMN Cloud Managed Network
+- `ali2_a_e_cmp_cloud_mobile_push` — CMP Cloud Mobile Push
+- `ali2_a_e_cms_cloud_monitor_service` — CMS Cloud Monitor Service
+- `ali2_a_e_codepipeline` — CodePipeline
+- `ali2_a_e_codestore` — CodeStore
+- `ali2_a_e_companyreg` — CompanyReg
+- `ali2_a_e_computenest` — ComputeNest
+- `ali2_a_e_content_security` — Content Security
+- `ali2_a_e_coo` — COO
+- `ali2_a_e_cpns_cell_phone_number_service` — CPNS Cell Phone Number Service
+- `ali2_a_e_csas_cloud_security_access_service` — CSAS Cloud Security Access Service
+- `ali2_a_e_cvc_cloud_video_conferencing` — CVC Cloud Video Conferencing
+- `ali2_a_e_cwh_cloud_web_hosting` — CWH Cloud Web Hosting
+- `ali2_a_e_das_database_autonomy_service` — DAS Database Autonomy Service
+- `ali2_a_e_databot` — DataBot
+- `ali2_a_e_datahub` — DataHub
+- `ali2_a_e_dataphin` — Dataphin
+- `ali2_a_e_dataquotient` — DataQuotient
+- `ali2_a_e_datav` — DataV
+- `ali2_a_e_dataworks_dataide` — DataWorks DataIDE
+- `ali2_a_e_dbaudit` — DBAudit
+- `ali2_a_e_dbes_database_expert_service` — DBES Database Expert Service
+- `ali2_a_e_dbfs_database_file_system` — DBFS Database File System
+- `ali2_a_e_dbs_database_backup` — DBS Database Backup
+- `ali2_a_e_dcdn_dynamic_route_for_cdn` — DCDN Dynamic Route for CDN
+- `ali2_a_e_ddh_dedicated_host` — DDH Dedicated Host
+- `ali2_a_e_ddos_bgp` — DDoS-BGP
+- `ali2_a_e_ddos_dip` — DDoS-DIP
+- `ali2_a_e_ddos_pro` — DDoS-Pro
+- `ali2_a_e_ddos_protection` — DDoS Protection
+- `ali2_a_e_devops` — DevOps
+- `ali2_a_e_dg_database_gateway` — DG Database Gateway
+- `ali2_a_e_directmail` — DirectMail
+- `ali2_a_e_disk_block_storage` — Disk Block Storage
+- `ali2_a_e_dlf_data_lake_formation` — DLF Data Lake Formation
+- `ali2_a_e_dms_data_management_service` — DMS Data Management Service
+- `ali2_a_e_dns_domain_name_system` — DNS Domain Name System
+- `ali2_a_e_dns_privatezone_01` — DNS PrivateZone 01
+- `ali2_a_e_dns_privatezone_02` — DNS PrivateZone 02
+- `ali2_a_e_domain` — Domain
+- `ali2_a_e_domain_and_website` — Domain and Website
+- `ali2_a_e_drds_distribute_relational_database_service` — DRDS Distribute Relational Database Service
+- `ali2_a_e_dsi_data_security_insurance` — DSI Data Security Insurance
+- `ali2_a_e_dts_data_transmission_service` — DTS Data Transmission Service
+- `ali2_a_e_e_mapreduce` — E-MapReduce
+- `ali2_a_e_eais_elastic_accelerated_computing_instances` — EAIS Elastic Accelerated Computing Instances
+- `ali2_a_e_eci_elastic_container_instance` — ECI Elastic Container Instance
+- `ali2_a_e_ecs_elastic_compute_service` — ECS Elastic Compute Service
+- `ali2_a_e_edas_enterprise_distributed_application_service` — EDAS Enterprise Distributed Application Service
+- `ali2_a_e_ehpc_elastic_high_performance_computing` — EHPC Elastic High Performance Computing
+- `ali2_a_e_eip_elastic_ip_address` — EIP Elastic IP Address
+- `ali2_a_e_elastic_web_hosting` — Elastic Web Hosting
+- `ali2_a_e_elasticsearch` — Elasticsearch
+- `ali2_a_e_emas_enterprise_mobile_application_studio` — EMAS Enterprise Mobile Application Studio
+- `ali2_a_e_energyexpert` — EnergyExpert
+- `ali2_a_e_ens_edge_node_service` — ENS Edge Node Service
+- `ali2_a_e_enterprise_website` — Enterprise Website
+- `ali2_a_e_eprofile` — EProfile
+- `ali2_a_e_esign` — ESign
+- `ali2_a_e_ess_elastic_scaling_service` — ESS Elastic Scaling Service
+- `ali2_a_e_eventbridge` — EventBridge
+- `ali2_a_e_express_connect` — Express Connect
+
+## 阿里云 2023 · F–M（ali2_f_m）— 76 个
+
+- `ali2_f_m_face_recognition` — Face Recognition
+- `ali2_f_m_fc_function_compute` — FC Function Compute
+- `ali2_f_m_flow_service` — Flow Service
+- `ali2_f_m_flowbag` — Flowbag
+- `ali2_f_m_fnf_serverless_function_flow` — FNF Serverless Function Flow
+- `ali2_f_m_fpga_field_programmable_gate_array` — FPGA Field Programmable Gate Array
+- `ali2_f_m_fraud_detection` — Fraud Detection
+- `ali2_f_m_ga_global_accelerator` — GA Global Accelerator
+- `ali2_f_m_gameshield` — GameShield
+- `ali2_f_m_gdb_graph_database` — GDB Graph Database
+- `ali2_f_m_graphanalytics` — GraphAnalytics
+- `ali2_f_m_graphcompute` — GraphCompute
+- `ali2_f_m_gtm_global_traffic_manager` — GTM Global Traffic Manager
+- `ali2_f_m_gts_global_transaction_service` — GTS Global Transaction Service
+- `ali2_f_m_gws_graphic_workstation` — GWS Graphic Workstation
+- `ali2_f_m_havip_high_availability_virtual_ip_address` — HaVip High-Availability Virtual IP Address
+- `ali2_f_m_hbase` — HBase
+- `ali2_f_m_hbr_hybrid_backup_recovery` — HBR Hybrid Backup Recovery
+- `ali2_f_m_hcs_hgw_hybrid_cloud_storage_array` — HCS-HGW Hybrid Cloud Storage Array
+- `ali2_f_m_hcs_mgw_hybrid_cloud_storage_datatransport` — HCS-MGW Hybrid Cloud Storage Datatransport
+- `ali2_f_m_hcs_sgw_hybrid_cloud_storage_gateway` — HCS-SGW Hybrid Cloud Storage Gateway
+- `ali2_f_m_hdr_hybrid_disaster_recovery` — HDR Hybrid Disaster Recovery
+- `ali2_f_m_hologres` — Hologres
+- `ali2_f_m_holowatcher` — HoloWatcher
+- `ali2_f_m_hsm_hardware_security_module` — HSM Hardware Security Module
+- `ali2_f_m_httpdns` — HTTPDNS
+- `ali2_f_m_idrsservice` — IDRSService
+- `ali2_f_m_image_recognition` — Image Recognition
+- `ali2_f_m_imagesearch` — ImageSearch
+- `ali2_f_m_imarketing` — IMarketing
+- `ali2_f_m_imm_intelligent_media_management` — IMM Intelligent Media Management
+- `ali2_f_m_imp_intelligent_media_production` — IMP Intelligent Media Production
+- `ali2_f_m_imp_low_code_video_factory` — IMP Low Code Video Factory
+- `ali2_f_m_indvi_industrial_visual_intelligence` — IndVI Industrial Visual Intelligence
+- `ali2_f_m_intelligent_advisor` — Intelligent Advisor
+- `ali2_f_m_iot_internet_of_things_platform` — IoT Internet of Things Platform
+- `ali2_f_m_iot_wireless_connection_service` — IoT Wireless Connection Service
+- `ali2_f_m_iotid_identity` — IoTID Identity
+- `ali2_f_m_iov_iot_vehicle_cloud` — IoV IoT Vehicle Cloud
+- `ali2_f_m_ipv6_gateway` — IPv6 Gateway
+- `ali2_f_m_isoc_iot_security_operations_center` — ISOC IoT Security Operations Center
+- `ali2_f_m_isu_intelligent_semantic_understanding` — ISU Intelligent Semantic Understanding
+- `ali2_f_m_ivision` — IVision
+- `ali2_f_m_ivpd_intelligent_visual_production` — IVPD Intelligent Visual Production
+- `ali2_f_m_kafka` — Kafka
+- `ali2_f_m_linkedmall` — LinkedMall
+- `ali2_f_m_linkwan` — LinkWan
+- `ali2_f_m_live` — Live
+- `ali2_f_m_livinglink` — LivingLink
+- `ali2_f_m_log_streaming` — Log Streaming
+- `ali2_f_m_logic_composer` — Logic Composer
+- `ali2_f_m_machine_learning` — Machine Learning
+- `ali2_f_m_man_mobile_analytics` — MAN Mobile Analytics
+- `ali2_f_m_mariadb` — MariaDB
+- `ali2_f_m_mas_mobile_acceleration_service` — MAS Mobile Acceleration Service
+- `ali2_f_m_maxcompute` — MaxCompute
+- `ali2_f_m_memcache` — Memcache
+- `ali2_f_m_miniappdev` — MiniAppDev
+- `ali2_f_m_mns_message_service` — MNS Message Service
+- `ali2_f_m_mobile_hotfix` — Mobile Hotfix
+- `ali2_f_m_mobsec` — MobSec
+- `ali2_f_m_mongodb` — MongoDB
+- `ali2_f_m_mps_ai` — MPS-AI
+- `ali2_f_m_mps_apsaravideo_media_processing` — MPS ApsaraVideo Media Processing
+- `ali2_f_m_mps_censor` — MPS-Censor
+- `ali2_f_m_mps_cover` — MPS-Cover
+- `ali2_f_m_mps_dna` — MPS-DNA
+- `ali2_f_m_mps_multimod` — MPS-Multimod
+- `ali2_f_m_mps_produce` — MPS-Produce
+- `ali2_f_m_mq_message_queue` — MQ Message Queue
+- `ali2_f_m_mqc_mobile_quality_center` — MQC Mobile Quality Center
+- `ali2_f_m_mse_microservices_engine` — MSE Microservices Engine
+- `ali2_f_m_multi_cloud_finops` — Multi-Cloud FinOps
+- `ali2_f_m_multi_mode_database_lindorm` — Multi-mode Database Lindorm
+- `ali2_f_m_multimediaai` — MultiMediaAI
+- `ali2_f_m_mysql` — MySQL
+
+## 阿里云 2023 · N–S（ali2_n_s）— 82 个
+
+- `ali2_n_s_nas_network_attached_storage` — NAS Network Attached Storage
+- `ali2_n_s_nat_gateway` — NAT Gateway
+- `ali2_n_s_network_acl_access_control_list` — Network ACL Access Control List
+- `ali2_n_s_nlb_network_load_balancer_01` — NLB Network Load Balancer 01
+- `ali2_n_s_nlb_network_load_balancer_02` — NLB Network Load Balancer 02
+- `ali2_n_s_nlp_address` — NLP-Address
+- `ali2_n_s_nlp_automl` — NLP-AutoML
+- `ali2_n_s_nlp_ie_text_information_extraction` — NLP-IE Text Information Extraction
+- `ali2_n_s_nlp_ke_keyword_extraction` — NLP-KE Keyword Extraction
+- `ali2_n_s_nlp_natural_language_processing` — NLP Natural Language Processing
+- `ali2_n_s_nlp_ner_named_entity_recognition` — NLP-NER Named Entity Recognition
+- `ali2_n_s_nlp_pos_part_of_speech_tagging` — NLP-POS Part-of-Speech Tagging
+- `ali2_n_s_nlp_ra_reflexive_anaphora` — NLP-RA Reflexive Anaphora
+- `ali2_n_s_nlp_sa_sentiment_analysis` — NLP-SA Sentiment Analysis
+- `ali2_n_s_nlp_tc_text_categorization` — NLP-TC Text Categorization
+- `ali2_n_s_nlp_ws_word_segmentation` — NLP-WS Word Segmentation
+- `ali2_n_s_nls` — NLS
+- `ali2_n_s_nls_asrbag` — NLS-ASRBag
+- `ali2_n_s_nls_asrcustommodel` — NLS-ASRCustomModel
+- `ali2_n_s_nls_filebag` — NLS-Filebag
+- `ali2_n_s_nls_service` — NLS-Service
+- `ali2_n_s_nls_shortasrbag` — NLS-ShortASRBag
+- `ali2_n_s_nls_ttsbag` — NLS-TTSBag
+- `ali2_n_s_nodejs_performance_platform` — Nodejs Performance Platform
+- `ali2_n_s_oceanbase` — OceanBase
+- `ali2_n_s_ocr_optical_character_recognition` — OCR Optical Character Recognition
+- `ali2_n_s_onsmqtt_micro_message_queuing_telemetry_transport` — OnsMQTT Micro Message Queuing Telemetry Transport
+- `ali2_n_s_oos_operation_orchestration_service` — OOS Operation Orchestration Service
+- `ali2_n_s_openanalytics` — OpenAnalytics
+- `ali2_n_s_openapi_explorer` — OpenAPI Explorer
+- `ali2_n_s_opensearch` — OpenSearch
+- `ali2_n_s_oss_object_storage_service` — OSS Object Storage Service
+- `ali2_n_s_ots_tablestore` — OTS Tablestore
+- `ali2_n_s_outboundbot` — OutboundBot
+- `ali2_n_s_pcdn_p2p_cdn` — PCDN P2P CDN
+- `ali2_n_s_petadata_hybriddb_for_mysql` — PetaData HybridDB for MySQL
+- `ali2_n_s_physical_connection` — Physical Connection
+- `ali2_n_s_pnvs_phone_number_verification_service` — PNVS Phone Number Verification Service
+- `ali2_n_s_polardb` — PolarDB
+- `ali2_n_s_porana_portrait_analysis` — Porana Portrait Analysis
+- `ali2_n_s_postgresql` — PostgreSQL
+- `ali2_n_s_ppas_pay_as_you_go_database` — PPAS Pay-As-You-Go Database
+- `ali2_n_s_privatelink` — PrivateLink
+- `ali2_n_s_prometheus` — Prometheus
+- `ali2_n_s_prophet` — Prophet
+- `ali2_n_s_pts_performance_test_service` — PTS Performance Test Service
+- `ali2_n_s_quickbi` — QuickBI
+- `ali2_n_s_ram_resource_access_management` — RAM Resource Access Management
+- `ali2_n_s_re_recommendation_engine` — RE Recommendation Engine
+- `ali2_n_s_realtime_compute` — Realtime Compute
+- `ali2_n_s_redis_kvstore` — Redis KVStore
+- `ali2_n_s_region` — Region
+- `ali2_n_s_retailir` — RetailIR
+- `ali2_n_s_ros_resource_orchestration_service` — ROS Resource Orchestration Service
+- `ali2_n_s_route_table` — Route Table
+- `ali2_n_s_router` — Router
+- `ali2_n_s_rsimganalys` — RSImgAnalys
+- `ali2_n_s_rtc_real_time_communication` — RTC Real-Time Communication
+- `ali2_n_s_sae_serverless_app_engine` — SAE Serverless App Engine
+- `ali2_n_s_sag_smart_access_gateway_01` — SAG Smart Access Gateway 01
+- `ali2_n_s_sag_smart_access_gateway_02` — SAG Smart Access Gateway 02
+- `ali2_n_s_sas_situational_awareness` — SAS Situational Awareness
+- `ali2_n_s_sca_smart_conversation_analysis_01` — SCA Smart Conversation Analysis 01
+- `ali2_n_s_sca_smart_conversation_analysis_02` — SCA Smart Conversation Analysis 02
+- `ali2_n_s_scc_super_computing_cluster` — SCC Super Computing Cluster
+- `ali2_n_s_scdn_secure_cdn` — SCDN Secure CDN
+- `ali2_n_s_scu_storage_capacity_unit` — SCU Storage Capacity Unit
+- `ali2_n_s_sddp_sensitive_data_protection` — SDDP Sensitive Data Protection
+- `ali2_n_s_shared_bandwidth` — Shared Bandwidth
+- `ali2_n_s_shared_flow_bag` — Shared Flow Bag
+- `ali2_n_s_shc_shield_hybrid_cloud` — SHC Shield Hybrid Cloud
+- `ali2_n_s_slb_server_load_balancer_01` — SLB Server Load Balancer 01
+- `ali2_n_s_slb_server_load_balancer_02` — SLB Server Load Balancer 02
+- `ali2_n_s_slb_server_load_balancer_03` — SLB Server Load Balancer 03
+- `ali2_n_s_sls_simple_log_service` — SLS Simple Log Service
+- `ali2_n_s_smc_server_migration_center` — SMC Server Migration Center
+- `ali2_n_s_sms_short_message_service` — SMS Short Message Service
+- `ali2_n_s_sos` — SOS
+- `ali2_n_s_spark_data_insights` — Spark Data Insights
+- `ali2_n_s_sppc` — SPPC
+- `ali2_n_s_sqlserver` — SQLServer
+- `ali2_n_s_swas_simple_application_server` — SWAS Simple Application Server
+
+## 阿里云 2023 · T–Z（ali2_t_z）— 19 个
+
+- `ali2_t_z_tr_transit_router` — TR Transit Router
+- `ali2_t_z_trademark_service` — Trademark Service
+- `ali2_t_z_uis_ultimate_internet_service` — UIS Ultimate Internet Service
+- `ali2_t_z_user` — User
+- `ali2_t_z_user_feedback_01` — User Feedback 01
+- `ali2_t_z_user_feedback_02` — User Feedback 02
+- `ali2_t_z_vbr_virtual_border_router` — VBR Virtual Border Router
+- `ali2_t_z_vcs_visual_computing_service` — VCS Visual Computing Service
+- `ali2_t_z_vms_voice_messaging_service` — VMS Voice Messaging Service
+- `ali2_t_z_voicebot_intelligent_voice_navigation` — VoiceBot Intelligent Voice Navigation
+- `ali2_t_z_vpc_virtual_private_cloud` — VPC Virtual Private Cloud
+- `ali2_t_z_vpn_gateway` — VPN Gateway
+- `ali2_t_z_vs_video_surveillance` — VS Video Surveillance
+- `ali2_t_z_vswitch` — VSwitch
+- `ali2_t_z_waf_web_application_firewall` — WAF Web Application Firewall
+- `ali2_t_z_webplus_web_app_service` — Webplus Web App Service
+- `ali2_t_z_xdragon_bare_metal_server` — XDragon Bare Metal Server
+- `ali2_t_z_xtrace` — XTrace
+- `ali2_t_z_yida` — Yida
+
+## AWS · 计算（aws_compute）— 17 个
+
+- `ami` — AMI
+- `auto scaling` — Auto Scaling
+- `db on instance` — DB On Instance
+- `ec2` — EC2
+- `ecr` — ECR
+- `ecs` — ECS
+- `elastic beanstalk` — Elastic Beanstalk
+- `elastic beanstalk app` — Elastic Beanstalk App
+- `elastic beanstalk deploy` — Elastic Beanstalk Deploy
+- `elastic ip` — Elastic IP
+- `elastic load balancing` — Elastic Load Balancing
+- `instance` — Instance
+- `instance with cloudwatch` — Instance with CloudWatch
+- `instances` — Instances
+- `lambda` — Lambda
+- `optimized instance` — Optimized Instance
+- `spot instance` — Spot Instance
+
+## AWS · 数据库（aws_database）— 29 个
+
+- `dense compute node` — Dense Compute Node
+- `dense storage node` — Dense Storage Node
+- `dynamo db` — Dynamo DB
+- `dynamo db attribute` — Dynamo DB Attribute
+- `dynamo db attributes` — Dynamo DB Attributes
+- `dynamo db item` — Dynamo DB Item
+- `dynamo db items` — Dynamo DB Items
+- `dynamo db table` — Dynamo DB table
+- `elastic cache` — Elastic Cache
+- `elastic cache cachenode` — Elastic Cache Cachenode
+- `elastic cache memcached` — Elastic Cache Memcached
+- `elastic cache redis` — Elastic Cache Redis
+- `global secondary index` — Global Secondary Index
+- `migration service` — Migration Service
+- `piop` — PIOP
+- `postgre sql instance` — Postgre SQL Instance
+- `rds` — RDS
+- `rds db instance` — RDS DB Instance
+- `rds db instance read replica` — RDS DB Instance Read Replica
+- `rds db instance standby (multi-az)` — RDS DB Instance Standby (multi-AZ)
+- `rds ms sql instance` — RDS MS SQL Instance
+- `rds ms sql instance lternate` — RDS MS SQL Instance Lternate
+- `rds mysql db instance` — RDS MySQL DB Instance
+- `rds mysql instance lternate` — RDS MySQL Instance Lternate
+- `rds oracle db instance` — RDS Oracle DB Instance
+- `rds oracle db instance alternate` — RDS Oracle DB Instance Alternate
+- `Redshift` — Redshift
+- `sql master` — SQL Master
+- `sql slave` — SQL Slave
+
+## AWS · 存储（aws_storage）— 21 个
+
+- `cloud front` — Cloud Front
+- `cloud front download distribution` — Cloud Front Download Distribution
+- `cloud front edge location` — Cloud Front Edge Location
+- `cloud front streaming distribution` — Cloud Front Streaming Distribution
+- `ebs` — EBS
+- `efs` — EFS
+- `glacier` — Glacier
+- `glacier archive` — Glacier Archive
+- `glacier vault` — Glacier Vault
+- `import/export snowball` — Import/Export Snowball
+- `import/export snowball import/export` — Import/Export Snowball Import/Export
+- `s3` — S3
+- `s3 bucket` — S3 Bucket
+- `s3 bucket with objects` — S3 Bucket with Objects
+- `s3 objects` — S3 Objects
+- `snapshot` — Snapshot
+- `storage gateway` — Storage Gateway
+- `storage gateway cached volume` — Storage Gateway Cached Volume
+- `storage gateway non-cached volume` — Storage Gateway Non-cached Volume
+- `storage gateway virtual tape library` — Storage Gateway Virtual Tape Library
+- `volume` — Volume
+
+## AWS · 网络（aws_networking）— 14 个
+
+- `aws vpn gateway` — VPN Gateway
+- `direct connect` — Direct Connect
+- `route 53` — Route 53
+- `route 53 hosted zone` — Route 53 Hosted Zone
+- `route 53 route table` — Route 53 Route Table
+- `vpc` — VPC
+- `vpc customer gateway` — VPC Customer Gateway
+- `vpc endpoints` — VPC Endpoints
+- `vpc flow logs` — VPC Flow Logs
+- `vpc internet gateway` — VPC Internet Gateway
+- `vpc nat gateway` — VPC NAT Gateway
+- `vpc router` — VPC Router
+- `vpn connection` — VPN Connection
+- `vpn peering` — VPN Peering
+
+## AWS · 安全与身份（aws_security_identity）— 16 个
+
+- `cloud hsm` — Cloud HSM
+- `directory service` — Directory Service
+- `iam` — IAM
+- `iam add-on` — IAM Add-on
+- `iam aws sts` — IAM AWS STS
+- `iam aws sts (alternate)` — IAM AWS STS (alternate)
+- `iam data encryption key` — IAM Data Encryption Key
+- `iam Encrypted Data` — IAM Encrypted Data
+- `iam long credential` — IAM Long Credential
+- `iam mfa token` — IAM MFA Token
+- `iam permissions` — IAM Permissions
+- `iam role` — IAM Role
+- `iam short credential` — IAM Short Credential
+- `inpector` — Inpector
+- `kms` — KMS
+- `waf` — WAF
+
+## AWS · 通用（aws_general）— 15 个
+
+- `aws cloud` — AWS Cloud
+- `aws management console` — AWS Management Console
+- `client` — Client
+- `corporate data center` — Corporate Data Center
+- `disk` — Disk
+- `forums` — Forums
+- `generic database` — Generic Database
+- `internet` — Internet
+- `mobile client` — Mobile Client
+- `multimedia` — Multimedia
+- `tape storage` — Tape Storage
+- `traditional server` — Traditional Server
+- `user` — User
+- `users` — Users
+- `virtual private cloud` — Virtual Private Cloud
+
+## AWS · 分组（aws_groups）— 11 个
+
+- `auto scaling container` — Auto Scaling Container
+- `availability zone` — Availability Zone
+- `aws cloud container` — AWS Cloud Container
+- `corporate data center container` — Corporate Data Center Container
+- `ec2 instance container` — EC2 Instance Container
+- `elastic beanstalk container` — Elastic Beanstalk Container
+- `region container` — Region Container
+- `security group container` — Security Group Container
+- `server contents` — Server Contents
+- `subnet container` — Subnet Container
+- `vpc container` — VPC Container
+
+## AWS · 应用服务（aws_app_servers）— 13 个
+
+- `api gateway` — API Gateway
+- `app stream` — App Stream
+- `cloud search` — Cloud Search
+- `cloud search metadata` — Cloud Search Metadata
+- `elastic transcoder` — Elastic Transcoder
+- `ses` — SES
+- `ses email` — SES Email
+- `sqs` — SQS
+- `sqs message` — SQS Message
+- `sqs queue` — SQS Queue
+- `swf` — SWF
+- `swf decider` — SWF Decider
+- `swf worker` — SWF Worker
+
+## AWS · 分析（aws_analytics）— 16 个
+
+- `aws data pipeline` — AWS Data Pipeline
+- `elastic search service` — Elastic Search Service
+- `emr` — EMR
+- `emr cluster` — EMR Cluster
+- `emr engine` — EMR Engine
+- `emr_hdf` — EMR_HDF
+- `emr_maprm3` — EMR_MAPRM3
+- `emr_maprm5` — EMR_MAPRM5
+- `emr_maprm7` — EMR_MAPRM7
+- `kinesis` — Kinesis
+- `kinesis firehose` — Kinesis Firehose
+- `kinesis streams` — Kinesis Streams
+- `kinesis-enabled` — Kinesis-enabled
+- `kinesisan alytics` — Kinesis Analytics
+- `machine learning` — Machine Learning
+- `quick sight` — Quick Sight
+
+## AWS · 管理工具（aws_mgmt_tools）— 18 个
+
+- `cloud formation` — Cloud Formation
+- `cloud formation stack` — Cloud Formation Stack
+- `cloud formation template` — Cloud Formation Template
+- `cloud trail` — Cloud Trail
+- `cloud watch` — Cloud Watch
+- `cloud watch alarm` — Cloud Watch Alarm
+- `config` — Config
+- `ops works` — Ops Works
+- `ops works appss` — Ops Works Apps
+- `ops works deployments` — Ops Works Deployments
+- `ops works instances` — Ops Works Instances
+- `ops works layers` — Ops Works Layers
+- `ops works monitoring` — Ops Works Monitoring
+- `ops works permissions` — Ops Works Permissions
+- `ops works resources` — Ops Works Resources
+- `ops works stack` — Ops Works Stack
+- `service catalog` — Service Catalog
+- `trusted advisor` — Trusted Advisor
+
+## AWS · 开发工具（aws_devel_tools）— 3 个
+
+- `codecommit` — CodeCommit
+- `codedeploy` — CodeDeploy
+- `codepipeline` — CodePipeline
+
+## AWS · IoT（aws_iot）— 34 个
+
+- `aws iot (continued)` — AWS IoT (Continued)
+- `iot action` — IoT Action
+- `iot actuator` — IoT Actuator
+- `iot certificate` — IoT Certificate
+- `iot desired state` — IoT Desired State
+- `iot hardware board` — IoT Hardware Board
+- `iot http protocol` — IoT HTTP Protocol
+- `iot http/2 protocol` — IoT HTTP/2 Protocol
+- `iot mqtt protocol` — IoT MQTT Protocol
+- `iot policy` — IoT Policy
+- `iot reported state` — IoT Reported State
+- `iot rule` — IoT Rule
+- `iot sensor` — IoT Sensor
+- `iot servo` — IoT Servo
+- `iot shadow` — IoT Shadow
+- `iot simulator` — IoT Simulator
+- `iot thing bank` — IoT Thing Bank
+- `iot thing bicycle` — IoT Thing Bicycle
+- `iot thing camera` — IoT Thing Camera
+- `iot thing car` — IoT Thing Car
+- `iot thing cart` — IoT Thing Cart
+- `iot thing coffee pot` — IoT Thing Coffee Pot
+- `iot thing door lock` — IoT Thing Door Lock
+- `iot thing factory` — IoT Thing Factory
+- `iot thing generic` — IoT Thing Generic
+- `iot thing house` — IoT Thing House
+- `iot thing lightbulb` — IoT Thing Lightbulb
+- `iot thing medical emergency` — IoT Thing Medical Emergency
+- `iot thing police emergency` — IoT Thing Police Emergency
+- `iot thing thermostat` — IoT Thing Thermostat
+- `iot thing travel` — IoT Thing Travel
+- `iot thing utility` — IoT Thing Utility
+- `iot thing windfarm` — IoT Thing Windfarm
+- `iot topic` — IoT Topic
+
+## AWS · 移动服务（aws_mobile_servers）— 8 个
+
+- `cognito` — Cognito
+- `device farm` — Device Farm
+- `mobile analytics` — Mobile Analytics
+- `mobile hub` — Mobile Hub
+- `sns` — SNS
+- `sns email notification` — SNS Email Notification
+- `sns http notification` — SNS HTTP Notification
+- `sns topic` — SNS Topic
+
+## AWS · SDK（aws_sdk）— 14 个
+
+- `.net` — .NET
+- `android` — Android
+- `AWS CLI` — AWS CLI
+- `aws toolkit for eclipse` — AWS Toolkit for Eclipse
+- `aws toolkit for visual studio` — AWS Toolkit for Visual Studio
+- `aws toolkit for windows powerShell` — AWS Toolkit for Windows PowerShell
+- `ios` — iOS
+- `java` — Java
+- `javaScript` — JavaScript
+- `node.js` — Node.js
+- `php` — PHP
+- `python (boto)` — Python (boto)
+- `ruby` — Ruby
+- `xamarin` — Xamarin
+
+## AWS · 协作（aws_workforce）— 5 个
+
+- `assignment/task` — Assignment/task
+- `human intelligence tasks (hit)` — Human Intelligence Tasks (HIT)
+- `mechanical turk` — Mechanical Turk
+- `requester` — Requester
+- `workers` — Workers
+
+## AWS · 企业应用（aws_enterprise_apps）— 3 个
+
+- `work docs` — Work Docs
+- `work mail` — Work Mail
+- `work spaces` — Work Spaces
+
+## AWS 2023 · A–B（aws4_a_b）— 122 个
+
+- `aws4_a_b_a1_instance` — A1 instance
+- `aws4_a_b_access_analyzer` — Access analyzer
+- `aws4_a_b_action` — Action
+- `aws4_a_b_activate` — Activate
+- `aws4_a_b_actuator` — Actuator
+- `aws4_a_b_ad_connector` — Ad connector
+- `aws4_a_b_addon` — Addon
+- `aws4_a_b_agent` — Agent
+- `aws4_a_b_agent2` — Agent2
+- `aws4_a_b_alarm` — Alarm
+- `aws4_a_b_alert` — Alert
+- `aws4_a_b_alexa_enabled_device` — Alexa enabled device
+- `aws4_a_b_alexa_enabled_device_2` — Alexa enabled device 2
+- `aws4_a_b_alexa_for_business` — Alexa for business
+- `aws4_a_b_alexa_skill` — Alexa skill
+- `aws4_a_b_alexa_smart_home_skill` — Alexa smart home skill
+- `aws4_a_b_alexa_voice_service` — Alexa voice service
+- `aws4_a_b_alexa_voice_service_2` — Alexa voice service 2
+- `aws4_a_b_all_products` — All products
+- `aws4_a_b_ami` — Ami
+- `aws4_a_b_amplify` — Amplify
+- `aws4_a_b_amplify_aws_amplify_studio` — Amplify aws amplify studio
+- `aws4_a_b_analytics` — Analytics
+- `aws4_a_b_apache_mxnet_on_aws` — Apache mxnet on aws
+- `aws4_a_b_api_gateway` — Api gateway
+- `aws4_a_b_app_config` — App config
+- `aws4_a_b_app_mesh` — App mesh
+- `aws4_a_b_app_runner` — App runner
+- `aws4_a_b_app_studio` — App studio
+- `aws4_a_b_app_wizard` — App wizard
+- `aws4_a_b_appfabric` — Appfabric
+- `aws4_a_b_appflow` — Appflow
+- `aws4_a_b_application` — Application
+- `aws4_a_b_application_auto_scaling` — Application auto scaling
+- `aws4_a_b_application_composer` — Application composer
+- `aws4_a_b_application_cost_profiler` — Application cost profiler
+- `aws4_a_b_application_discovery_service` — Application discovery service
+- `aws4_a_b_application_discovery_service_aws_agentless_collector` — Application discovery service aws agentless collector
+- `aws4_a_b_application_discovery_service_aws_discovery_agent` — Application discovery service aws discovery agent
+- `aws4_a_b_application_discovery_service_migration_evaluator_collector` — Application discovery service migration evaluator collector
+- `aws4_a_b_application_integration` — Application integration
+- `aws4_a_b_application_load_balancer` — Application load balancer
+- `aws4_a_b_application_recovery_controller` — Application recovery controller
+- `aws4_a_b_apps` — Apps
+- `aws4_a_b_appstream_20` — Appstream 20
+- `aws4_a_b_appsync` — Appsync
+- `aws4_a_b_ar_vr` — Ar vr
+- `aws4_a_b_archive` — Archive
+- `aws4_a_b_artifact` — Artifact
+- `aws4_a_b_athena` — Athena
+- `aws4_a_b_athena_data_source_connectors` — Athena data source connectors
+- `aws4_a_b_attribute` — Attribute
+- `aws4_a_b_attributes` — Attributes
+- `aws4_a_b_audit_manager` — Audit manager
+- `aws4_a_b_augmented_ai` — Augmented ai
+- `aws4_a_b_aurora` — Aurora
+- `aws4_a_b_aurora_instance` — Aurora instance
+- `aws4_a_b_aurora_instance_alt` — Aurora instance alt
+- `aws4_a_b_authenticated_user` — Authenticated user
+- `aws4_a_b_auto_scaling` — Auto scaling
+- `aws4_a_b_auto_scaling2` — Auto scaling2
+- `aws4_a_b_auto_scaling3` — Auto scaling3
+- `aws4_a_b_automation` — Automation
+- `aws4_a_b_autoscaling` — Autoscaling
+- `aws4_a_b_aws_backup_for_aws_cloudformation` — Aws backup for aws cloudformation
+- `aws4_a_b_aws_backup_legal_hold` — Aws backup legal hold
+- `aws4_a_b_aws_backup_support_for_amazon_fsx_for_netapp_ontap` — Aws backup support for amazon fsx for netapp ontap
+- `aws4_a_b_aws_backup_vault_lock` — Aws backup vault lock
+- `aws4_a_b_aws_backup_virtual_machine_monitor` — Aws backup virtual machine monitor
+- `aws4_a_b_aws_cloud` — Aws cloud
+- `aws4_a_b_aws_glue_data_quality` — Aws glue data quality
+- `aws4_a_b_aws_glue_for_ray` — Aws glue for ray
+- `aws4_a_b_aws_managed_microsoft_ad` — Aws managed microsoft ad
+- `aws4_a_b_aws_user_notifications` — Aws user notifications
+- `aws4_a_b_b2b_data_interchange` — B2b data interchange
+- `aws4_a_b_backint_agent` — Backint agent
+- `aws4_a_b_backup` — Backup
+- `aws4_a_b_backup_audit_manager` — Backup audit manager
+- `aws4_a_b_backup_aws_backup_support_for_amazon_s3` — Backup aws backup support for amazon s3
+- `aws4_a_b_backup_aws_backup_support_for_vmware_workloads` — Backup aws backup support for vmware workloads
+- `aws4_a_b_backup_backup_plan` — Backup backup plan
+- `aws4_a_b_backup_backup_restore` — Backup backup restore
+- `aws4_a_b_backup_compliance_reporting` — Backup compliance reporting
+- `aws4_a_b_backup_compute` — Backup compute
+- `aws4_a_b_backup_database` — Backup database
+- `aws4_a_b_backup_gateway` — Backup gateway
+- `aws4_a_b_backup_plan` — Backup plan
+- `aws4_a_b_backup_recovery_point_objective` — Backup recovery point objective
+- `aws4_a_b_backup_recovery_time_objective` — Backup recovery time objective
+- `aws4_a_b_backup_restore` — Backup restore
+- `aws4_a_b_backup_storage` — Backup storage
+- `aws4_a_b_backup_vault` — Backup vault
+- `aws4_a_b_backup_virtual_machine` — Backup virtual machine
+- `aws4_a_b_backup_virtual_machine_monitor` — Backup virtual machine monitor
+- `aws4_a_b_bank` — Bank
+- `aws4_a_b_batch` — Batch
+- `aws4_a_b_bedrock` — Bedrock
+- `aws4_a_b_bedrock_agentcore` — Bedrock AgentCore
+- `aws4_a_b_bicycle` — Bicycle
+- `aws4_a_b_blockchain` — Blockchain
+- `aws4_a_b_blockchain_resource` — Blockchain resource
+- `aws4_a_b_bottlerocket` — Bottlerocket
+- `aws4_a_b_braket` — Braket
+- `aws4_a_b_braket_chandelier` — Braket chandelier
+- `aws4_a_b_braket_chip` — Braket chip
+- `aws4_a_b_braket_embedded_simulator` — Braket embedded simulator
+- `aws4_a_b_braket_managed_simulator` — Braket managed simulator
+- `aws4_a_b_braket_noise_simulator` — Braket noise simulator
+- `aws4_a_b_braket_qpu` — Braket qpu
+- `aws4_a_b_braket_simulator` — Braket simulator
+- `aws4_a_b_braket_simulator_1` — Braket simulator 1
+- `aws4_a_b_braket_simulator_2` — Braket simulator 2
+- `aws4_a_b_braket_simulator_3` — Braket simulator 3
+- `aws4_a_b_braket_simulator_4` — Braket simulator 4
+- `aws4_a_b_braket_state_vector` — Braket state vector
+- `aws4_a_b_braket_tensor_network` — Braket tensor network
+- `aws4_a_b_bucket` — Bucket
+- `aws4_a_b_bucket_with_objects` — Bucket with objects
+- `aws4_a_b_budgets` — Budgets
+- `aws4_a_b_budgets_2` — Budgets 2
+- `aws4_a_b_business_application` — Business application
+- `aws4_a_b_bycicle` — Bycicle
+
+## AWS 2023 · C（aws4_c）— 106 个
+
+- `aws4_c_c4_instance` — C4 instance
+- `aws4_c_c5_instance` — C5 instance
+- `aws4_c_c5a` — C5a
+- `aws4_c_c5ad` — C5ad
+- `aws4_c_c5d` — C5d
+- `aws4_c_c5n_instance` — C5n instance
+- `aws4_c_c6g_instance` — C6g instance
+- `aws4_c_c6gd` — C6gd
+- `aws4_c_cache_node` — Cache node
+- `aws4_c_cached_volume` — Cached volume
+- `aws4_c_camera` — Camera
+- `aws4_c_camera2` — Camera2
+- `aws4_c_car` — Car
+- `aws4_c_cart` — Cart
+- `aws4_c_certificate_manager` — Certificate manager
+- `aws4_c_certificate_manager_2` — Certificate manager 2
+- `aws4_c_certificate_manager_3` — Certificate manager 3
+- `aws4_c_change_set` — Change set
+- `aws4_c_chat` — Chat
+- `aws4_c_chatbot` — Chatbot
+- `aws4_c_checklist` — Checklist
+- `aws4_c_checklist_cost` — Checklist cost
+- `aws4_c_checklist_fault_tolerant` — Checklist fault tolerant
+- `aws4_c_checklist_performance` — Checklist performance
+- `aws4_c_checklist_security` — Checklist security
+- `aws4_c_chime` — Chime
+- `aws4_c_chime_sdk` — Chime sdk
+- `aws4_c_classic_load_balancer` — Classic load balancer
+- `aws4_c_clean_rooms` — Clean rooms
+- `aws4_c_client` — Client
+- `aws4_c_client_vpn` — Client vpn
+- `aws4_c_cloud_control_api` — Cloud control api
+- `aws4_c_cloud_development_kit` — Cloud development kit
+- `aws4_c_cloud_digital_interface` — Cloud digital interface
+- `aws4_c_cloud_directory` — Cloud directory
+- `aws4_c_cloud_extension_ros` — Cloud extension ros
+- `aws4_c_cloud_map` — Cloud map
+- `aws4_c_cloud_map_resource` — Cloud map resource
+- `aws4_c_cloud_wan` — Cloud wan
+- `aws4_c_cloud_wan_core_network_edge` — Cloud wan core network edge
+- `aws4_c_cloud_wan_segment_network` — Cloud wan segment network
+- `aws4_c_cloud_wan_transit_gateway_route_table_attachment` — Cloud wan transit gateway route table attachment
+- `aws4_c_cloud_wan_virtual_pop` — Cloud wan virtual pop
+- `aws4_c_cloud9` — Cloud9
+- `aws4_c_cloudendure_disaster_recovery` — Cloudendure disaster recovery
+- `aws4_c_cloudendure_migration` — Cloudendure migration
+- `aws4_c_cloudformation` — Cloudformation
+- `aws4_c_cloudfront` — Cloudfront
+- `aws4_c_cloudfront_functions` — Cloudfront functions
+- `aws4_c_cloudhsm` — Cloudhsm
+- `aws4_c_cloudsearch` — Cloudsearch
+- `aws4_c_cloudsearch2` — Cloudsearch2
+- `aws4_c_cloudshell` — Cloudshell
+- `aws4_c_cloudtrail` — Cloudtrail
+- `aws4_c_cloudtrail_cloudtrail_lake` — Cloudtrail cloudtrail lake
+- `aws4_c_cloudwatch` — Cloudwatch
+- `aws4_c_cloudwatch_2` — Cloudwatch 2
+- `aws4_c_cloudwatch_cross_account_observability` — Cloudwatch cross account observability
+- `aws4_c_cloudwatch_data_protection` — Cloudwatch data protection
+- `aws4_c_cloudwatch_evidently` — Cloudwatch evidently
+- `aws4_c_cloudwatch_logs` — Cloudwatch logs
+- `aws4_c_cloudwatch_metrics_insights` — Cloudwatch metrics insights
+- `aws4_c_cloudwatch_rum` — Cloudwatch rum
+- `aws4_c_cloudwatch_synthetics` — Cloudwatch synthetics
+- `aws4_c_cluster` — Cluster
+- `aws4_c_codeartifact` — Codeartifact
+- `aws4_c_codebuild` — Codebuild
+- `aws4_c_codecatalyst` — Codecatalyst
+- `aws4_c_codecommit` — Codecommit
+- `aws4_c_codedeploy` — Codedeploy
+- `aws4_c_codeguru` — Codeguru
+- `aws4_c_codeguru_2` — Codeguru 2
+- `aws4_c_codepipeline` — Codepipeline
+- `aws4_c_codestar` — Codestar
+- `aws4_c_codewhisperer` — Codewhisperer
+- `aws4_c_coffee_pot` — Coffee pot
+- `aws4_c_cognito` — Cognito
+- `aws4_c_cold_storage` — Cold storage
+- `aws4_c_command_line_interface` — Command line interface
+- `aws4_c_comprehend` — Comprehend
+- `aws4_c_comprehend_medical` — Comprehend medical
+- `aws4_c_compute` — Compute
+- `aws4_c_compute_optimizer` — Compute optimizer
+- `aws4_c_config` — Config
+- `aws4_c_connect` — Connect
+- `aws4_c_connector` — Connector
+- `aws4_c_console_mobile_application` — Console mobile application
+- `aws4_c_contact_center` — Contact center
+- `aws4_c_container_1` — Container 1
+- `aws4_c_container_2` — Container 2
+- `aws4_c_container_3` — Container 3
+- `aws4_c_container_registry_image` — Container registry image
+- `aws4_c_containers` — Containers
+- `aws4_c_control_tower` — Control tower
+- `aws4_c_corporate_data_center` — Corporate data center
+- `aws4_c_corporate_data_center2` — Corporate data center2
+- `aws4_c_corretto` — Corretto
+- `aws4_c_cost_and_usage_report` — Cost and usage report
+- `aws4_c_cost_explorer` — Cost explorer
+- `aws4_c_cost_management` — Cost management
+- `aws4_c_credentials` — Credentials
+- `aws4_c_custom_billing_manager` — Custom billing manager
+- `aws4_c_custom_event_bus_resource` — Custom event bus resource
+- `aws4_c_customer_enablement` — Customer enablement
+- `aws4_c_customer_engagement` — Customer engagement
+- `aws4_c_customer_gateway` — Customer gateway
+
+## AWS 2023 · D–F（aws4_d_f）— 210 个
+
+- `aws4_d_f_d2_instance` — D2 instance
+- `aws4_d_f_d3_instance` — D3 instance
+- `aws4_d_f_d3en_instance` — D3en instance
+- `aws4_d_f_data_encryption_key` — Data encryption key
+- `aws4_d_f_data_exchange` — Data exchange
+- `aws4_d_f_data_exchange_for_apis` — Data exchange for apis
+- `aws4_d_f_data_lake_resource_icon` — Data lake resource icon
+- `aws4_d_f_data_pipeline` — Data pipeline
+- `aws4_d_f_data_set` — Data set
+- `aws4_d_f_data_stream` — Data stream
+- `aws4_d_f_data_table` — Data table
+- `aws4_d_f_data_transfer_terminal` — Data transfer terminal
+- `aws4_d_f_database` — Database
+- `aws4_d_f_database_migration_service` — Database migration service
+- `aws4_d_f_database_migration_workflow_job` — Database migration workflow job
+- `aws4_d_f_datasync` — Datasync
+- `aws4_d_f_datasync_discovery` — Datasync discovery
+- `aws4_d_f_datazone` — Datazone
+- `aws4_d_f_datazone_business_data_catalog` — Datazone business data catalog
+- `aws4_d_f_datazone_data_portal` — Datazone data portal
+- `aws4_d_f_datazone_data_projects` — Datazone data projects
+- `aws4_d_f_db_instance` — Db instance
+- `aws4_d_f_db_instance_read_replica` — Db instance read replica
+- `aws4_d_f_db_instance_standby` — Db instance standby
+- `aws4_d_f_db_on_instance` — Db on instance
+- `aws4_d_f_db_on_instance2` — Db on instance2
+- `aws4_d_f_deadline_cloud` — Deadline cloud
+- `aws4_d_f_deep_learning_amis` — Deep learning amis
+- `aws4_d_f_deep_learning_containers` — Deep learning containers
+- `aws4_d_f_deepcomposer` — Deepcomposer
+- `aws4_d_f_deeplens` — Deeplens
+- `aws4_d_f_deepracer` — Deepracer
+- `aws4_d_f_default_event_bus_resource` — Default event bus resource
+- `aws4_d_f_dense_compute_node` — Dense compute node
+- `aws4_d_f_dense_storage_node` — Dense storage node
+- `aws4_d_f_deployment` — Deployment
+- `aws4_d_f_deployments` — Deployments
+- `aws4_d_f_desired_state` — Desired state
+- `aws4_d_f_desktop_and_app_streaming` — Desktop and app streaming
+- `aws4_d_f_detective` — Detective
+- `aws4_d_f_developer_tools` — Developer tools
+- `aws4_d_f_development_environment` — Development environment
+- `aws4_d_f_device_farm` — Device farm
+- `aws4_d_f_devops_agent` — DevOps Agent
+- `aws4_d_f_devops_guru` — Devops guru
+- `aws4_d_f_devops_guru_insights` — Devops guru insights
+- `aws4_d_f_direct_connect` — Direct connect
+- `aws4_d_f_directory_service` — Directory service
+- `aws4_d_f_disk` — Disk
+- `aws4_d_f_distro_for_opentelemetry` — Distro for opentelemetry
+- `aws4_d_f_document` — Document
+- `aws4_d_f_documentdb_elastic_clusters` — Documentdb elastic clusters
+- `aws4_d_f_documentdb_with_mongodb_compatibility` — Documentdb with mongodb compatibility
+- `aws4_d_f_documents` — Documents
+- `aws4_d_f_documents2` — Documents2
+- `aws4_d_f_documents3` — Documents3
+- `aws4_d_f_door_lock` — Door lock
+- `aws4_d_f_download_distribution` — Download distribution
+- `aws4_d_f_dynamodb` — Dynamodb
+- `aws4_d_f_dynamodb_dax` — Dynamodb dax
+- `aws4_d_f_dynamodb_standard_access_table_class` — Dynamodb standard access table class
+- `aws4_d_f_dynamodb_standard_infrequent_access_table_class` — Dynamodb standard infrequent access table class
+- `aws4_d_f_dynamodb_stream` — Dynamodb stream
+- `aws4_d_f_ec2` — Ec2
+- `aws4_d_f_ec2_aws_microservice_extractor_for_net` — Ec2 aws microservice extractor for net
+- `aws4_d_f_ec2_c6a_instance` — Ec2 c6a instance
+- `aws4_d_f_ec2_c6gn_instance` — Ec2 c6gn instance
+- `aws4_d_f_ec2_c6i_instance` — Ec2 c6i instance
+- `aws4_d_f_ec2_c6in_instance` — Ec2 c6in instance
+- `aws4_d_f_ec2_c7g_instance` — Ec2 c7g instance
+- `aws4_d_f_ec2_c7gn_instance` — Ec2 c7gn instance
+- `aws4_d_f_ec2_dl1_instance` — Ec2 dl1 instance
+- `aws4_d_f_ec2_g5_instance` — Ec2 g5 instance
+- `aws4_d_f_ec2_g5g_instance` — Ec2 g5g instance
+- `aws4_d_f_ec2_hpc6a_instance` — Ec2 hpc6a instance
+- `aws4_d_f_ec2_hpc6id_instance` — Ec2 hpc6id instance
+- `aws4_d_f_ec2_i4i_instance` — Ec2 i4i instance
+- `aws4_d_f_ec2_im4gn_instance` — Ec2 im4gn instance
+- `aws4_d_f_ec2_image_builder` — Ec2 image builder
+- `aws4_d_f_ec2_inf2_instance` — Ec2 inf2 instance
+- `aws4_d_f_ec2_instance_contents` — Ec2 instance contents
+- `aws4_d_f_ec2_is4gen_instance` — Ec2 is4gen instance
+- `aws4_d_f_ec2_m1_mac_instance` — Ec2 m1 mac instance
+- `aws4_d_f_ec2_m6a_instance` — Ec2 m6a instance
+- `aws4_d_f_ec2_m6i_instance` — Ec2 m6i instance
+- `aws4_d_f_ec2_m6idn_instance` — Ec2 m6idn instance
+- `aws4_d_f_ec2_m6in_instance` — Ec2 m6in instance
+- `aws4_d_f_ec2_p4de_instance` — Ec2 p4de instance
+- `aws4_d_f_ec2_r6a_instance` — Ec2 r6a instance
+- `aws4_d_f_ec2_r6i_instance` — Ec2 r6i instance
+- `aws4_d_f_ec2_r6idn_instance` — Ec2 r6idn instance
+- `aws4_d_f_ec2_r6in_instance` — Ec2 r6in instance
+- `aws4_d_f_ec2_r7iz_instance` — Ec2 r7iz instance
+- `aws4_d_f_ec2_trn1_instance` — Ec2 trn1 instance
+- `aws4_d_f_ec2_vt1_instance` — Ec2 vt1 instance
+- `aws4_d_f_ec2_x2gd_instance` — Ec2 x2gd instance
+- `aws4_d_f_ec2_x2idn_instance` — Ec2 x2idn instance
+- `aws4_d_f_ec2_x2iedn_instance` — Ec2 x2iedn instance
+- `aws4_d_f_ec2_x2iezn_instance` — Ec2 x2iezn instance
+- `aws4_d_f_echo` — Echo
+- `aws4_d_f_ecr` — Ecr
+- `aws4_d_f_ecs` — Ecs
+- `aws4_d_f_ecs_anywhere` — Ecs anywhere
+- `aws4_d_f_ecs_copilot_cli` — Ecs copilot cli
+- `aws4_d_f_ecs_service` — Ecs service
+- `aws4_d_f_ecs_service_connect` — Ecs service connect
+- `aws4_d_f_ecs_task` — Ecs task
+- `aws4_d_f_edge_location` — Edge location
+- `aws4_d_f_efs_infrequentaccess` — Efs infrequentaccess
+- `aws4_d_f_efs_standard` — Efs standard
+- `aws4_d_f_eks` — Eks
+- `aws4_d_f_eks_anywhere` — Eks anywhere
+- `aws4_d_f_eks_cloud` — Eks cloud
+- `aws4_d_f_eks_distro` — Eks distro
+- `aws4_d_f_eks_on_outposts` — Eks on outposts
+- `aws4_d_f_elastic_beanstalk` — Elastic beanstalk
+- `aws4_d_f_elastic_block_store` — Elastic block store
+- `aws4_d_f_elastic_block_store_amazon_data_lifecycle_manager` — Elastic block store amazon data lifecycle manager
+- `aws4_d_f_elastic_block_store_volume_gp3` — Elastic block store volume gp3
+- `aws4_d_f_elastic_fabric_adapter` — Elastic fabric adapter
+- `aws4_d_f_elastic_file_system` — Elastic file system
+- `aws4_d_f_elastic_file_system_elastic_throughput` — Elastic file system elastic throughput
+- `aws4_d_f_elastic_file_system_infrequent_access` — Elastic file system infrequent access
+- `aws4_d_f_elastic_file_system_intelligent_tiering` — Elastic file system intelligent tiering
+- `aws4_d_f_elastic_file_system_one_zone` — Elastic file system one zone
+- `aws4_d_f_elastic_file_system_one_zone_infrequent_access` — Elastic file system one zone infrequent access
+- `aws4_d_f_elastic_file_system_one_zone_standard` — Elastic file system one zone standard
+- `aws4_d_f_elastic_file_system_standard` — Elastic file system standard
+- `aws4_d_f_elastic_file_system_standard_infrequent_access` — Elastic file system standard infrequent access
+- `aws4_d_f_elastic_inference` — Elastic inference
+- `aws4_d_f_elastic_inference_2` — Elastic inference 2
+- `aws4_d_f_elastic_ip_address` — Elastic ip address
+- `aws4_d_f_elastic_load_balancing` — Elastic load balancing
+- `aws4_d_f_elastic_network_adapter` — Elastic network adapter
+- `aws4_d_f_elastic_network_interface` — Elastic network interface
+- `aws4_d_f_elastic_transcoder` — Elastic transcoder
+- `aws4_d_f_elastic_vmware_service` — Elastic vmware service
+- `aws4_d_f_elasticache` — Elasticache
+- `aws4_d_f_elasticache_for_memcached` — Elasticache for memcached
+- `aws4_d_f_elasticache_for_redis` — Elasticache for redis
+- `aws4_d_f_elasticache_for_valkey` — Elasticache for valkey
+- `aws4_d_f_elasticsearch_service` — Elasticsearch service
+- `aws4_d_f_elemental` — Elemental
+- `aws4_d_f_elemental_inference` — Elemental inference
+- `aws4_d_f_elemental_link` — Elemental link
+- `aws4_d_f_elemental_mediaconnect` — Elemental mediaconnect
+- `aws4_d_f_elemental_mediaconvert` — Elemental mediaconvert
+- `aws4_d_f_elemental_medialive` — Elemental medialive
+- `aws4_d_f_elemental_mediapackage` — Elemental mediapackage
+- `aws4_d_f_elemental_mediastore` — Elemental mediastore
+- `aws4_d_f_elemental_mediatailor` — Elemental mediatailor
+- `aws4_d_f_email` — Email
+- `aws4_d_f_email_2` — Email 2
+- `aws4_d_f_email_notification` — Email notification
+- `aws4_d_f_emr` — Emr
+- `aws4_d_f_emr_engine` — Emr engine
+- `aws4_d_f_emr_engine_mapr_m3` — Emr engine mapr m3
+- `aws4_d_f_emr_engine_mapr_m5` — Emr engine mapr m5
+- `aws4_d_f_emr_engine_mapr_m7` — Emr engine mapr m7
+- `aws4_d_f_encrypted_data` — Encrypted data
+- `aws4_d_f_end_user_messaging` — End user messaging
+- `aws4_d_f_endpoint` — Endpoint
+- `aws4_d_f_endpoints` — Endpoints
+- `aws4_d_f_entity_resolution` — Entity resolution
+- `aws4_d_f_event` — Event
+- `aws4_d_f_event_event_based` — Event event based
+- `aws4_d_f_event_resource` — Event resource
+- `aws4_d_f_event_time_based` — Event time based
+- `aws4_d_f_eventbridge` — Eventbridge
+- `aws4_d_f_eventbridge_custom_event_bus_resource` — Eventbridge custom event bus resource
+- `aws4_d_f_eventbridge_default_event_bus_resource` — Eventbridge default event bus resource
+- `aws4_d_f_eventbridge_pipes` — Eventbridge pipes
+- `aws4_d_f_eventbridge_saas_partner_event_bus_resource` — Eventbridge saas partner event bus resource
+- `aws4_d_f_eventbridge_scheduler` — Eventbridge scheduler
+- `aws4_d_f_eventbridge_schema` — Eventbridge schema
+- `aws4_d_f_eventbridge_schema_registry` — Eventbridge schema registry
+- `aws4_d_f_express_workflow` — Express workflow
+- `aws4_d_f_external_sdk` — External sdk
+- `aws4_d_f_external_toolkit` — External toolkit
+- `aws4_d_f_f1_instance` — F1 instance
+- `aws4_d_f_factory` — Factory
+- `aws4_d_f_fargate` — Fargate
+- `aws4_d_f_fault_injection_simulator` — Fault injection simulator
+- `aws4_d_f_file_cache` — File cache
+- `aws4_d_f_file_cache_hybrid_nfs_linked_datasets` — File cache hybrid nfs linked datasets
+- `aws4_d_f_file_cache_on_premises_nfs_linked_datasets` — File cache on premises nfs linked datasets
+- `aws4_d_f_file_cache_s3_linked_datasets` — File cache s3 linked datasets
+- `aws4_d_f_file_gateway` — File gateway
+- `aws4_d_f_file_system` — File system
+- `aws4_d_f_filtering_rule` — Filtering rule
+- `aws4_d_f_finding` — Finding
+- `aws4_d_f_finops_agent` — Finops agent
+- `aws4_d_f_finspace` — Finspace
+- `aws4_d_f_firetv` — Firetv
+- `aws4_d_f_firetv_stick` — Firetv stick
+- `aws4_d_f_firewall_manager` — Firewall manager
+- `aws4_d_f_fleet_management` — Fleet management
+- `aws4_d_f_flow_logs` — Flow logs
+- `aws4_d_f_folder` — Folder
+- `aws4_d_f_folders` — Folders
+- `aws4_d_f_forecast` — Forecast
+- `aws4_d_f_forums` — Forums
+- `aws4_d_f_fraud_detector` — Fraud detector
+- `aws4_d_f_freertos` — Freertos
+- `aws4_d_f_fsx` — Fsx
+- `aws4_d_f_fsx_file_gateway` — Fsx file gateway
+- `aws4_d_f_fsx_for_lustre` — Fsx for lustre
+- `aws4_d_f_fsx_for_netapp_ontap` — Fsx for netapp ontap
+- `aws4_d_f_fsx_for_openzfs` — Fsx for openzfs
+- `aws4_d_f_fsx_for_windows_file_server` — Fsx for windows file server
+
+## AWS 2023 · G–I（aws4_g_i）— 156 个
+
+- `aws4_g_i_g3_instance` — G3 instance
+- `aws4_g_i_g4ad_instance` — G4ad instance
+- `aws4_g_i_g4dn` — G4dn
+- `aws4_g_i_game_tech` — Game tech
+- `aws4_g_i_game_tech2` — Game tech2
+- `aws4_g_i_gamekit` — Gamekit
+- `aws4_g_i_gamelift` — Gamelift
+- `aws4_g_i_gamelift_2` — Gamelift 2
+- `aws4_g_i_gamelift_streams` — Gamelift streams
+- `aws4_g_i_games` — Games
+- `aws4_g_i_gamesparks` — Gamesparks
+- `aws4_g_i_gateway` — Gateway
+- `aws4_g_i_gateway_load_balancer` — Gateway load balancer
+- `aws4_g_i_gear` — Gear
+- `aws4_g_i_general` — General
+- `aws4_g_i_general_access_points` — General access points
+- `aws4_g_i_generic` — Generic
+- `aws4_g_i_generic_application` — Generic application
+- `aws4_g_i_generic_database` — Generic database
+- `aws4_g_i_generic_firewall` — Generic firewall
+- `aws4_g_i_genomics_cli` — Genomics cli
+- `aws4_g_i_git_repository` — Git repository
+- `aws4_g_i_glacier` — Glacier
+- `aws4_g_i_glacier_deep_archive` — Glacier deep archive
+- `aws4_g_i_global_accelerator` — Global accelerator
+- `aws4_g_i_global_secondary_index` — Global secondary index
+- `aws4_g_i_globe` — Globe
+- `aws4_g_i_glue` — Glue
+- `aws4_g_i_glue_crawlers` — Glue crawlers
+- `aws4_g_i_glue_data_catalog` — Glue data catalog
+- `aws4_g_i_glue_databrew` — Glue databrew
+- `aws4_g_i_glue_elastic_views` — Glue elastic views
+- `aws4_g_i_greengrass` — Greengrass
+- `aws4_g_i_ground_station` — Ground station
+- `aws4_g_i_group_account` — Group account
+- `aws4_g_i_group_auto_scaling_group` — Group auto scaling group
+- `aws4_g_i_group_availability_zone` — Group availability zone
+- `aws4_g_i_group_aws_cloud` — Group aws cloud
+- `aws4_g_i_group_aws_cloud_alt` — Group aws cloud alt
+- `aws4_g_i_group_aws_step_functions_workflow` — Group aws step functions workflow
+- `aws4_g_i_group_corporate_data_center` — Group corporate data center
+- `aws4_g_i_group_ec2_instance_contents` — Group ec2 instance contents
+- `aws4_g_i_group_elastic_beanstalk` — Group elastic beanstalk
+- `aws4_g_i_group_elastic_load_balancing` — Group elastic load balancing
+- `aws4_g_i_group_iot_greengrass` — Group iot greengrass
+- `aws4_g_i_group_iot_greengrass_deployment` — Group iot greengrass deployment
+- `aws4_g_i_group_on_premise` — Group on premise
+- `aws4_g_i_group_region` — Group region
+- `aws4_g_i_group_security_group` — Group security group
+- `aws4_g_i_group_spot_fleet` — Group spot fleet
+- `aws4_g_i_group_subnet` — Group subnet
+- `aws4_g_i_group_vpc` — Group vpc
+- `aws4_g_i_group_vpc2` — Group vpc2
+- `aws4_g_i_guardduty` — Guardduty
+- `aws4_g_i_h1_instance` — H1 instance
+- `aws4_g_i_habana_gaudi` — Habana gaudi
+- `aws4_g_i_hardware_board` — Hardware board
+- `aws4_g_i_hdfs_cluster` — Hdfs cluster
+- `aws4_g_i_healthimaging` — Healthimaging
+- `aws4_g_i_healthlake` — Healthlake
+- `aws4_g_i_healthscribe` — Healthscribe
+- `aws4_g_i_high_memory_instance` — High memory instance
+- `aws4_g_i_honeycode` — Honeycode
+- `aws4_g_i_hosted_zone` — Hosted zone
+- `aws4_g_i_house` — House
+- `aws4_g_i_http_notification` — Http notification
+- `aws4_g_i_http_protocol` — Http protocol
+- `aws4_g_i_http2_protocol` — Http2 protocol
+- `aws4_g_i_i2` — I2
+- `aws4_g_i_i3_instance` — I3 instance
+- `aws4_g_i_i3en` — I3en
+- `aws4_g_i_identity_access_management_iam_roles_anywhere` — Identity access management iam roles anywhere
+- `aws4_g_i_identity_and_access_management` — Identity and access management
+- `aws4_g_i_illustration_desktop` — Illustration desktop
+- `aws4_g_i_illustration_devices` — Illustration devices
+- `aws4_g_i_illustration_notification` — Illustration notification
+- `aws4_g_i_illustration_office_building` — Illustration office building
+- `aws4_g_i_illustration_users` — Illustration users
+- `aws4_g_i_import_export` — Import export
+- `aws4_g_i_inf1` — Inf1
+- `aws4_g_i_inferentia` — Inferentia
+- `aws4_g_i_infrequent_access_storage_class` — Infrequent access storage class
+- `aws4_g_i_inspector` — Inspector
+- `aws4_g_i_instance` — Instance
+- `aws4_g_i_instance_with_cloudwatch` — Instance with cloudwatch
+- `aws4_g_i_instance_with_cloudwatch2` — Instance with cloudwatch2
+- `aws4_g_i_instance2` — Instance2
+- `aws4_g_i_instances` — Instances
+- `aws4_g_i_instances_2` — Instances 2
+- `aws4_g_i_intelligent_tiering` — Intelligent tiering
+- `aws4_g_i_interactive_video` — Interactive video
+- `aws4_g_i_interconnect` — Interconnect
+- `aws4_g_i_internet` — Internet
+- `aws4_g_i_internet_alt1` — Internet alt1
+- `aws4_g_i_internet_alt2` — Internet alt2
+- `aws4_g_i_internet_alt22` — Internet alt22
+- `aws4_g_i_internet_gateway` — Internet gateway
+- `aws4_g_i_internet_of_things` — Internet of things
+- `aws4_g_i_inventory` — Inventory
+- `aws4_g_i_iot_1click` — Iot 1click
+- `aws4_g_i_iot_analytics` — Iot analytics
+- `aws4_g_i_iot_analytics_channel` — Iot analytics channel
+- `aws4_g_i_iot_analytics_data_store` — Iot analytics data store
+- `aws4_g_i_iot_analytics_dataset` — Iot analytics dataset
+- `aws4_g_i_iot_analytics_pipeline` — Iot analytics pipeline
+- `aws4_g_i_iot_button` — Iot button
+- `aws4_g_i_iot_certificate` — Iot certificate
+- `aws4_g_i_iot_core` — Iot core
+- `aws4_g_i_iot_core_device_advisor` — Iot core device advisor
+- `aws4_g_i_iot_core_device_location` — Iot core device location
+- `aws4_g_i_iot_device_defender` — Iot device defender
+- `aws4_g_i_iot_device_defender_iot_device_jobs` — Iot device defender iot device jobs
+- `aws4_g_i_iot_device_gateway` — Iot device gateway
+- `aws4_g_i_iot_device_jobs_resource` — Iot device jobs resource
+- `aws4_g_i_iot_device_management` — Iot device management
+- `aws4_g_i_iot_device_management_fleet` — Iot device management fleet
+- `aws4_g_i_iot_device_tester` — Iot device tester
+- `aws4_g_i_iot_edukit` — Iot edukit
+- `aws4_g_i_iot_events` — Iot events
+- `aws4_g_i_iot_expresslink` — Iot expresslink
+- `aws4_g_i_iot_fleetwise` — Iot fleetwise
+- `aws4_g_i_iot_greengrass_artifact` — Iot greengrass artifact
+- `aws4_g_i_iot_greengrass_component` — Iot greengrass component
+- `aws4_g_i_iot_greengrass_component_machine_learning` — Iot greengrass component machine learning
+- `aws4_g_i_iot_greengrass_component_nucleus` — Iot greengrass component nucleus
+- `aws4_g_i_iot_greengrass_component_private` — Iot greengrass component private
+- `aws4_g_i_iot_greengrass_component_public` — Iot greengrass component public
+- `aws4_g_i_iot_greengrass_interprocess_communication` — Iot greengrass interprocess communication
+- `aws4_g_i_iot_greengrass_protocol` — Iot greengrass protocol
+- `aws4_g_i_iot_greengrass_recipe` — Iot greengrass recipe
+- `aws4_g_i_iot_greengrass_stream_manager` — Iot greengrass stream manager
+- `aws4_g_i_iot_lorawan_protocol` — Iot lorawan protocol
+- `aws4_g_i_iot_over_the_air_update` — Iot over the air update
+- `aws4_g_i_iot_roborunner` — Iot roborunner
+- `aws4_g_i_iot_sailboat` — Iot sailboat
+- `aws4_g_i_iot_sitewise` — Iot sitewise
+- `aws4_g_i_iot_sitewise_asset` — Iot sitewise asset
+- `aws4_g_i_iot_sitewise_asset_hierarchy` — Iot sitewise asset hierarchy
+- `aws4_g_i_iot_sitewise_asset_model` — Iot sitewise asset model
+- `aws4_g_i_iot_sitewise_asset_properties` — Iot sitewise asset properties
+- `aws4_g_i_iot_sitewise_data_streams` — Iot sitewise data streams
+- `aws4_g_i_iot_thing_freertos_device` — Iot thing freertos device
+- `aws4_g_i_iot_thing_humidity_sensor` — Iot thing humidity sensor
+- `aws4_g_i_iot_thing_industrial_pc` — Iot thing industrial pc
+- `aws4_g_i_iot_thing_plc` — Iot thing plc
+- `aws4_g_i_iot_thing_relay` — Iot thing relay
+- `aws4_g_i_iot_thing_stacklight` — Iot thing stacklight
+- `aws4_g_i_iot_thing_temperature_humidity_sensor` — Iot thing temperature humidity sensor
+- `aws4_g_i_iot_thing_temperature_sensor` — Iot thing temperature sensor
+- `aws4_g_i_iot_thing_temperature_vibration_sensor` — Iot thing temperature vibration sensor
+- `aws4_g_i_iot_thing_vibration_sensor` — Iot thing vibration sensor
+- `aws4_g_i_iot_things_graph` — Iot things graph
+- `aws4_g_i_iot_twinmaker` — Iot twinmaker
+- `aws4_g_i_iq` — Iq
+- `aws4_g_i_item` — Item
+- `aws4_g_i_items` — Items
+
+## AWS 2023 · J–M（aws4_j_m）— 100 个
+
+- `aws4_j_m_json_script` — Json script
+- `aws4_j_m_kendra` — Kendra
+- `aws4_j_m_key_management_service` — Key management service
+- `aws4_j_m_key_management_service_external_key_store` — Key management service external key store
+- `aws4_j_m_keyspaces` — Keyspaces
+- `aws4_j_m_kinesis` — Kinesis
+- `aws4_j_m_kinesis_data_analytics` — Kinesis data analytics
+- `aws4_j_m_kinesis_data_firehose` — Kinesis data firehose
+- `aws4_j_m_kinesis_data_streams` — Kinesis data streams
+- `aws4_j_m_kinesis_video_streams` — Kinesis video streams
+- `aws4_j_m_lake_formation` — Lake formation
+- `aws4_j_m_lambda` — Lambda
+- `aws4_j_m_lambda_function` — Lambda function
+- `aws4_j_m_layers` — Layers
+- `aws4_j_m_lex` — Lex
+- `aws4_j_m_license_manager` — License manager
+- `aws4_j_m_license_manager_application_discovery` — License manager application discovery
+- `aws4_j_m_license_manager_license_blending` — License manager license blending
+- `aws4_j_m_lightbulb` — Lightbulb
+- `aws4_j_m_lightsail` — Lightsail
+- `aws4_j_m_lightsail_for_research` — Lightsail for research
+- `aws4_j_m_local_zones` — Local zones
+- `aws4_j_m_location_service` — Location service
+- `aws4_j_m_location_service_geofence` — Location service geofence
+- `aws4_j_m_location_service_map` — Location service map
+- `aws4_j_m_location_service_place` — Location service place
+- `aws4_j_m_location_service_routes` — Location service routes
+- `aws4_j_m_location_service_track` — Location service track
+- `aws4_j_m_logs` — Logs
+- `aws4_j_m_long_term_security_credential` — Long term security credential
+- `aws4_j_m_lookout_for_equipment` — Lookout for equipment
+- `aws4_j_m_lookout_for_metrics` — Lookout for metrics
+- `aws4_j_m_lookout_for_vision` — Lookout for vision
+- `aws4_j_m_lumberyard` — Lumberyard
+- `aws4_j_m_m4_instance` — M4 instance
+- `aws4_j_m_m5_instance` — M5 instance
+- `aws4_j_m_m5a_instance` — M5a instance
+- `aws4_j_m_m5d_instance` — M5d instance
+- `aws4_j_m_m5dn_instance` — M5dn instance
+- `aws4_j_m_m5n` — M5n
+- `aws4_j_m_m5n_instance` — M5n instance
+- `aws4_j_m_m5zn_instance` — M5zn instance
+- `aws4_j_m_m6g_instance` — M6g instance
+- `aws4_j_m_m6gd_instance` — M6gd instance
+- `aws4_j_m_mac_instance` — Mac instance
+- `aws4_j_m_machine_learning` — Machine learning
+- `aws4_j_m_macie` — Macie
+- `aws4_j_m_magnifying_glass` — Magnifying glass
+- `aws4_j_m_magnifying_glass_2` — Magnifying glass 2
+- `aws4_j_m_mainframe_modernization` — Mainframe modernization
+- `aws4_j_m_mainframe_modernization_analyzer` — Mainframe modernization analyzer
+- `aws4_j_m_mainframe_modernization_compiler` — Mainframe modernization compiler
+- `aws4_j_m_mainframe_modernization_converter` — Mainframe modernization converter
+- `aws4_j_m_mainframe_modernization_developer` — Mainframe modernization developer
+- `aws4_j_m_mainframe_modernization_runtime` — Mainframe modernization runtime
+- `aws4_j_m_maintenance_windows` — Maintenance windows
+- `aws4_j_m_managed_apache_cassandra_service` — Managed apache cassandra service
+- `aws4_j_m_managed_blockchain` — Managed blockchain
+- `aws4_j_m_managed_ms_ad` — Managed ms ad
+- `aws4_j_m_managed_service_for_apache_flink` — Managed service for apache flink
+- `aws4_j_m_managed_service_for_grafana` — Managed service for grafana
+- `aws4_j_m_managed_service_for_prometheus` — Managed service for prometheus
+- `aws4_j_m_managed_services` — Managed services
+- `aws4_j_m_managed_streaming_for_kafka` — Managed streaming for kafka
+- `aws4_j_m_managed_workflows_for_apache_airflow` — Managed workflows for apache airflow
+- `aws4_j_m_management_and_governance` — Management and governance
+- `aws4_j_m_management_console` — Management console
+- `aws4_j_m_management_console2` — Management console2
+- `aws4_j_m_marketplace` — Marketplace
+- `aws4_j_m_media_services` — Media services
+- `aws4_j_m_mediaconnect_gateway` — Mediaconnect gateway
+- `aws4_j_m_medical_emergency` — Medical emergency
+- `aws4_j_m_memorydb_for_redis` — Memorydb for redis
+- `aws4_j_m_mesh` — Mesh
+- `aws4_j_m_message` — Message
+- `aws4_j_m_metrics` — Metrics
+- `aws4_j_m_mfa_token` — Mfa token
+- `aws4_j_m_migration_and_transfer` — Migration and transfer
+- `aws4_j_m_migration_evaluator` — Migration evaluator
+- `aws4_j_m_migration_hub` — Migration hub
+- `aws4_j_m_migration_hub_refactor_spaces_applications` — Migration hub refactor spaces applications
+- `aws4_j_m_migration_hub_refactor_spaces_environments` — Migration hub refactor spaces environments
+- `aws4_j_m_migration_hub_refactor_spaces_services` — Migration hub refactor spaces services
+- `aws4_j_m_mobile` — Mobile
+- `aws4_j_m_mobile_application` — Mobile application
+- `aws4_j_m_mobile_client` — Mobile client
+- `aws4_j_m_mobile_hub` — Mobile hub
+- `aws4_j_m_monitoring` — Monitoring
+- `aws4_j_m_monitron` — Monitron
+- `aws4_j_m_mq` — Mq
+- `aws4_j_m_mq_broker` — Mq broker
+- `aws4_j_m_mqtt_protocol` — Mqtt protocol
+- `aws4_j_m_ms_sql_instance` — Ms sql instance
+- `aws4_j_m_ms_sql_instance_alternate` — Ms sql instance alternate
+- `aws4_j_m_msk_amazon_msk_connect` — Msk amazon msk connect
+- `aws4_j_m_multicloud_and_hybrid` — Multicloud and hybrid
+- `aws4_j_m_multimedia` — Multimedia
+- `aws4_j_m_multiple_volumes_resource` — Multiple volumes resource
+- `aws4_j_m_mysql_db_instance` — Mysql db instance
+- `aws4_j_m_mysql_db_instance_alternate` — Mysql db instance alternate
+
+## AWS 2023 · N–R（aws4_n_r）— 162 个
+
+- `aws4_n_r_namespace` — Namespace
+- `aws4_n_r_nat_gateway` — Nat gateway
+- `aws4_n_r_neptune` — Neptune
+- `aws4_n_r_network_access_control_list` — Network access control list
+- `aws4_n_r_network_firewall` — Network firewall
+- `aws4_n_r_network_firewall_endpoints` — Network firewall endpoints
+- `aws4_n_r_network_load_balancer` — Network load balancer
+- `aws4_n_r_networking_and_content_delivery` — Networking and content delivery
+- `aws4_n_r_neuron_ml_sdk` — Neuron ml sdk
+- `aws4_n_r_nice_dcv` — Nice dcv
+- `aws4_n_r_nice_enginframe` — Nice enginframe
+- `aws4_n_r_nimble_studio` — Nimble studio
+- `aws4_n_r_nitro_enclaves` — Nitro enclaves
+- `aws4_n_r_non_cached_volume` — Non cached volume
+- `aws4_n_r_notebook` — Notebook
+- `aws4_n_r_nova` — Nova
+- `aws4_n_r_nova2` — Nova2
+- `aws4_n_r_object` — Object
+- `aws4_n_r_office_building` — Office building
+- `aws4_n_r_omics` — Omics
+- `aws4_n_r_one_zone_ia` — One zone ia
+- `aws4_n_r_open_3d_engine` — Open 3d engine
+- `aws4_n_r_open_3d_engine_2` — Open 3d engine 2
+- `aws4_n_r_opensearch_dashboards` — Opensearch dashboards
+- `aws4_n_r_opensearch_ingestion` — Opensearch ingestion
+- `aws4_n_r_opensearch_observability` — Opensearch observability
+- `aws4_n_r_opensearch_service_cluster_administrator_node` — Opensearch service cluster administrator node
+- `aws4_n_r_opensearch_service_data_node` — Opensearch service data node
+- `aws4_n_r_opensearch_service_index` — Opensearch service index
+- `aws4_n_r_opensearch_service_traces` — Opensearch service traces
+- `aws4_n_r_opensearch_service_ultrawarm_node` — Opensearch service ultrawarm node
+- `aws4_n_r_opsworks` — Opsworks
+- `aws4_n_r_opsworks_apps` — Opsworks apps
+- `aws4_n_r_opsworks_permissions` — Opsworks permissions
+- `aws4_n_r_optimized_instance` — Optimized instance
+- `aws4_n_r_oracle_database_at_aws` — Oracle database at aws
+- `aws4_n_r_oracle_db_instance` — Oracle db instance
+- `aws4_n_r_oracle_db_instance_alternate` — Oracle db instance alternate
+- `aws4_n_r_organizations` — Organizations
+- `aws4_n_r_organizations_account` — Organizations account
+- `aws4_n_r_organizations_account2` — Organizations account2
+- `aws4_n_r_organizations_management_account` — Organizations management account
+- `aws4_n_r_organizations_management_account2` — Organizations management account2
+- `aws4_n_r_organizations_organizational_unit` — Organizations organizational unit
+- `aws4_n_r_organizations_organizational_unit2` — Organizations organizational unit2
+- `aws4_n_r_outposts` — Outposts
+- `aws4_n_r_outposts_1u_and_2u_servers` — Outposts 1u and 2u servers
+- `aws4_n_r_outposts_family` — Outposts family
+- `aws4_n_r_p2_instance` — P2 instance
+- `aws4_n_r_p3_instance` — P3 instance
+- `aws4_n_r_p3dn_instance` — P3dn instance
+- `aws4_n_r_p4_instance` — P4 instance
+- `aws4_n_r_p4d_instance` — P4d instance
+- `aws4_n_r_panorama` — Panorama
+- `aws4_n_r_parallel_cluster` — Parallel cluster
+- `aws4_n_r_parallel_computing_service` — Parallel computing service
+- `aws4_n_r_parameter_store` — Parameter store
+- `aws4_n_r_partner_central` — Partner central
+- `aws4_n_r_patch_manager` — Patch manager
+- `aws4_n_r_payment_cryptography` — Payment cryptography
+- `aws4_n_r_peering` — Peering
+- `aws4_n_r_permissions` — Permissions
+- `aws4_n_r_permissions_2` — Permissions 2
+- `aws4_n_r_personal_health_dashboard` — Personal health dashboard
+- `aws4_n_r_personalize` — Personalize
+- `aws4_n_r_pinpoint` — Pinpoint
+- `aws4_n_r_pinpoint_journey` — Pinpoint journey
+- `aws4_n_r_police_emergency` — Police emergency
+- `aws4_n_r_policy` — Policy
+- `aws4_n_r_polly` — Polly
+- `aws4_n_r_postgresql_instance` — Postgresql instance
+- `aws4_n_r_private_5g` — Private 5g
+- `aws4_n_r_private_certificate_authority` — Private certificate authority
+- `aws4_n_r_privatelink` — Privatelink
+- `aws4_n_r_professional_services` — Professional services
+- `aws4_n_r_programming_language` — Programming language
+- `aws4_n_r_proton` — Proton
+- `aws4_n_r_q` — Q
+- `aws4_n_r_quantum_ledger_database` — Quantum ledger database
+- `aws4_n_r_quantum_technologies` — Quantum technologies
+- `aws4_n_r_question` — Question
+- `aws4_n_r_queue` — Queue
+- `aws4_n_r_quick_suite` — Quick suite
+- `aws4_n_r_quicksight` — Quicksight
+- `aws4_n_r_quicksight_paginated_reports` — Quicksight paginated reports
+- `aws4_n_r_r4_instance` — R4 instance
+- `aws4_n_r_r5_instance` — R5 instance
+- `aws4_n_r_r5a_instance` — R5a instance
+- `aws4_n_r_r5ad_instance` — R5ad instance
+- `aws4_n_r_r5b_instance` — R5b instance
+- `aws4_n_r_r5d_instance` — R5d instance
+- `aws4_n_r_r5gd_instance` — R5gd instance
+- `aws4_n_r_r5n` — R5n
+- `aws4_n_r_r5n_instance` — R5n instance
+- `aws4_n_r_r6g_instance` — R6g instance
+- `aws4_n_r_rdn_instance` — Rdn instance
+- `aws4_n_r_rds` — Rds
+- `aws4_n_r_rds_blue_green_deployments` — Rds blue green deployments
+- `aws4_n_r_rds_instance` — Rds instance
+- `aws4_n_r_rds_instance_alt` — Rds instance alt
+- `aws4_n_r_rds_mariadb_instance` — Rds mariadb instance
+- `aws4_n_r_rds_mariadb_instance_alt` — Rds mariadb instance alt
+- `aws4_n_r_rds_multi_az` — Rds multi az
+- `aws4_n_r_rds_multi_az_db_cluster` — Rds multi az db cluster
+- `aws4_n_r_rds_mysql_instance` — Rds mysql instance
+- `aws4_n_r_rds_mysql_instance_alt` — Rds mysql instance alt
+- `aws4_n_r_rds_on_vmware` — Rds on vmware
+- `aws4_n_r_rds_optimized_writes` — Rds optimized writes
+- `aws4_n_r_rds_oracle_instance` — Rds oracle instance
+- `aws4_n_r_rds_oracle_instance_alt` — Rds oracle instance alt
+- `aws4_n_r_rds_piop` — Rds piop
+- `aws4_n_r_rds_piops` — Rds piops
+- `aws4_n_r_rds_postgresql_instance` — Rds postgresql instance
+- `aws4_n_r_rds_postgresql_instance_alt` — Rds postgresql instance alt
+- `aws4_n_r_rds_proxy` — Rds proxy
+- `aws4_n_r_rds_proxy_alt` — Rds proxy alt
+- `aws4_n_r_rds_sql_server_instance` — Rds sql server instance
+- `aws4_n_r_rds_sql_server_instance_alt` — Rds sql server instance alt
+- `aws4_n_r_rds_trusted_language_extensions_for_postgresql` — Rds trusted language extensions for postgresql
+- `aws4_n_r_recover` — Recover
+- `aws4_n_r_red_hat_openshift` — Red hat openshift
+- `aws4_n_r_redshift` — Redshift
+- `aws4_n_r_redshift_auto_copy` — Redshift auto copy
+- `aws4_n_r_redshift_data_sharing_governance` — Redshift data sharing governance
+- `aws4_n_r_redshift_ml` — Redshift ml
+- `aws4_n_r_redshift_query_editor_v20_light` — Redshift query editor v20 light
+- `aws4_n_r_redshift_ra3` — Redshift ra3
+- `aws4_n_r_redshift_streaming_ingestion` — Redshift streaming ingestion
+- `aws4_n_r_registry` — Registry
+- `aws4_n_r_rekognition` — Rekognition
+- `aws4_n_r_rekognition_2` — Rekognition 2
+- `aws4_n_r_rekognition_image` — Rekognition image
+- `aws4_n_r_rekognition_video` — Rekognition video
+- `aws4_n_r_replication` — Replication
+- `aws4_n_r_replication_time_control` — Replication time control
+- `aws4_n_r_reported_state` — Reported state
+- `aws4_n_r_repost` — Repost
+- `aws4_n_r_repost_private` — Repost private
+- `aws4_n_r_rescue` — Rescue
+- `aws4_n_r_reserved_instance_reporting` — Reserved instance reporting
+- `aws4_n_r_resilience_hub` — Resilience hub
+- `aws4_n_r_resource` — Resource
+- `aws4_n_r_resource_access_manager` — Resource access manager
+- `aws4_n_r_resource_explorer` — Resource explorer
+- `aws4_n_r_resources` — Resources
+- `aws4_n_r_robomaker` — Robomaker
+- `aws4_n_r_robotics` — Robotics
+- `aws4_n_r_role` — Role
+- `aws4_n_r_route_53` — Route 53
+- `aws4_n_r_route_53_application_recovery_controller` — Route 53 application recovery controller
+- `aws4_n_r_route_53_readiness_checks` — Route 53 readiness checks
+- `aws4_n_r_route_53_resolver` — Route 53 resolver
+- `aws4_n_r_route_53_resolver_dns_firewall` — Route 53 resolver dns firewall
+- `aws4_n_r_route_53_resolver_query_logging` — Route 53 resolver query logging
+- `aws4_n_r_route_53_routing_controls` — Route 53 routing controls
+- `aws4_n_r_route_table` — Route table
+- `aws4_n_r_router` — Router
+- `aws4_n_r_rtb_fabric` — Rtb fabric
+- `aws4_n_r_rule` — Rule
+- `aws4_n_r_rule_2` — Rule 2
+- `aws4_n_r_rule_3` — Rule 3
+- `aws4_n_r_run_command` — Run command
+
+## AWS 2023 · S–Z（aws4_s_z）— 194 个
+
+- `aws4_s_z_s3` — S3
+- `aws4_s_z_s3_batch_operations` — S3 batch operations
+- `aws4_s_z_s3_express_one_zone` — S3 express one zone
+- `aws4_s_z_s3_file_gateway` — S3 file gateway
+- `aws4_s_z_s3_files` — S3 files
+- `aws4_s_z_s3_multi_region_access_points` — S3 multi region access points
+- `aws4_s_z_s3_object_lambda` — S3 object lambda
+- `aws4_s_z_s3_object_lambda_access_points` — S3 object lambda access points
+- `aws4_s_z_s3_object_lock` — S3 object lock
+- `aws4_s_z_s3_on_outposts` — S3 on outposts
+- `aws4_s_z_s3_on_outposts_storage` — S3 on outposts storage
+- `aws4_s_z_s3_replication_time_control` — S3 replication time control
+- `aws4_s_z_s3_select` — S3 select
+- `aws4_s_z_s3_storage_lens` — S3 storage lens
+- `aws4_s_z_s3_tables` — S3 tables
+- `aws4_s_z_s3_vectors` — S3 vectors
+- `aws4_s_z_saas_event_bus_resource` — Saas event bus resource
+- `aws4_s_z_sagemaker` — Sagemaker
+- `aws4_s_z_sagemaker_2` — Sagemaker 2
+- `aws4_s_z_sagemaker_canvas` — Sagemaker canvas
+- `aws4_s_z_sagemaker_geospatial_ml` — Sagemaker geospatial ml
+- `aws4_s_z_sagemaker_ground_truth` — Sagemaker ground truth
+- `aws4_s_z_sagemaker_model` — Sagemaker model
+- `aws4_s_z_sagemaker_notebook` — Sagemaker notebook
+- `aws4_s_z_sagemaker_shadow_testing` — Sagemaker shadow testing
+- `aws4_s_z_sagemaker_studio_lab` — Sagemaker studio lab
+- `aws4_s_z_sagemaker_train` — Sagemaker train
+- `aws4_s_z_saml_token` — Saml token
+- `aws4_s_z_satellite` — Satellite
+- `aws4_s_z_savings_plans` — Savings plans
+- `aws4_s_z_search_documents` — Search documents
+- `aws4_s_z_secrets_manager` — Secrets manager
+- `aws4_s_z_security_agent` — Security Agent
+- `aws4_s_z_security_group` — Security group
+- `aws4_s_z_security_hub` — Security hub
+- `aws4_s_z_security_hub_finding` — Security hub finding
+- `aws4_s_z_security_identity_and_compliance` — Security identity and compliance
+- `aws4_s_z_security_incident_response` — Security incident response
+- `aws4_s_z_security_lake` — Security lake
+- `aws4_s_z_sensor` — Sensor
+- `aws4_s_z_server_migration_service` — Server migration service
+- `aws4_s_z_serverless` — Serverless
+- `aws4_s_z_serverless_application_repository` — Serverless application repository
+- `aws4_s_z_servers` — Servers
+- `aws4_s_z_service` — Service
+- `aws4_s_z_service_catalog` — Service catalog
+- `aws4_s_z_service_management_connector` — Service management connector
+- `aws4_s_z_servo` — Servo
+- `aws4_s_z_shadow` — Shadow
+- `aws4_s_z_shield` — Shield
+- `aws4_s_z_shield_shield_advanced` — Shield shield advanced
+- `aws4_s_z_shield2` — Shield2
+- `aws4_s_z_signer` — Signer
+- `aws4_s_z_simple_ad` — Simple ad
+- `aws4_s_z_simple_email_service` — Simple email service
+- `aws4_s_z_simple_storage_service_directory_bucket` — Simple storage service directory bucket
+- `aws4_s_z_simple_storage_service_s3_glacier_instant_retrieval` — Simple storage service s3 glacier instant retrieval
+- `aws4_s_z_simspace_weaver` — Simspace weaver
+- `aws4_s_z_simulation` — Simulation
+- `aws4_s_z_simulator` — Simulator
+- `aws4_s_z_single_sign_on` — Single sign on
+- `aws4_s_z_site_to_site_vpn` — Site to site vpn
+- `aws4_s_z_snapshot` — Snapshot
+- `aws4_s_z_snowball` — Snowball
+- `aws4_s_z_snowball_edge` — Snowball edge
+- `aws4_s_z_snowcone` — Snowcone
+- `aws4_s_z_snowmobile` — Snowmobile
+- `aws4_s_z_sns` — Sns
+- `aws4_s_z_source_code` — Source code
+- `aws4_s_z_spot_instance` — Spot instance
+- `aws4_s_z_sql_primary` — Sql primary
+- `aws4_s_z_sql_replica` — Sql replica
+- `aws4_s_z_sql_workbench` — Sql workbench
+- `aws4_s_z_sqs` — Sqs
+- `aws4_s_z_ssl_padlock` — Ssl padlock
+- `aws4_s_z_stack` — Stack
+- `aws4_s_z_stack2` — Stack2
+- `aws4_s_z_standard_ia` — Standard ia
+- `aws4_s_z_state_manager` — State manager
+- `aws4_s_z_step_functions` — Step functions
+- `aws4_s_z_storage` — Storage
+- `aws4_s_z_storage_gateway` — Storage gateway
+- `aws4_s_z_streaming_distribution` — Streaming distribution
+- `aws4_s_z_sts` — Sts
+- `aws4_s_z_sts_alternate` — Sts alternate
+- `aws4_s_z_sumerian` — Sumerian
+- `aws4_s_z_supply_chain` — Supply chain
+- `aws4_s_z_support` — Support
+- `aws4_s_z_sustainability` — Sustainability
+- `aws4_s_z_systems_manager` — Systems manager
+- `aws4_s_z_systems_manager_application_manager` — Systems manager application manager
+- `aws4_s_z_systems_manager_change_calendar` — Systems manager change calendar
+- `aws4_s_z_systems_manager_change_manager` — Systems manager change manager
+- `aws4_s_z_systems_manager_compliance` — Systems manager compliance
+- `aws4_s_z_systems_manager_distributor` — Systems manager distributor
+- `aws4_s_z_systems_manager_incident_manager` — Systems manager incident manager
+- `aws4_s_z_systems_manager_opscenter` — Systems manager opscenter
+- `aws4_s_z_systems_manager_session_manager` — Systems manager session manager
+- `aws4_s_z_t2_instance` — T2 instance
+- `aws4_s_z_t3_instance` — T3 instance
+- `aws4_s_z_t3a_instance` — T3a instance
+- `aws4_s_z_t4g_instance` — T4g instance
+- `aws4_s_z_table` — Table
+- `aws4_s_z_tape_gateway` — Tape gateway
+- `aws4_s_z_tape_storage` — Tape storage
+- `aws4_s_z_telco_network_builder` — Telco network builder
+- `aws4_s_z_template` — Template
+- `aws4_s_z_temporary_security_credential` — Temporary security credential
+- `aws4_s_z_tensorflow_on_aws` — Tensorflow on aws
+- `aws4_s_z_textract` — Textract
+- `aws4_s_z_textract_analyze_lending` — Textract analyze lending
+- `aws4_s_z_thermostat` — Thermostat
+- `aws4_s_z_thinkbox_deadline` — Thinkbox deadline
+- `aws4_s_z_thinkbox_draft` — Thinkbox draft
+- `aws4_s_z_thinkbox_frost` — Thinkbox frost
+- `aws4_s_z_thinkbox_krakatoa` — Thinkbox krakatoa
+- `aws4_s_z_thinkbox_sequoia` — Thinkbox sequoia
+- `aws4_s_z_thinkbox_stoke` — Thinkbox stoke
+- `aws4_s_z_thinkbox_xmesh` — Thinkbox xmesh
+- `aws4_s_z_timestream` — Timestream
+- `aws4_s_z_tools_and_sdks` — Tools and sdks
+- `aws4_s_z_topic` — Topic
+- `aws4_s_z_topic_2` — Topic 2
+- `aws4_s_z_torchserve` — Torchserve
+- `aws4_s_z_traditional_server` — Traditional server
+- `aws4_s_z_training_certification` — Training certification
+- `aws4_s_z_trainium_instance` — Trainium instance
+- `aws4_s_z_transcribe` — Transcribe
+- `aws4_s_z_transfer_family` — Transfer family
+- `aws4_s_z_transfer_family_aws_as2` — Transfer family aws as2
+- `aws4_s_z_transfer_for_ftp_resource` — Transfer for ftp resource
+- `aws4_s_z_transfer_for_ftps_resource` — Transfer for ftps resource
+- `aws4_s_z_transfer_for_sftp` — Transfer for sftp
+- `aws4_s_z_transfer_for_sftp_resource` — Transfer for sftp resource
+- `aws4_s_z_transform` — Transform
+- `aws4_s_z_transit_gateway` — Transit gateway
+- `aws4_s_z_transit_gateway_attachment` — Transit gateway attachment
+- `aws4_s_z_translate` — Translate
+- `aws4_s_z_travel` — Travel
+- `aws4_s_z_trusted_advisor` — Trusted advisor
+- `aws4_s_z_user` — User
+- `aws4_s_z_user_notifications` — User notifications
+- `aws4_s_z_users` — Users
+- `aws4_s_z_utility` — Utility
+- `aws4_s_z_vault` — Vault
+- `aws4_s_z_verified_access` — Verified access
+- `aws4_s_z_verified_permissions` — Verified permissions
+- `aws4_s_z_virtual_gateway` — Virtual gateway
+- `aws4_s_z_virtual_node` — Virtual node
+- `aws4_s_z_virtual_private_cloud` — Virtual private cloud
+- `aws4_s_z_virtual_router` — Virtual router
+- `aws4_s_z_virtual_service` — Virtual service
+- `aws4_s_z_virtual_tape_library` — Virtual tape library
+- `aws4_s_z_vmware_cloud_on_aws` — Vmware cloud on aws
+- `aws4_s_z_volume` — Volume
+- `aws4_s_z_volume_gateway` — Volume gateway
+- `aws4_s_z_vpc` — Vpc
+- `aws4_s_z_vpc_access_points` — Vpc access points
+- `aws4_s_z_vpc_carrier_gateway` — Vpc carrier gateway
+- `aws4_s_z_vpc_lattice` — Vpc lattice
+- `aws4_s_z_vpc_network_access_analyzer` — Vpc network access analyzer
+- `aws4_s_z_vpc_privatelink` — Vpc privatelink
+- `aws4_s_z_vpc_reachability_analyzer` — Vpc reachability analyzer
+- `aws4_s_z_vpc_traffic_mirroring` — Vpc traffic mirroring
+- `aws4_s_z_vpc_virtual_private_cloud_vpc` — Vpc virtual private cloud vpc
+- `aws4_s_z_vpn_connection` — Vpn connection
+- `aws4_s_z_vpn_gateway` — Vpn gateway
+- `aws4_s_z_waf` — Waf
+- `aws4_s_z_waf_bad_bot` — Waf bad bot
+- `aws4_s_z_waf_bot` — Waf bot
+- `aws4_s_z_waf_bot_control` — Waf bot control
+- `aws4_s_z_waf_labels` — Waf labels
+- `aws4_s_z_waf_managed_rule` — Waf managed rule
+- `aws4_s_z_waf_rule` — Waf rule
+- `aws4_s_z_wavelength` — Wavelength
+- `aws4_s_z_well_architect_tool` — Well architect tool
+- `aws4_s_z_well_architected_tool` — Well architected tool
+- `aws4_s_z_wickr` — Wickr
+- `aws4_s_z_windfarm` — Windfarm
+- `aws4_s_z_work_package` — Work package
+- `aws4_s_z_workdocs` — Workdocs
+- `aws4_s_z_worklink` — Worklink
+- `aws4_s_z_workmail` — Workmail
+- `aws4_s_z_workspaces` — Workspaces
+- `aws4_s_z_workspaces_family` — Workspaces family
+- `aws4_s_z_workspaces_family_amazon_workspaces` — Workspaces family amazon workspaces
+- `aws4_s_z_workspaces_family_amazon_workspaces_core` — Workspaces family amazon workspaces core
+- `aws4_s_z_workspaces_thin_client` — Workspaces thin client
+- `aws4_s_z_workspaces_workspaces_web` — Workspaces workspaces web
+- `aws4_s_z_x1_instance` — X1 instance
+- `aws4_s_z_x1_instance2` — X1 instance2
+- `aws4_s_z_x1e_instance` — X1e instance
+- `aws4_s_z_xray` — Xray
+- `aws4_s_z_z1d_instance` — Z1d instance
+
+## Azure（azure）— 101 个
+
+- `access control services` — Access Control Services
+- `active directory` — Active Directory
+- `add ons` — Add Ons
+- `alert` — Alert
+- `api management` — API Management
+- `automation` — Automation
+- `autoscale` — Autoscale
+- `azure cloud` — Azure Cloud
+- `azure machine learning` — Azure Machine Learning
+- `azure message` — Azure Message
+- `azure server` — Server
+- `backup service` — Backup Service
+- `batch services` — Batch Services
+- `bitbucket` — BitBucket
+- `biztalk services` — BizTalk Services
+- `cache` — Cache
+- `cdn` — CDN
+- `certificate` — Certificate
+- `cloud service` — Cloud Service
+- `cloud service configuration file` — Cloud Service Configuration File
+- `cloud service definition file` — Cloud Service Definition File
+- `cloud service package` — Cloud Service Package
+- `code file` — Code File
+- `codeplex` — Codeplex
+- `computer` — Computer
+- `database generic` — Database Generic
+- `dropbox` — Dropbox
+- `enterprise` — Enterprise
+- `event hub` — Event Hub
+- `express route` — Express Route
+- `file` — File
+- `file (black)` — File (Black)
+- `git deployment` — Git Deployment
+- `github` — GitHub
+- `HDInsight` — HDInsight
+- `hdinsight old` — HDInsight OLD
+- `health monitoring` — Health Monitoring
+- `healthy` — Healthy
+- `laptop` — Laptop
+- `load balancer` — Load Balancer
+- `load balancer (generic)` — Load Balancer (Generic)
+- `management service` — Management Service
+- `marketplace` — Marketplace
+- `media services` — Media Services
+- `microsoft azure` — Microsoft Azure
+- `mobile` — Mobile
+- `mobile services` — Mobile Services
+- `multi factor authentication` — Multi factor Authentication
+- `mysql database` — MySQL Database
+- `network` — Network
+- `notification hub` — Notification Hub
+- `notification topic` — Notification Topic
+- `operating system image` — Operating System Image
+- `operational insights` — Operational Insights
+- `powershell file` — PowerShell File
+- `queue` — Queue
+- `rdp (remoteing file)` — RDP (Remoteing File)
+- `recovery services` — Recovery Services
+- `remoteapp` — RemoteApp
+- `scheduler` — Scheduler
+- `script file` — Script File
+- `sdk` — SDK
+- `server rack` — Server Rack
+- `service bus` — Service Bus
+- `service bus queues` — Service Bus Queues
+- `service bus Relay` — Service Bus Relay
+- `service bus topics and subscriptions` — Service Bus Topics and Subscriptions
+- `service endpoint` — Service Endpoint
+- `service fabric` — Service Fabric
+- `sql azure` — SQL Azure
+- `sql database (Generic)` — SQL Database (Generic)
+- `sql database (sql azure)` — SQL Database (SQL Azure)
+- `sql datasync` — SQL DataSync
+- `sql reporting` — SQL Reporting
+- `startup file` — Startup File
+- `storage blob` — Storage Blob
+- `storage queue` — Storage Queue
+- `storage table` — Storage Table
+- `storsimple` — StorSimple
+- `stream analytics` — Stream Analytics
+- `subscription` — Subscription
+- `table storage` — Table Storage
+- `tablet` — Tablet
+- `traffic manager` — Traffic Manager
+- `unidentified code object` — Unidentified Code Object
+- `User` — User
+- `vhd` — VHD
+- `vhd data disk` — VHD Data Disk
+- `virtual machine` — Virtual Machine
+- `virtual machine elasticSearch` — Virtual Machine ElasticSearch
+- `virtual machines` — Virtual Machines
+- `visual studio` — Visual Studio
+- `wad (diagnostics) config (sdk 2.5)` — WAD (Diagnostics) Config (SDK 2.5)
+- `wad (diagnostics) config (sdk 2.6+)` — WAD (Diagnostics) Config (SDK 2.6+)
+- `web role` — Web Role
+- `web roles` — Web Roles
+- `web sites` — Web Sites
+- `website (generic)` — Website (Generic)
+- `windows azure` — Windows Azure
+- `worker role` — Worker Role
+- `worker roles` — Worker Roles
+
+## 网络通用（network）— 103 个
+
+- `access point` — 接入点
+- `adsl` — ADSL 调制解调器
+- `antenna` — 天线
+- `building` — 大楼
+- `bus` — 总线
+- `comm` — 通讯设备
+- `dish antenna` — 碟形天线
+- `ethernet` — 以太网
+- `firewall` — 防火墙
+- `globe` — 互联网
+- `hub` — 集线器
+- `ip phone` — IP 电话
+- `iphone` — iPhone
+- `isp` — ISP 运营商
+- `mac` — Mac 电脑
+- `macbook` — MacBook
+- `monitor` — 显示器
+- `network cloud` — 云
+- `notebook` — 笔记本电脑
+- `office` — 办公区
+- `pc` — PC 计算机
+- `phone` — 电话
+- `printer` — 打印机
+- `router` — 路由器
+- `satellite` — 卫星
+- `scanner` — 扫描仪
+- `server` — 服务器
+- `signal` — 信号塔
+- `tab` — 平板电脑
+- `topo_acl` — 访问控制策略
+- `topo_antenna` — 天线
+- `topo_auth` — 身份认证
+- `topo_backup` — 备份存储
+- `topo_balancer` — 负载均衡
+- `topo_bridge` — 网桥
+- `topo_building` — 楼宇
+- `topo_cache` — 缓存
+- `topo_camera` — 摄像头
+- `topo_cdn` — CDN
+- `topo_cloud` — 云
+- `topo_cluster` — 集群
+- `topo_container` — 容器
+- `topo_controller` — 无线控制器
+- `topo_database` — 数据库
+- `topo_dish` — 卫星接收锅
+- `topo_disk` — 磁盘阵列
+- `topo_dns` — DNS 服务器
+- `topo_edge` — 边缘节点
+- `topo_file` — 文件服务器
+- `topo_firewall` — 防火墙
+- `topo_gateway` — 网关
+- `topo_hub` — 集线器
+- `topo_idc` — 数据中心 / 机房
+- `topo_ids` — 入侵检测 IDS
+- `topo_internet` — 因特网
+- `topo_intranet` — 内网 / 私有云
+- `topo_iot` — IoT 传感器
+- `topo_ip_phone` — IP 话机
+- `topo_isp` — 运营商
+- `topo_lan` — 局域网 LAN
+- `topo_laptop` — 笔记本
+- `topo_mail` — 邮件服务器
+- `topo_meeting` — 会议室
+- `topo_modem` — 光猫 / 调制解调器
+- `topo_monitor` — 显示器
+- `topo_monitor_net` — 网管监控
+- `topo_mq` — 消息队列
+- `topo_nas` — NAS 存储
+- `topo_nat` — NAT
+- `topo_pc` — 台式机
+- `topo_pos` — POS 收银机
+- `topo_printer` — 打印机
+- `topo_proxy` — 代理服务器
+- `topo_rack` — 机柜
+- `topo_repeater` — 中继器 / 放大器
+- `topo_router` — 路由器
+- `topo_router_edge` — 边界路由器
+- `topo_satellite` — 卫星
+- `topo_server` — 服务器
+- `topo_server_tower` — 塔式服务器
+- `topo_smartphone` — 手机
+- `topo_switch_l2` — 二层交换机
+- `topo_switch_l3` — 三层交换机
+- `topo_tablet` — 平板
+- `topo_ups` — UPS 电源
+- `topo_user` — 用户
+- `topo_users` — 用户组
+- `topo_vm` — 虚拟机
+- `topo_vpn` — VPN 网关
+- `topo_waf` — Web 应用防火墙
+- `topo_wan` — 广域网 WAN
+- `topo_web` — Web 服务器
+- `topo_wireless_ap` — 无线 AP
+- `topo_workstation` — 工作站
+- `topo_zone_az` — 可用区
+- `topo_zone_cluster` — 集群
+- `topo_zone_dmz` — DMZ
+- `topo_zone_group` — 通用分组框
+- `topo_zone_region` — 地域 (Region)
+- `topo_zone_security` — 安全域
+- `topo_zone_site` — 站点 / 机房
+- `topo_zone_subnet` — 子网 / VLAN
+- `topo_zone_vpc` — VPC
+
+## Cisco · 建筑（cisco_bulidings）— 9 个
+
+- `branch office` — Branch Office
+- `end office` — End Office
+- `generic building` — Generic Building
+- `government building` — Government Building
+- `mdu` — MDU
+- `small business` — Small Business
+- `telecommuter house` — Telecommuter House
+- `telecommuter house pc` — Telecommuter House PC
+- `university` — University
+
+## Cisco · 计算机与外设（cisco_computers_peripherals）— 20 个
+
+- `cisco laptop` — Cisco Laptop
+- `cisco pc` — PC
+- `cisco printer` — Printer
+- `cisco scanner` — Scanner
+- `cisco tablet` — Cisco Tablet
+- `ibm mainframe` — IBM Mainframe
+- `ibm mini as400` — IBM Mini AS400
+- `ibm tower` — IBM Tower
+- `macintosh` — Macintosh
+- `microphone` — Microphone
+- `pc adapter card` — PC Adapter Card
+- `pc routercard` — PC Routercard
+- `speaker` — Speaker
+- `sun workstation` — Sun Workstation
+- `supercomputer` — Supercomputer
+- `terminal` — Terminal
+- `upc` — UPC
+- `video camera` — Video Camera
+- `web browser` — WEB Browser
+- `workstation` — Workstation
+
+## Cisco · 控制模块（cisco_control_module）— 8 个
+
+- `10ge fcoe` — 10GE FCoE
+- `3174 (desktop)` — 3174 (desktop)
+- `3x74 (floor)` — 3x74 (Floor)
+- `content switch module` — Content Switch Module
+- `firewall service module (fwsm)` — Firewall Service Module (FwSM)
+- `service module` — Service Module
+- `system controller` — System Controller
+- `virtual switch controller (vsc3000)` — Virtual Switch Controller (VSC3000)
+
+## Cisco · 调度器（cisco_directors）— 5 个
+
+- `content engine (cache director)` — Content Engine (Cache Director)
+- `director-class fibre channel director` — Director-Class Fibre Channel Director
+- `distributed director` — Distributed Director
+- `localdirector` — Localdirector
+- `workgroup director` — Workgroup Director
+
+## Cisco · 集线器与网关（cisco_hubs_gateways）— 9 个
+
+- `100baset hub` — 100baset hub
+- `access gateway` — access gateway
+- `cisco hub` — Cisco Hub
+- `cisco vpn gateway` — VPN Gateway
+- `cisco_hub` — Hub
+- `generic gateway` — Generic Gateway
+- `mas gateway` — MAS Gateway
+- `small hub` — Small Hub
+- `universal gateway` — Universal Gateway
+
+## Cisco · 其他（cisco_misc）— 128 个
+
+- `15200` — 15200
+- `6700 series` — 6700 series
+- `7500ars (7513)` — 7500ars (7513)
+- `ace` — ACE
+- `ACS` — ACS
+- `adm` — ADM
+- `asic processor` — Asic Processor
+- `asr 1000 series` — ASR 1000 Series
+- `ata` — ATA
+- `atm 3800` — ATM 3800
+- `avs` — AVS
+- `axp` — AXP
+- `bbsm` — BBSM
+- `breakout box` — Breakout Box
+- `bridge` — Bridge
+- `bts 10200` — BTS 10200
+- `call manager` — Call Manager
+- `car` — Car
+- `carrier routing system` — Carrier Routing System
+- `cddi fddi` — CDDI FDDI
+- `cdm` — CDM
+- `cisco 1000` — Cisco 1000
+- `cisco access point` — Cisco Access Point
+- `cisco asa 5500` — Cisco ASA 5500
+- `cisco ca` — Cisco CA
+- `cisco unityexpress` — Cisco Unityexpress
+- `cisco works` — Cisco Works
+- `contact center` — Contact Center
+- `content transformation engine (cte)` — Content Transformation Engine (CTE)
+- `CS MARS` — CS MARS
+- `CSM S` — CSM S
+- `CSU DSU` — CSU DSU
+- `CUBE` — CUBE
+- `detector` — Detector
+- `dot-dot` — Dot-dot
+- `dpt` — Dpt
+- `dslam` — DSLAM
+- `dual mode` — Dual Mode
+- `dwdm filter` — DWDM Filter
+- `fddi ring` — FDDI Ring
+- `front end processor` — Front End Processor
+- `general applicance` — General Applicance
+- `generic processor` — Generic Processor
+- `h 323` — H 323
+- `handheld` — Handheld
+- `hp mini` — HP Mini
+- `icm` — ICM
+- `ics` — ICS
+- `internet streamer` — Internet Streamer
+- `ios slb` — IOS SLB
+- `ip` — IP
+- `ip communicator` — IP Communicator
+- `ip dsl` — IP DSL
+- `iptc` — IPTC
+- `iptv content manager` — IPTV Content Manager
+- `itp` — ITP
+- `jbod` — JBOD
+- `key` — Key
+- `keys` — Keys
+- `lan to lan` — Lan to Lan
+- `lightweight ap` — Lightweight AP
+- `longreach cpe` — Longreach CPE
+- `MAU` — MAU
+- `mcu` — MCU
+- `me 1100` — ME 1100
+- `mediator` — Mediator
+- `meetingplace` — Meetingplace
+- `mesh ap` — Mesh AP
+- `metro 1500` — Metro 1500
+- `mini vax` — Mini VAX
+- `mobile streamer` — Mobile Streamer
+- `mse` — MSE
+- `mux` — MUX
+- `mxe` — MXE
+- `nac appliance` — NAC Appliance
+- `nce` — NCE
+- `netranger` — Netranger
+- `netsonar` — Netsonar
+- `network management` — Network Management
+- `nexus 1000` — Nexus 1000
+- `nexus 2000` — Nexus 2000
+- `nexus 5000` — Nexus 5000
+- `nexus 7000` — Nexus 7000
+- `octel` — Octel
+- `ons15500` — Ons15500
+- `optical amplifier` — Optical Amplifier
+- `optical transport` — Optical Transport
+- `pad 1` — PAD 1
+- `pad 2` — PAD 2
+- `page icon` — Page Icon
+- `pbx` — PBX
+- `pc software` — PC Software
+- `pc video` — PC Video
+- `pda` — PDA
+- `pmc` — PMC
+- `protocol translator` — Protocol Translator
+- `pxf` — PXF
+- `ratemux` — Ratemux
+- `repeater` — Repeater
+- `route switch processor` — Route Switch Processor
+- `rpsrps` — Rpsrps
+- `safeharbor icon` — Safeharbor Icon
+- `service control` — Service Control
+- `services` — Services
+- `set top box` — Set top box
+- `ssc` — SSC
+- `ssl terminator` — SSL Terminator
+- `stb` — STB
+- `stp` — STP
+- `streamer` — Streamer
+- `svx` — SVX
+- `telecommuter icon` — Telecommuter Icon
+- `token` — Token
+- `tp mcu` — TP MCU
+- `transpath` — Transpath
+- `truck` — Truck
+- `turret` — Turret
+- `tv` — TV
+- `ubr910` — UBR910
+- `umg series` — UMG Series
+- `ups` — UPS
+- `vault` — Vault
+- `vip` — VIP
+- `vpn concentrator` — VPN Concentrator
+- `vsd` — VSD
+- `vss` — VSS
+- `wae` — WAE
+- `wism` — WISM
+
+## Cisco · 调制解调器与电话（cisco_modems_phones）— 11 个
+
+- `cable modem` — Cable Modem
+- `cellular phone` — Cellular Phone
+- `cisco ip phone` — IP Phone
+- `cisco phone` — Phone
+- `fax` — Fax
+- `hootphone` — Hootphone
+- `mobile access ip phone` — Mobile Access Ip Phone
+- `modem` — Modem
+- `phone fax` — Phone Fax
+- `RF modem` — RF Modem
+- `softphone` — Softphone
+
+## Cisco · 人物（cisco_people）— 8 个
+
+- `androgenous person` — Androgenous Person
+- `mac woman` — Mac Woman
+- `man woman` — Man Woman
+- `pc man` — PC Man
+- `running man` — Running Man
+- `sitting woman` — Sitting Woman
+- `standing man` — Standing man
+- `standing woman` — Standing Woman
+
+## Cisco · 路由器（cisco_routers）— 24 个
+
+- `10700` — 10700
+- `3200 mobile access router` — 3200 Mobile Access Router
+- `atm router` — ATM Router
+- `atm tag switch router` — ATM Tag Switch Router
+- `broadband router` — Broadband Router
+- `cisco router` — Router
+- `content service router` — Content Service Router
+- `gigabit switch atm tag router` — Gigabit Switch ATM Tag Router
+- `iad router` — IAD Router
+- `ip telephony router` — IP Telephony Router
+- `iscsi router` — ISCSI Router
+- `mobile access router` — Mobile Access Router
+- `nce router` — NCE Router
+- `netflow router` — Netflow Router
+- `optical services router` — Optical Services Router
+- `router in building` — Router In Building
+- `router with silicon switch` — Router With Silicon Switch
+- `service router` — Service Router
+- `space router` — Space Router
+- `storage router` — Storage Router
+- `tdm router` — TDM router
+- `voice router` — Voice Router
+- `wavelength router` — Wavelength Router
+- `wireless router` — Wireless Router
+
+## Cisco · 安全（cisco_security）— 9 个
+
+- `centri firewall` — Centri Firewall
+- `cisco firewall` — Cisco Firewall
+- `cisco security` — Cisco Security
+- `gatekeeper` — Gatekeeper
+- `guard` — Guard
+- `ios firewall` — IOS Firewall
+- `lock` — Lock
+- `pix firewall` — PIX Firewall
+- `router Firewall` — Router Firewall
+
+## Cisco · 服务器（cisco_servers）— 17 个
+
+- `cisco unified presence server` — Cisco Unified Presence Server
+- `communications server` — Communications Server
+- `directory server` — Directory Server
+- `file server` — File Server
+- `fileserver` — Fileserver
+- `host` — Host
+- `iptv server` — Iptv Server
+- `microwebserver` — Microwebserver
+- `moh server` — MOH Server
+- `server with router` — Server With Router
+- `sip proxy werver` — SIP Proxy Werver
+- `software based server` — Software Based Server
+- `standard host` — Standard Host
+- `storage server` — Storage Server
+- `unity server` — Unity Server
+- `voice commserver` — Voice Commserver
+- `www server` — WWW Sserver
+
+## Cisco · 存储（cisco_storage）— 9 个
+
+- `cisco cloud` — Cisco Cloud
+- `cisco file engine` — Cisco File Engine
+- `diskette` — Diskette
+- `fc storage` — FC Storage
+- `fibre channel disk subsystem` — Fibre Channel Disk Subsystem
+- `file cabinet` — File Cabinet
+- `relational database` — Relational Database
+- `tape array` — Tape Array
+- `web cluster` — WEB Cluster
+
+## Cisco · 交换机（cisco_switches）— 24 个
+
+- `atm fast gigabit etherswitch` — ATM Fast Gigabit Etherswitch
+- `atm switch` — ATM Switch
+- `class 4 5 switch` — Class 4 5 Switch
+- `content service switch 1100` — Content Service Switch 1100
+- `content switch` — Content Switch
+- `fibre channel fabric switch` — Fibre Channel Fabric Switch
+- `generic softswitch` — Generic Softswitch
+- `intelliswitch stack` — Intelliswitch Stack
+- `isdn switch` — ISDN Switch
+- `layer 2 remote switch` — Layer 2 Remote Switch
+- `layer 3 switch` — Layer 3 Switch
+- `mgx 8000 multiservice switch` — MGX 8000 Multiservice Switch
+- `mulitswitch device` — Mulitswitch Device
+- `multi-fabric server switch` — Multi-Fabric Server Switch
+- `multilayer remote switch` — Multilayer Remote Switch
+- `pbx switch` — PBX Switch
+- `programmable switch` — Programmable Switch
+- `server switch` — Server Switch
+- `simulitlayer switch` — Simulitlayer Switch
+- `softswitch pgw mgc` — Softswitch PGW MGC
+- `virtual layer switch` — Virtual Layer Switch
+- `voice atm switch` — Voice ATM Switch
+- `voice switch` — Voice switch
+- `workgroup switch` — Workgroup Switch
+
+## Cisco · 无线（cisco_wireless）— 11 个
+
+- `cisco antenna` — Cisco Antenna
+- `ground terminal` — Ground Terminal
+- `radio tower` — Radio Tower
+- `sattelite` — Sattelite
+- `sattelite dish` — Sattelite Dish
+- `wi-fi tag` — WI-FI Tag
+- `wireless` — Wireless
+- `wireless bridge` — Wireless Bridge
+- `wireless location appliance` — Wireless Location Appliance
+- `wireless transport` — Wireless Transport
+- `wlan controller` — Wlan Controller
+
+## 电气工程 · 抽象符号（elec_abstract）— 21 个
+
+- `elec_abstract_amplifier` — Amplifier
+- `elec_abstract_controlled_amplifier` — Controlled Amplifier
+- `elec_abstract_dac` — DAC
+- `elec_abstract_delta` — Delta
+- `elec_abstract_demux` — Demux
+- `elec_abstract_filter` — Filter
+- `elec_abstract_function` — Function
+- `elec_abstract_integrator` — Integrator
+- `elec_abstract_multiplier` — Multiplier
+- `elec_abstract_mux` — Mux
+- `elec_abstract_mux_demux` — Mux-Demux
+- `elec_abstract_operational_amp_1` — Operational Amp 1
+- `elec_abstract_operational_amp_2` — Operational Amp 2
+- `elec_abstract_ota_1` — OTA 1
+- `elec_abstract_ota_2` — OTA 2
+- `elec_abstract_ota_3` — OTA 3
+- `elec_abstract_quantizer` — Quantizer
+- `elec_abstract_sum` — Sum
+- `elec_abstract_summation_point` — Summation Point
+- `elec_abstract_thermistor_with_independent_integral_heater` — Thermistor With Independent Integral Heater
+- `elec_abstract_voltage_regulator` — Voltage Regulator
+
+## 电气工程 · 电容（elec_capacitors）— 16 个
+
+- `elec_capacitors_capacitor_1` — Capacitor 1
+- `elec_capacitors_capacitor_2` — Capacitor 2
+- `elec_capacitors_capacitor_3` — Capacitor 3
+- `elec_capacitors_capacitor_4` — Capacitor 4
+- `elec_capacitors_capacitor_5` — Capacitor 5
+- `elec_capacitors_capacitor_6` — Capacitor 6
+- `elec_capacitors_differential_capacitor` — Differential Capacitor
+- `elec_capacitors_feed_through_capacitor` — Feed Through Capacitor
+- `elec_capacitors_ganged_capacitor` — Ganged Capacitor
+- `elec_capacitors_multiple_capacitor` — Multiple Capacitor
+- `elec_capacitors_multiple_electrolytic_capacitor_comm_neg` — Multiple Electrolytic Capacitor Comm Neg
+- `elec_capacitors_multiple_electrolytic_capacitor_comm_pos` — Multiple Electrolytic Capacitor Comm Pos
+- `elec_capacitors_trimmer_capacitor_1` — Trimmer Capacitor 1
+- `elec_capacitors_trimmer_capacitor_2` — Trimmer Capacitor 2
+- `elec_capacitors_variable_capacitor_1` — Variable Capacitor 1
+- `elec_capacitors_variable_capacitor_2` — Variable Capacitor 2
+
+## 电气工程 · 二极管（elec_diodes）— 13 个
+
+- `elec_diodes_diode` — Diode
+- `elec_diodes_field_effect_diode` — Field Effect Diode
+- `elec_diodes_four_layer_diode` — Four Layer Diode
+- `elec_diodes_gunn_diode` — Gunn Diode
+- `elec_diodes_schottky_diode` — Schottky Diode
+- `elec_diodes_transorb_1` — Transorb 1
+- `elec_diodes_transorb_2` — Transorb 2
+- `elec_diodes_tunnel_diode` — Tunnel Diode
+- `elec_diodes_tunnel_diode_2` — Tunnel Diode 2
+- `elec_diodes_varactor_varicap` — Varactor - Varicap
+- `elec_diodes_zener_diode_1` — Zener Diode 1
+- `elec_diodes_zener_diode_2` — Zener Diode 2
+- `elec_diodes_zener_diode_3` — Zener Diode 3
+
+## 电气工程 · 机电（elec_electro_mech）— 68 个
+
+- `elec_electro_mech_2_position_switch` — 2 Position Switch
+- `elec_electro_mech_2_way_switch` — 2-Way Switch
+- `elec_electro_mech_3_position_switch` — 3 Position Switch
+- `elec_electro_mech_4_position_switch` — 4 Position Switch
+- `elec_electro_mech_bell` — Bell
+- `elec_electro_mech_break_contact` — Break Contact
+- `elec_electro_mech_buzzer` — Buzzer
+- `elec_electro_mech_changeover_contact` — Changeover Contact
+- `elec_electro_mech_circuit_breaker` — Circuit Breaker
+- `elec_electro_mech_dpdt` — DPDT
+- `elec_electro_mech_dpdt2` — DPDT2
+- `elec_electro_mech_dpst` — DPST
+- `elec_electro_mech_flow_actuated` — Flow Actuated
+- `elec_electro_mech_fuse` — Fuse
+- `elec_electro_mech_gas_flow_actuated` — Gas Flow Actuated
+- `elec_electro_mech_inertia_switch` — Inertia Switch
+- `elec_electro_mech_isolator` — Isolator
+- `elec_electro_mech_limit_switch` — Limit Switch
+- `elec_electro_mech_limit_switch_nc` — Limit Switch NC
+- `elec_electro_mech_limit_switch_no` — Limit Switch NO
+- `elec_electro_mech_liquid_level_actuated` — Liquid Level Actuated
+- `elec_electro_mech_liquid_level_actuated_2` — Liquid Level Actuated 2
+- `elec_electro_mech_loudspeaker` — Loudspeaker
+- `elec_electro_mech_make_contact` — Make Contact
+- `elec_electro_mech_manual_switch` — Manual Switch
+- `elec_electro_mech_mercury_switch` — Mercury Switch
+- `elec_electro_mech_mercury_switch_2` — Mercury Switch 2
+- `elec_electro_mech_motor_1` — Motor 1
+- `elec_electro_mech_motor_2` — Motor 2
+- `elec_electro_mech_passing_make_contact` — Passing Make Contact
+- `elec_electro_mech_piezo_sounder` — Piezo Sounder
+- `elec_electro_mech_pilot_light` — Pilot Light
+- `elec_electro_mech_pressure_actuated` — Pressure Actuated
+- `elec_electro_mech_proximity_limit_switch` — Proximity Limit Switch
+- `elec_electro_mech_push_switch_nc` — Push Switch NC
+- `elec_electro_mech_push_switch_no` — Push Switch NO
+- `elec_electro_mech_pushbutton_2_circuit` — Pushbutton 2 Circuit
+- `elec_electro_mech_pushbutton_break` — Pushbutton Break
+- `elec_electro_mech_pushbutton_make` — Pushbutton Make
+- `elec_electro_mech_reed_switch` — Reed Switch
+- `elec_electro_mech_relay` — Relay
+- `elec_electro_mech_relay_changeover_contact` — Relay Changeover Contact
+- `elec_electro_mech_relay_coil` — Relay Coil
+- `elec_electro_mech_relay_coil_2` — Relay Coil 2
+- `elec_electro_mech_relay_contact_nc` — Relay Contact NC
+- `elec_electro_mech_relay_contact_no` — Relay Contact NO
+- `elec_electro_mech_relay_contacts` — Relay Contacts
+- `elec_electro_mech_relay_pole` — Relay Pole
+- `elec_electro_mech_resonator` — Resonator
+- `elec_electro_mech_safety_interlock` — Safety Interlock
+- `elec_electro_mech_selector_switch` — Selector Switch
+- `elec_electro_mech_selector_switch_3_position` — Selector Switch 3 position
+- `elec_electro_mech_selector_switch_6_position` — Selector Switch 6 position
+- `elec_electro_mech_shorting_selector` — Shorting Selector
+- `elec_electro_mech_simple_switch` — Simple Switch
+- `elec_electro_mech_spring_return` — Spring Return
+- `elec_electro_mech_spring_return_2` — Spring Return 2
+- `elec_electro_mech_stay_put` — Stay Put
+- `elec_electro_mech_switch_contact` — Switch Contact
+- `elec_electro_mech_switch_disconnector` — Switch Disconnector
+- `elec_electro_mech_temperature_actuated` — Temperature Actuated
+- `elec_electro_mech_temperature_switch` — Temperature Switch
+- `elec_electro_mech_thermostat` — Thermostat
+- `elec_electro_mech_time_delay_break` — Time Delay Break
+- `elec_electro_mech_time_delay_break_2` — Time Delay Break 2
+- `elec_electro_mech_time_delay_make` — Time Delay Make
+- `elec_electro_mech_time_delay_make_2` — Time Delay Make 2
+- `elec_electro_mech_two_way_contact` — Two Way Contact
+
+## 电气工程 · IEC 417（elec_iec417）— 45 个
+
+- `elec_iec417_ac_ac_converter` — AC-AC Converter
+- `elec_iec417_ac_dc_converter` — AC-DC Converter
+- `elec_iec417_ad_converter` — AD Converter
+- `elec_iec417_amp` — Amp
+- `elec_iec417_amp_bidirectional` — Amp Bidirectional
+- `elec_iec417_att` — Att
+- `elec_iec417_bandpass` — Bandpass
+- `elec_iec417_bandstop` — Bandstop
+- `elec_iec417_block` — Block
+- `elec_iec417_block_convert` — Block Convert
+- `elec_iec417_circulator` — Circulator
+- `elec_iec417_combine` — Combine
+- `elec_iec417_corrector` — Corrector
+- `elec_iec417_da_converter` — DA Converter
+- `elec_iec417_dc_ac_converter` — DC-AC Converter
+- `elec_iec417_dc_dc_converter` — DC-DC Converter
+- `elec_iec417_decrypt` — Decrypt
+- `elec_iec417_delay` — Delay
+- `elec_iec417_demodulator` — Demodulator
+- `elec_iec417_detector` — Detector
+- `elec_iec417_differential_amp` — Differential Amp
+- `elec_iec417_diplexer` — Diplexer
+- `elec_iec417_divide_by_n` — Divide by n
+- `elec_iec417_down_converter` — Down Converter
+- `elec_iec417_encrypt` — Encrypt
+- `elec_iec417_hipass` — Hipass
+- `elec_iec417_hybrid` — Hybrid
+- `elec_iec417_limiter` — Limiter
+- `elec_iec417_lopass` — Lopass
+- `elec_iec417_mixer_1` — Mixer 1
+- `elec_iec417_mixer_2` — Mixer 2
+- `elec_iec417_modem` — Modem
+- `elec_iec417_modulator` — Modulator
+- `elec_iec417_oscilloscope` — Oscilloscope
+- `elec_iec417_phase_detector` — Phase Detector
+- `elec_iec417_process` — Process
+- `elec_iec417_pulse` — Pulse
+- `elec_iec417_sampler` — Sampler
+- `elec_iec417_splitter` — Splitter
+- `elec_iec417_square_up` — Square-up
+- `elec_iec417_step` — Step
+- `elec_iec417_transformer` — Transformer
+- `elec_iec417_trim` — Trim
+- `elec_iec417_up_converter` — Up converter
+- `elec_iec417_var` — Var
+
+## 电气工程 · IEC 逻辑门（elec_iec_logic_gates）— 9 个
+
+- `elec_iec_logic_gates_and` — AND
+- `elec_iec_logic_gates_nand` — NAND
+- `elec_iec_logic_gates_nand_2` — NAND 2
+- `elec_iec_logic_gates_nor` — NOR
+- `elec_iec_logic_gates_nor_2` — NOR 2
+- `elec_iec_logic_gates_not` — NOT
+- `elec_iec_logic_gates_not_2` — NOT 2
+- `elec_iec_logic_gates_or` — OR
+- `elec_iec_logic_gates_xor` — XOR
+
+## 电气工程 · 电感（elec_inductors）— 39 个
+
+- `elec_inductors_1_phase_induction_volt_reg` — 1 Phase Induction Volt Reg
+- `elec_inductors_adjustable_transformer` — Adjustable Transformer
+- `elec_inductors_choke` — Choke
+- `elec_inductors_coaxial_choke` — Coaxial Choke
+- `elec_inductors_compensation_inductor_1` — Compensation Inductor 1
+- `elec_inductors_compensation_inductor_2` — Compensation Inductor 2
+- `elec_inductors_current_transformer_1` — Current Transformer 1
+- `elec_inductors_current_transformer_2` — Current Transformer 2
+- `elec_inductors_current_transformer_3` — Current Transformer 3
+- `elec_inductors_ferrite_core` — Ferrite Core
+- `elec_inductors_half_inductor` — Half Inductor
+- `elec_inductors_induction_voltage_regulator` — Induction Voltage Regulator
+- `elec_inductors_inductor` — Inductor
+- `elec_inductors_inductor_1` — Inductor 1
+- `elec_inductors_inductor_10` — Inductor 10
+- `elec_inductors_inductor_11` — Inductor 11
+- `elec_inductors_inductor_2` — Inductor 2
+- `elec_inductors_inductor_3` — Inductor 3
+- `elec_inductors_inductor_4` — Inductor 4
+- `elec_inductors_inductor_5` — Inductor 5
+- `elec_inductors_inductor_6` — Inductor 6
+- `elec_inductors_inductor_7` — Inductor 7
+- `elec_inductors_inductor_8` — Inductor 8
+- `elec_inductors_inductor_9` — Inductor 9
+- `elec_inductors_iron_core` — Iron Core
+- `elec_inductors_linear_coupler` — Linear Coupler
+- `elec_inductors_magnetic_core` — Magnetic Core
+- `elec_inductors_outdoor_metering_device` — Outdoor Metering Device
+- `elec_inductors_pot_trans_3_windings` — Pot Trans 3 Windings
+- `elec_inductors_potential_transformer` — Potential Transformer
+- `elec_inductors_potential_transformer_2` — Potential Transformer 2
+- `elec_inductors_saturating_transformer` — Saturating Transformer
+- `elec_inductors_transductor` — Transductor
+- `elec_inductors_transformer` — Transformer
+- `elec_inductors_transformer_1` — Transformer 1
+- `elec_inductors_transformer_2` — Transformer 2
+- `elec_inductors_triplex_induction_volt_reg` — Triplex Induction Volt Reg
+- `elec_inductors_variable_inductor` — Variable Inductor
+- `elec_inductors_variometer` — Variometer
+
+## 电气工程 · 仪表（elec_instruments）— 5 个
+
+- `elec_instruments_ampermeter` — Ampermeter
+- `elec_instruments_galvanometer` — Galvanometer
+- `elec_instruments_oscilloscope` — Oscilloscope
+- `elec_instruments_signal_generator` — Signal Generator
+- `elec_instruments_voltmeter` — Voltmeter
+
+## 电气工程 · 逻辑门（elec_logic_gates）— 25 个
+
+- `elec_logic_gates_and` — AND
+- `elec_logic_gates_bandpass_filter` — Bandpass Filter
+- `elec_logic_gates_buffer` — Buffer
+- `elec_logic_gates_d_type_flip_flop` — D Type Flip-Flop
+- `elec_logic_gates_d_type_flip_flop_with_clear` — D Type Flip-Flop With Clear
+- `elec_logic_gates_d_type_flip_flop_with_clear_2` — D Type Flip-Flop With Clear 2
+- `elec_logic_gates_d_type_rs_flip_flop` — D Type RS Flip-Flop
+- `elec_logic_gates_highpass_filter` — Highpass Filter
+- `elec_logic_gates_inverter` — Inverter
+- `elec_logic_gates_inverter_2` — Inverter 2
+- `elec_logic_gates_inverting_contact` — Inverting Contact
+- `elec_logic_gates_jk_flip_flop` — JK Flip-Flop
+- `elec_logic_gates_jk_flip_flop_with_clear` — JK Flip-Flop With Clear
+- `elec_logic_gates_jk_flip_flop_with_clear_2` — JK Flip-Flop With Clear 2
+- `elec_logic_gates_jk_flip_flop_with_sr` — JK Flip-Flop With SR
+- `elec_logic_gates_lowpass_filter` — Lowpass Filter
+- `elec_logic_gates_nand` — NAND
+- `elec_logic_gates_nor` — NOR
+- `elec_logic_gates_or` — OR
+- `elec_logic_gates_rs_latch` — RS Latch
+- `elec_logic_gates_schmitt_trigger` — Schmitt Trigger
+- `elec_logic_gates_synchronous_rs_latch` — Synchronous RS Latch
+- `elec_logic_gates_t_type_flip_flop` — T Type Flip-Flop
+- `elec_logic_gates_xnor` — XNOR
+- `elec_logic_gates_xor` — XOR
+
+## 电气工程 · 其他（elec_misc）— 67 个
+
+- `elec_misc_2_conductor_jack` — 2 Conductor Jack
+- `elec_misc_2_conductor_plug` — 2 Conductor Plug
+- `elec_misc_3_conductor_jack` — 3 Conductor Jack
+- `elec_misc_3_conductor_plug` — 3 Conductor Plug
+- `elec_misc_ac_out` — AC Out
+- `elec_misc_adapter` — Adapter
+- `elec_misc_c_header_connector` — C Header Connector
+- `elec_misc_cable_termination` — Cable Termination
+- `elec_misc_chassis` — Chassis
+- `elec_misc_circuit_breaker` — Circuit Breaker
+- `elec_misc_co_ax` — Co-ax
+- `elec_misc_coaxial_center_conductor` — Coaxial Center Conductor
+- `elec_misc_coaxial_jack_plug` — Coaxial Jack Plug
+- `elec_misc_coaxial_outside_conductor` — Coaxial Outside Conductor
+- `elec_misc_crystal_1` — Crystal 1
+- `elec_misc_crystal_2` — Crystal 2
+- `elec_misc_delay_element` — Delay Element
+- `elec_misc_f_m_2_conductor_1` — F M 2 Conductor 1
+- `elec_misc_f_m_2_conductor_2` — F M 2 Conductor 2
+- `elec_misc_f_m_2_conductor_3` — F M 2 Conductor 3
+- `elec_misc_f_m_3_conductor_1` — F M 3 Conductor 1
+- `elec_misc_f_m_3_conductor_2` — F M 3 Conductor 2
+- `elec_misc_f_m_3_conductor_3` — F M 3 Conductor 3
+- `elec_misc_f_m_3_conductor_4` — F M 3 Conductor 4
+- `elec_misc_f_m_3_conductor_5` — F M 3 Conductor 5
+- `elec_misc_flourescent_lamp` — Flourescent Lamp
+- `elec_misc_fusable_resistor` — Fusable Resistor
+- `elec_misc_fuse_1` — Fuse 1
+- `elec_misc_fuse_2` — Fuse 2
+- `elec_misc_fuse_3` — Fuse 3
+- `elec_misc_fuse_4` — Fuse 4
+- `elec_misc_generic_component` — Generic Component
+- `elec_misc_igniter_plug` — Igniter Plug
+- `elec_misc_igniter_plug2` — Igniter Plug2
+- `elec_misc_illuminating_bulb` — Illuminating Bulb
+- `elec_misc_indicator` — Indicator
+- `elec_misc_lamp_1` — Lamp 1
+- `elec_misc_lamp_2` — Lamp 2
+- `elec_misc_large_d_connector` — Large D Connector
+- `elec_misc_light_bulb` — Light Bulb
+- `elec_misc_loop_antenna` — Loop Antenna
+- `elec_misc_mf_contact_2` — MF Contact 2
+- `elec_misc_monocell_battery` — Monocell Battery
+- `elec_misc_multicell_battery` — Multicell Battery
+- `elec_misc_multicell_battery_tapped` — Multicell Battery Tapped
+- `elec_misc_neon_lamp` — Neon Lamp
+- `elec_misc_neon_lamp_2` — Neon Lamp 2
+- `elec_misc_normalled_jack` — Normalled Jack
+- `elec_misc_normalled_jack2` — Normalled Jack2
+- `elec_misc_normalled_jacks` — Normalled Jacks
+- `elec_misc_normalled_jacks2` — Normalled Jacks2
+- `elec_misc_permanent_magnet` — Permanent Magnet
+- `elec_misc_plug_socket_connection` — Plug Socket Connection
+- `elec_misc_sensing_link_squib` — Sensing Link Squib
+- `elec_misc_shielded_jack_plug` — Shielded Jack Plug
+- `elec_misc_small_d_connector` — Small D Connector
+- `elec_misc_squib_ignitor` — Squib Ignitor
+- `elec_misc_surge_protector` — Surge Protector
+- `elec_misc_surge_protector_2` — Surge Protector 2
+- `elec_misc_terminal_board` — Terminal Board
+- `elec_misc_thermal_element` — Thermal Element
+- `elec_misc_thermistor_1` — Thermistor 1
+- `elec_misc_thermistor_2` — Thermistor 2
+- `elec_misc_thermocouple` — Thermocouple
+- `elec_misc_thermopile` — Thermopile
+- `elec_misc_transducer` — Transducer
+- `elec_misc_transducer_2` — Transducer 2
+
+## 电气工程 · MOSFET 1（elec_mosfets1）— 21 个
+
+- `elec_mosfets1_dual_gate_mosfet` — Dual Gate MOSFET
+- `elec_mosfets1_dual_gate_mosfet_n` — Dual Gate MOSFET N
+- `elec_mosfets1_dual_gate_mosfet_p` — Dual Gate MOSFET P
+- `elec_mosfets1_mosfet_ic_n` — MOSFET IC N
+- `elec_mosfets1_mosfet_ic_n_body_diode` — MOSFET IC N Body Diode
+- `elec_mosfets1_mosfet_ic_p` — MOSFET IC P
+- `elec_mosfets1_mosfet_ic_p_body_diode` — MOSFET IC P Body Diode
+- `elec_mosfets1_mosfet_n_no_bulk` — MOSFET N No Bulk
+- `elec_mosfets1_mosfet_p_no_bulk` — MOSFET P No Bulk
+- `elec_mosfets1_n_channel_mosfet_1` — N-channel MOSFET 1
+- `elec_mosfets1_n_channel_mosfet_2` — N-channel MOSFET 2
+- `elec_mosfets1_n_channel_mosfet_3` — N-channel MOSFET 3
+- `elec_mosfets1_n_channel_mosfet_4` — N-channel MOSFET 4
+- `elec_mosfets1_n_channel_mosfet_5` — N-channel MOSFET 5
+- `elec_mosfets1_n_channel_mosfet_6` — N-channel MOSFET 6
+- `elec_mosfets1_p_channel_mosfet_1` — P-channel MOSFET 1
+- `elec_mosfets1_p_channel_mosfet_2` — P-channel MOSFET 2
+- `elec_mosfets1_p_channel_mosfet_3` — P-channel MOSFET 3
+- `elec_mosfets1_p_channel_mosfet_4` — P-channel MOSFET 4
+- `elec_mosfets1_p_channel_mosfet_5` — P-channel MOSFET 5
+- `elec_mosfets1_p_channel_mosfet_6` — P-channel MOSFET 6
+
+## 电气工程 · MOSFET 2（elec_mosfets2）— 15 个
+
+- `elec_mosfets2_dual_gate_mosfet` — Dual Gate MOSFET
+- `elec_mosfets2_n_channel_mosfet_1` — N-channel MOSFET 1
+- `elec_mosfets2_n_channel_mosfet_2` — N-channel MOSFET 2
+- `elec_mosfets2_n_channel_mosfet_3` — N-channel MOSFET 3
+- `elec_mosfets2_n_channel_mosfet_4` — N-channel MOSFET 4
+- `elec_mosfets2_n_channel_mosfet_5` — N-channel MOSFET 5
+- `elec_mosfets2_n_channel_mosfet_6` — N-channel MOSFET 6
+- `elec_mosfets2_nmos_fet` — NMOS FET
+- `elec_mosfets2_p_channel_mosfet_1` — P-channel MOSFET 1
+- `elec_mosfets2_p_channel_mosfet_2` — P-channel MOSFET 2
+- `elec_mosfets2_p_channel_mosfet_3` — P-channel MOSFET 3
+- `elec_mosfets2_p_channel_mosfet_4` — P-channel MOSFET 4
+- `elec_mosfets2_p_channel_mosfet_5` — P-channel MOSFET 5
+- `elec_mosfets2_p_channel_mosfet_6` — P-channel MOSFET 6
+- `elec_mosfets2_pmos_fet` — PMOS FET
+
+## 电气工程 · 运放（elec_op_amps）— 10 个
+
+- `elec_op_amps_comparator` — Comparator
+- `elec_op_amps_differentiator` — Differentiator
+- `elec_op_amps_integrator` — Integrator
+- `elec_op_amps_inverting_amplifier` — Inverting Amplifier
+- `elec_op_amps_multivibrator` — Multivibrator
+- `elec_op_amps_non_inverting_amplifier` — Non-inverting Amplifier
+- `elec_op_amps_regen_comparator` — Regen Comparator
+- `elec_op_amps_subtractor` — Subtractor
+- `elec_op_amps_summing_amplifier` — Summing Amplifier
+- `elec_op_amps_unity_gain_follower` — Unity Gain Follower
+
+## 电气工程 · 光电子（elec_opto_electronics）— 15 个
+
+- `elec_opto_electronics_7_segment_display` — 7 Segment Display
+- `elec_opto_electronics_7_segment_display_with_dp` — 7 Segment Display with DP
+- `elec_opto_electronics_9_segment_display` — 9 Segment Display
+- `elec_opto_electronics_9_segment_display_with_dp` — 9 Segment Display with DP
+- `elec_opto_electronics_lamp` — Lamp
+- `elec_opto_electronics_led_1` — LED 1
+- `elec_opto_electronics_led_2` — LED 2
+- `elec_opto_electronics_light_activated_scr` — Light-activated SCR
+- `elec_opto_electronics_opto_coupler` — Opto-coupler
+- `elec_opto_electronics_opto_transistor` — Opto-transistor
+- `elec_opto_electronics_photo_resistor_1` — Photo Resistor 1
+- `elec_opto_electronics_photo_resistor_2` — Photo Resistor 2
+- `elec_opto_electronics_photo_resistor_3` — Photo Resistor 3
+- `elec_opto_electronics_photodiode` — Photodiode
+- `elec_opto_electronics_solar_cell` — Solar Cell
+
+## 电气工程 · PLC 梯形图（elec_plc_ladder）— 6 个
+
+- `elec_plc_ladder_contact` — Contact
+- `elec_plc_ladder_not_contact` — Not Contact
+- `elec_plc_ladder_not_output_1` — Not Output 1
+- `elec_plc_ladder_not_output_2` — Not Output 2
+- `elec_plc_ladder_output_1` — Output 1
+- `elec_plc_ladder_output_2` — Output 2
+
+## 电气工程 · 功率半导体（elec_power_semicond）— 21 个
+
+- `elec_power_semicond_bridge_rectifier_1` — Bridge Rectifier 1
+- `elec_power_semicond_bridge_rectifier_2` — Bridge Rectifier 2
+- `elec_power_semicond_bridge_rectifier_3` — Bridge Rectifier 3
+- `elec_power_semicond_diac_1` — Diac 1
+- `elec_power_semicond_diac_2` — Diac 2
+- `elec_power_semicond_gto_scr` — GTO SCR
+- `elec_power_semicond_igct_1` — IGCT 1
+- `elec_power_semicond_igct_2` — IGCT 2
+- `elec_power_semicond_npn_igbt_1` — NPN IGBT 1
+- `elec_power_semicond_npn_igbt_2` — NPN IGBT 2
+- `elec_power_semicond_npn_igbt_3` — NPN IGBT 3
+- `elec_power_semicond_npn_igbt_4` — NPN IGBT 4
+- `elec_power_semicond_pnp_igbt_1` — PNP IGBT 1
+- `elec_power_semicond_pnp_igbt_2` — PNP IGBT 2
+- `elec_power_semicond_pnp_igbt_3` — PNP IGBT 3
+- `elec_power_semicond_pnp_igbt_4` — PNP IGBT 4
+- `elec_power_semicond_scr_1` — SCR 1
+- `elec_power_semicond_scr_2` — SCR 2
+- `elec_power_semicond_sidac` — SIDAC
+- `elec_power_semicond_triac_1` — Triac 1
+- `elec_power_semicond_triac_2` — Triac 2
+
+## 电气工程 · 无线电（elec_radio）— 11 个
+
+- `elec_radio_aerial_antenna_1` — Aerial - Antenna 1
+- `elec_radio_aerial_antenna_2` — Aerial - Antenna 2
+- `elec_radio_buzzer` — Buzzer
+- `elec_radio_chassis` — Chassis
+- `elec_radio_dipole` — Dipole
+- `elec_radio_earth` — Earth
+- `elec_radio_electret_microphone` — Electret Microphone
+- `elec_radio_headphones` — Headphones
+- `elec_radio_loop_antenna` — Loop Antenna
+- `elec_radio_microphone_1` — Microphone 1
+- `elec_radio_microphone_2` — Microphone 2
+
+## 电气工程 · 电阻（elec_resistors）— 23 个
+
+- `elec_resistors_attenuator` — Attenuator
+- `elec_resistors_magnetoresistor` — Magnetoresistor
+- `elec_resistors_memristor_1` — Memristor 1
+- `elec_resistors_memristor_2` — Memristor 2
+- `elec_resistors_nonlinear_resistor` — Nonlinear Resistor
+- `elec_resistors_potentiometer_1` — Potentiometer 1
+- `elec_resistors_potentiometer_2` — Potentiometer 2
+- `elec_resistors_resistor_1` — Resistor 1
+- `elec_resistors_resistor_2` — Resistor 2
+- `elec_resistors_resistor_3` — Resistor 3
+- `elec_resistors_resistor_4` — Resistor 4
+- `elec_resistors_resistor_adjustable_contact` — Resistor, Adjustable Contact
+- `elec_resistors_resistor_shunt` — Resistor, Shunt
+- `elec_resistors_resistor_with_instrument_or_relay_shunt` — Resistor With Instrument or Relay Shunt
+- `elec_resistors_symmetrical_photoconductive_transducer` — Symmetrical Photoconductive Transducer
+- `elec_resistors_symmetrical_varistor` — Symmetrical Varistor
+- `elec_resistors_tapped_resistor` — Tapped Resistor
+- `elec_resistors_trimmer_pot_1` — Trimmer Pot 1
+- `elec_resistors_trimmer_pot_2` — Trimmer Pot 2
+- `elec_resistors_trimmer_resistor_1` — Trimmer Resistor 1
+- `elec_resistors_trimmer_resistor_2` — Trimmer Resistor 2
+- `elec_resistors_variable_resistor_1` — Variable Resistor 1
+- `elec_resistors_variable_resistor_2` — Variable Resistor 2
+
+## 电气工程 · 旋转机械（elec_rot_mech）— 15 个
+
+- `elec_rot_mech_armature` — Armature
+- `elec_rot_mech_automatic_return` — Automatic Return
+- `elec_rot_mech_blocking_device` — Blocking Device
+- `elec_rot_mech_clutch` — Clutch
+- `elec_rot_mech_clutch_2` — Clutch 2
+- `elec_rot_mech_delayed_action` — Delayed Action
+- `elec_rot_mech_detent` — Detent
+- `elec_rot_mech_field` — Field
+- `elec_rot_mech_gearing` — Gearing
+- `elec_rot_mech_latching_device` — Latching Device
+- `elec_rot_mech_manual_control` — Manual Control
+- `elec_rot_mech_mechanical_interlock` — Mechanical Interlock
+- `elec_rot_mech_rotation` — Rotation
+- `elec_rot_mech_synchro` — Synchro
+- `elec_rot_mech_winding_connection` — Winding Connection
+
+## 电气工程 · 信号源（elec_signal_sources）— 18 个
+
+- `elec_signal_sources_ac_source` — AC Source
+- `elec_signal_sources_current_flow` — Current Flow
+- `elec_signal_sources_current_source` — Current Source
+- `elec_signal_sources_dc_source_1` — DC Source 1
+- `elec_signal_sources_dc_source_2` — DC Source 2
+- `elec_signal_sources_dc_source_3` — DC Source 3
+- `elec_signal_sources_dependent_source_1` — Dependent Source 1
+- `elec_signal_sources_dependent_source_2` — Dependent Source 2
+- `elec_signal_sources_dependent_source_3` — Dependent Source 3
+- `elec_signal_sources_equipotential` — Equipotential
+- `elec_signal_sources_explosive_squib` — Explosive Squib
+- `elec_signal_sources_ideal_source` — Ideal Source
+- `elec_signal_sources_noise_source` — Noise Source
+- `elec_signal_sources_protective_earth` — Protective Earth
+- `elec_signal_sources_signal_ground` — Signal Ground
+- `elec_signal_sources_vdd` — Vdd
+- `elec_signal_sources_voltage` — Voltage
+- `elec_signal_sources_vss2` — Vss2
+
+## 电气工程 · 热电子管（elec_thermionic）— 7 个
+
+- `elec_thermionic_diode` — Diode
+- `elec_thermionic_double_diode` — Double Diode
+- `elec_thermionic_double_triode` — Double Triode
+- `elec_thermionic_pentode` — Pentode
+- `elec_thermionic_photocell` — Photocell
+- `elec_thermionic_tetrode` — Tetrode
+- `elec_thermionic_triode` — Triode
+
+## 电气工程 · 晶体管（elec_transistors）— 23 个
+
+- `elec_transistors_complementary_unijunction` — Complementary Unijunction
+- `elec_transistors_darlington_pair` — Darlington Pair
+- `elec_transistors_n_channel_jfet_1` — N-channel JFET 1
+- `elec_transistors_n_channel_jfet_2` — N-channel JFET 2
+- `elec_transistors_nigbt` — NIGBT
+- `elec_transistors_nmos` — NMOS
+- `elec_transistors_nmos_bulk` — NMOS Bulk
+- `elec_transistors_npn_transistor_1` — NPN Transistor 1
+- `elec_transistors_npn_transistor_2` — NPN Transistor 2
+- `elec_transistors_npn_transistor_3` — NPN Transistor 3
+- `elec_transistors_npn_transistor_4` — NPN Transistor 4
+- `elec_transistors_npn_transistor_5` — NPN Transistor 5
+- `elec_transistors_p_channel_jfet_1` — P-channel JFET 1
+- `elec_transistors_p_channel_jfet_2` — P-channel JFET 2
+- `elec_transistors_pigbt` — PIGBT
+- `elec_transistors_pmos` — PMOS
+- `elec_transistors_pmos_bulk` — PMOS Bulk
+- `elec_transistors_pnp_transistor_1` — PNP Transistor 1
+- `elec_transistors_pnp_transistor_2` — PNP Transistor 2
+- `elec_transistors_pnp_transistor_3` — PNP Transistor 3
+- `elec_transistors_pnp_transistor_4` — PNP Transistor 4
+- `elec_transistors_pnp_transistor_5` — PNP Transistor 5
+- `elec_transistors_unijunction` — Unijunction
+
+## 电气工程 · 传输（elec_transmission）— 13 个
+
+- `elec_transmission_2_line_bus` — 2 Line Bus
+- `elec_transmission_3_line_bus` — 3 Line Bus
+- `elec_transmission_4_line_bus` — 4 Line Bus
+- `elec_transmission_8_line_bus` — 8 Line Bus
+- `elec_transmission_anticreepage_device` — Anticreepage Device
+- `elec_transmission_bus_width` — Bus Width
+- `elec_transmission_cable_group` — Cable Group
+- `elec_transmission_line_cable` — Line Cable
+- `elec_transmission_line_concentrator` — Line Concentrator
+- `elec_transmission_optical_fiber` — Optical Fiber
+- `elec_transmission_optical_fiber2` — Optical Fiber2
+- `elec_transmission_overground_enclosure` — Overground Enclosure
+- `elec_transmission_terminal_3_phase` — Terminal 3 Phase
+
+## 电气工程 · 波形（elec_waveforms）— 23 个
+
+- `elec_waveforms_data_changing` — Data Changing
+- `elec_waveforms_data_ending` — Data Ending
+- `elec_waveforms_data_invalid_1` — Data Invalid 1
+- `elec_waveforms_data_invalid_2` — Data Invalid 2
+- `elec_waveforms_data_starting` — Data Starting
+- `elec_waveforms_data_valid` — Data Valid
+- `elec_waveforms_down_ramp` — Down Ramp
+- `elec_waveforms_edge` — Edge
+- `elec_waveforms_event` — Event
+- `elec_waveforms_level` — Level
+- `elec_waveforms_pulse_1` — Pulse 1
+- `elec_waveforms_pulse_2` — Pulse 2
+- `elec_waveforms_sawtooth` — Sawtooth
+- `elec_waveforms_sine_wave` — Sine Wave
+- `elec_waveforms_slow_square_wave` — Slow Square Wave
+- `elec_waveforms_square_wave` — Square Wave
+- `elec_waveforms_step_1` — Step 1
+- `elec_waveforms_step_2` — Step 2
+- `elec_waveforms_timing_line` — Timing Line
+- `elec_waveforms_timing_mark_1` — Timing Mark 1
+- `elec_waveforms_timing_mark_2` — Timing Mark 2
+- `elec_waveforms_timing_mark_3` — Timing Mark 3
+- `elec_waveforms_up_ramp` — Up Ramp
+
+## 机房机架 · APC（rack_apc）— 3 个
+
+- `rack_apc_apc_smart_ups_1000_3000_va_2u` — APC Smart UPS 1000-3000 VA 2U
+- `rack_apc_apc_smart_ups_5000_va_5u` — APC Smart UPS 5000 VA 5U
+- `rack_apc_apc_smart_ups_750_va_1u` — APC Smart UPS 750 VA 1U
+
+## 机房机架 · Cisco（rack_cisco）— 101 个
+
+- `rack_cisco_cisco_1905_serial_integrated_services_router` — Cisco 1905 Serial Integrated Services Router
+- `rack_cisco_cisco_1921_integrated_services_router` — Cisco 1921 Integrated Services Router
+- `rack_cisco_cisco_1941_series_integrated_services_router` — Cisco 1941 Series Integrated Services Router
+- `rack_cisco_cisco_2901_integrated_services_router` — Cisco 2901 Integrated Services Router
+- `rack_cisco_cisco_2911_integrated_services_router` — Cisco 2911 Integrated Services Router
+- `rack_cisco_cisco_2921_integrated_services_router` — Cisco 2921 Integrated Services Router
+- `rack_cisco_cisco_2951_integrated_services_router` — Cisco 2951 Integrated Services Router
+- `rack_cisco_cisco_3925_integrated_services_router` — Cisco 3925 Integrated Services Router
+- `rack_cisco_cisco_3945_integrated_services_router` — Cisco 3945 Integrated Services Router
+- `rack_cisco_cisco_7603_router` — Cisco 7603 Router
+- `rack_cisco_cisco_7604_router` — Cisco 7604 Router
+- `rack_cisco_cisco_7606_router` — Cisco 7606 Router
+- `rack_cisco_cisco_7609_router` — Cisco 7609 Router
+- `rack_cisco_cisco_7613_router` — Cisco 7613 Router
+- `rack_cisco_cisco_8340_application_oriented_networking_appliance` — Cisco 8340 Application-Oriented Networking Appliance
+- `rack_cisco_cisco_asa_5585_x_adaptive_security_appliance` — Cisco ASA 5585-X Adaptive Security Appliance
+- `rack_cisco_cisco_asr_1001_router` — Cisco ASR 1001 Router
+- `rack_cisco_cisco_asr_1002_router` — Cisco ASR 1002 Router
+- `rack_cisco_cisco_asr_1002_x_router` — Cisco ASR 1002-X Router
+- `rack_cisco_cisco_asr_1004_router` — Cisco ASR 1004 Router
+- `rack_cisco_cisco_asr_1006_router` — Cisco ASR 1006 Router
+- `rack_cisco_cisco_asr_1013_router` — Cisco ASR 1013 Router
+- `rack_cisco_cisco_asr_9001` — Cisco ASR 9001
+- `rack_cisco_cisco_asr_9006` — Cisco ASR 9006
+- `rack_cisco_cisco_asr_9010` — Cisco ASR 9010
+- `rack_cisco_cisco_asr_9922` — Cisco ASR 9922
+- `rack_cisco_cisco_blade_switch_3030` — Cisco Blade Switch 3030
+- `rack_cisco_cisco_carrier_packet_transport_200` — Cisco Carrier Packet Transport 200
+- `rack_cisco_cisco_carrier_packet_transport_50` — Cisco Carrier Packet Transport 50
+- `rack_cisco_cisco_carrier_packet_transport_600` — Cisco Carrier Packet Transport 600
+- `rack_cisco_cisco_catalyst_4900m_switch` — Cisco Catalyst 4900M Switch
+- `rack_cisco_cisco_catalyst_4928_10_gigabit_ethernet_switch` — Cisco Catalyst 4928 10 Gigabit Ethernet Switch
+- `rack_cisco_cisco_catalyst_4948_10_gigabit_ethernet_switch` — Cisco Catalyst 4948 10 Gigabit Ethernet Switch
+- `rack_cisco_cisco_catalyst_4948_switch` — Cisco Catalyst 4948 Switch
+- `rack_cisco_cisco_catalyst_6503_e_switch` — Cisco Catalyst 6503-E Switch
+- `rack_cisco_cisco_catalyst_6504_e_switch` — Cisco Catalyst 6504-E Switch
+- `rack_cisco_cisco_catalyst_6506_e_switch` — Cisco Catalyst 6506-E Switch
+- `rack_cisco_cisco_catalyst_6509_switch` — Cisco Catalyst 6509 Switch
+- `rack_cisco_cisco_catalyst_6513_e` — Cisco Catalyst 6513-E
+- `rack_cisco_cisco_catalyst_blade_switch_3020_for_hp` — Cisco Catalyst Blade Switch 3020 for HP
+- `rack_cisco_cisco_catalyst_blade_switch_3032_for_dell` — Cisco Catalyst Blade Switch 3032 for Dell
+- `rack_cisco_cisco_catalyst_blade_switch_3040_for_dell` — Cisco Catalyst Blade Switch 3040 for Dell
+- `rack_cisco_cisco_catalyst_blade_switch_3100_for_dell` — Cisco Catalyst Blade Switch 3100 for Dell
+- `rack_cisco_cisco_catalyst_blade_switch_3120_for_hp` — Cisco Catalyst Blade Switch 3120 for HP
+- `rack_cisco_cisco_catalyst_blade_switch_3130_for_dell` — Cisco Catalyst Blade Switch 3130 for Dell
+- `rack_cisco_cisco_identity_services_engine` — Cisco Identity Services Engine
+- `rack_cisco_cisco_ips_4500_sensor` — Cisco IPS 4500 Sensor
+- `rack_cisco_cisco_network_access_control` — Cisco Network Access Control
+- `rack_cisco_cisco_nexus_1010_virtual_services_appliance` — Cisco Nexus 1010 Virtual Services Appliance
+- `rack_cisco_cisco_nexus_2148t_fabric_extender` — Cisco Nexus 2148T Fabric Extender
+- `rack_cisco_cisco_nexus_2224tp_ge_fabric_extender` — Cisco Nexus 2224TP GE Fabric Extender
+- `rack_cisco_cisco_nexus_2232pp_10ge_fabric_extender` — Cisco Nexus 2232PP 10GE Fabric Extender
+- `rack_cisco_cisco_nexus_2232tm_10ge_fabric_extender` — Cisco Nexus 2232TM 10GE Fabric Extender
+- `rack_cisco_cisco_nexus_2248pq_10ge_fabric_extender` — Cisco Nexus 2248PQ 10GE Fabric Extender
+- `rack_cisco_cisco_nexus_2248tp_ge_fabric_extender` — Cisco Nexus 2248TP GE Fabric Extender
+- `rack_cisco_cisco_nexus_3016_switch` — Cisco Nexus 3016 Switch
+- `rack_cisco_cisco_nexus_3048_switch` — Cisco Nexus 3048 Switch
+- `rack_cisco_cisco_nexus_3064_switch` — Cisco Nexus 3064 Switch
+- `rack_cisco_cisco_nexus_3548_switch` — Cisco Nexus 3548 Switch
+- `rack_cisco_cisco_nexus_5548p_switch` — Cisco Nexus 5548P Switch
+- `rack_cisco_cisco_nexus_5596t` — Cisco Nexus 5596T
+- `rack_cisco_cisco_nexus_5596up_switch` — Cisco Nexus 5596UP Switch
+- `rack_cisco_cisco_nexus_6001_switch` — Cisco Nexus 6001 Switch
+- `rack_cisco_cisco_nexus_6004_switch` — Cisco Nexus 6004 Switch
+- `rack_cisco_cisco_nexus_7000_10_slot_switch_chassis` — Cisco Nexus 7000 10-Slot Switch Chassis
+- `rack_cisco_cisco_nexus_7000_18_slot_switch_chassis` — Cisco Nexus 7000 18-Slot Switch Chassis
+- `rack_cisco_cisco_nexus_7000_4_slot_switch_chassis` — Cisco Nexus 7000 4-Slot Switch Chassis
+- `rack_cisco_cisco_nexus_7000_9_slot_switch_chassis` — Cisco Nexus 7000 9-Slot Switch Chassis
+- `rack_cisco_cisco_ons_15305_multiservice_customer_access_platform` — Cisco ONS 15305 Multiservice Customer Access Platform
+- `rack_cisco_cisco_ons_15310_cl_sonet_multiservice_platform` — Cisco ONS 15310-CL SONET Multiservice Platform
+- `rack_cisco_cisco_ons_15310_ma_sdh_multiservice_platform` — Cisco ONS 15310-MA SDH Multiservice Platform
+- `rack_cisco_cisco_ons_15454_sonet_sdh_multiservice_provisioning_platform` — Cisco ONS 15454 SONET-SDH Multiservice Provisioning Platform
+- `rack_cisco_cisco_ons_15600_multiservice_switching_platform` — Cisco ONS 15600 Multiservice Switching Platform
+- `rack_cisco_cisco_physical_security_4u_storage` — Cisco Physical Security 4U Storage
+- `rack_cisco_cisco_physical_security_multiservice_platform_1u` — Cisco Physical Security Multiservice Platform 1U
+- `rack_cisco_cisco_physical_security_multiservice_platform_2u` — Cisco Physical Security Multiservice Platform 2U
+- `rack_cisco_cisco_physical_security_multiservice_platform_4u` — Cisco Physical Security Multiservice Platform 4U
+- `rack_cisco_cisco_ucs_5100_chassis` — Cisco UCS 5100 Chassis
+- `rack_cisco_cisco_ucs_6248up_fabric_interconnect` — Cisco UCS 6248UP Fabric Interconnect
+- `rack_cisco_cisco_ucs_6296up_fabric_interconnect` — Cisco UCS 6296UP Fabric Interconnect
+- `rack_cisco_cisco_ucs_c22_m3_server` — Cisco UCS C22 M3 Server
+- `rack_cisco_cisco_ucs_c220_m3_server` — Cisco UCS C220 M3 Server
+- `rack_cisco_cisco_ucs_c24_m3_server` — Cisco UCS C24 M3 Server
+- `rack_cisco_cisco_ucs_c240_m3_server` — Cisco UCS C240 M3 Server
+- `rack_cisco_cisco_ucs_c260_m3_server` — Cisco UCS C260 M3 Server
+- `rack_cisco_cisco_ucs_c420_m3_server` — Cisco UCS C420 M3 Server
+- `rack_cisco_cisco_ucs_c460_m2_server` — Cisco UCS C460 M2 Server
+- `rack_cisco_cisco_wae_512` — Cisco WAE-512
+- `rack_cisco_cisco_wae_612` — Cisco WAE-612
+- `rack_cisco_cisco_wae_674` — Cisco WAE-674
+- `rack_cisco_cisco_wae_7341` — Cisco WAE-7341
+- `rack_cisco_cisco_wae_7371` — Cisco WAE-7371
+- `rack_cisco_cisco_wave_294` — Cisco WAVE 294
+- `rack_cisco_cisco_wave_594` — Cisco WAVE 594
+- `rack_cisco_cisco_wave_694` — Cisco WAVE 694
+- `rack_cisco_cisco_wave_7541` — Cisco WAVE 7541
+- `rack_cisco_cisco_wave_7571` — Cisco WAVE 7571
+- `rack_cisco_cisco_wave_8541` — Cisco WAVE 8541
+- `rack_cisco_cisco_web_security_appliance_s170` — Cisco Web Security Appliance S170
+- `rack_cisco_cisco_web_security_appliance_s370` — Cisco Web Security Appliance S370
+- `rack_cisco_cisco_web_security_appliance_s670` — Cisco Web Security Appliance S670
+
+## 机房机架 · Dell（rack_dell）— 33 个
+
+- `rack_dell_dell_poweredge_1u` — Dell PowerEdge 1U
+- `rack_dell_dell_poweredge_2u` — Dell PowerEdge 2U
+- `rack_dell_dell_poweredge_4u` — Dell PowerEdge 4U
+- `rack_dell_power_strip` — Power Strip
+- `rack_dell_poweredge_630` — PowerEdge 630
+- `rack_dell_poweredge_c4140` — PowerEdge C4140
+- `rack_dell_poweredge_m1000e_enclosure` — PowerEdge M1000e Enclosure
+- `rack_dell_poweredge_m420` — PowerEdge M420
+- `rack_dell_poweredge_m520` — PowerEdge M520
+- `rack_dell_poweredge_m610x` — PowerEdge M610x
+- `rack_dell_poweredge_m620` — PowerEdge M620
+- `rack_dell_poweredge_m820` — PowerEdge M820
+- `rack_dell_poweredge_m915` — PowerEdge M915
+- `rack_dell_poweredge_r240` — PowerEdge R240
+- `rack_dell_poweredge_r340` — PowerEdge R340
+- `rack_dell_poweredge_r440` — PowerEdge R440
+- `rack_dell_poweredge_r540` — PowerEdge R540
+- `rack_dell_poweredge_r640` — PowerEdge R640
+- `rack_dell_poweredge_r6415` — PowerEdge R6415
+- `rack_dell_poweredge_r6515` — PowerEdge R6515
+- `rack_dell_poweredge_r6525` — PowerEdge R6525
+- `rack_dell_poweredge_r730` — PowerEdge R730
+- `rack_dell_poweredge_r730xd` — PowerEdge R730xd
+- `rack_dell_poweredge_r740` — PowerEdge R740
+- `rack_dell_poweredge_r740xd` — PowerEdge R740xd
+- `rack_dell_poweredge_r740xd2` — PowerEdge R740xd2
+- `rack_dell_poweredge_r7415` — PowerEdge R7415
+- `rack_dell_poweredge_r7425` — PowerEdge R7425
+- `rack_dell_poweredge_r7515` — PowerEdge R7515
+- `rack_dell_poweredge_r840` — PowerEdge R840
+- `rack_dell_poweredge_r940` — PowerEdge R940
+- `rack_dell_poweredge_r940xa` — PowerEdge R940xa
+- `rack_dell_poweredge_xr2` — PowerEdge XR2
+
+## 机房机架 · F5（rack_f5）— 25 个
+
+- `rack_f5_arx_1000` — ARX 1000
+- `rack_f5_arx_1500` — ARX 1500
+- `rack_f5_arx_2000` — ARX 2000
+- `rack_f5_arx_2500` — ARX 2500
+- `rack_f5_arx_4000` — ARX 4000
+- `rack_f5_arx_500` — ARX 500
+- `rack_f5_arx_5000` — ARX 5000
+- `rack_f5_arx_6000` — ARX 6000
+- `rack_f5_big_ip_10x00` — BIG IP 10x00
+- `rack_f5_big_ip_110x0` — BIG IP 110x0
+- `rack_f5_big_ip_1600` — BIG IP 1600
+- `rack_f5_big_ip_2x00` — BIG IP 2x00
+- `rack_f5_big_ip_3600` — BIG IP 3600
+- `rack_f5_big_ip_3900` — BIG IP 3900
+- `rack_f5_big_ip_4x00` — BIG IP 4x00
+- `rack_f5_big_ip_5x00` — BIG IP 5x00
+- `rack_f5_big_ip_6900` — BIG IP 6900
+- `rack_f5_big_ip_7x00` — BIG IP 7x00
+- `rack_f5_big_ip_89x0` — BIG IP 89x0
+- `rack_f5_em_4000` — EM 4000
+- `rack_f5_firepass_1200` — FirePass 1200
+- `rack_f5_firepass_4100` — FirePass 4100
+- `rack_f5_viprion_2400` — VIPRION 2400
+- `rack_f5_viprion_4400` — VIPRION 4400
+- `rack_f5_viprion_4800` — VIPRION 4800
+
+## 机房机架 · 通用（rack_general）— 26 个
+
+- `rack_general_12u_rack_19_standard` — 12U Rack 19 Standard
+- `rack_general_1u` — 1U
+- `rack_general_1u_rack_server` — 1U Rack Server
+- `rack_general_26u_rack_19_standard` — 26U Rack 19 Standard
+- `rack_general_2u` — 2U
+- `rack_general_2u_rack_server` — 2U Rack Server
+- `rack_general_36u_rack_19_standard` — 36U Rack 19 Standard
+- `rack_general_3u` — 3U
+- `rack_general_3u_rack_server` — 3U Rack Server
+- `rack_general_40u_rack_19_standard` — 40U Rack 19 Standard
+- `rack_general_42u_rack_19_standard` — 42U Rack 19 Standard
+- `rack_general_44u_rack_19_standard` — 44U Rack 19 Standard
+- `rack_general_47u_rack_19_ibm` — 47U Rack 19 IBM
+- `rack_general_48u_rack_19_standard` — 48U Rack 19 Standard
+- `rack_general_4u` — 4U
+- `rack_general_5u` — 5U
+- `rack_general_6u` — 6U
+- `rack_general_cat5e_enhanced_patch_panel_48_ports` — CAT5e Enhanced Patch Panel 48 ports
+- `rack_general_cat5e_rack_mount_patch_panel_24_ports` — CAT5e Rack Mount Patch Panel 24 ports
+- `rack_general_cat5e_rack_mount_patch_panel_96_ports` — CAT5e Rack Mount Patch Panel 96 ports
+- `rack_general_hub` — Hub
+- `rack_general_server_1` — Server 1
+- `rack_general_server_2` — Server 2
+- `rack_general_server_3` — Server 3
+- `rack_general_switches_1` — Switches 1
+- `rack_general_switches_2` — Switches 2
+
+## 机房机架 · HP（rack_hp）— 19 个
+
+- `rack_hp_hp_6125g_ethernet_blade_switch` — HP 6125G Ethernet Blade Switch
+- `rack_hp_hp_bladesystem_c3000_enclosure` — HP BladeSystem c3000 Enclosure
+- `rack_hp_hp_bladesystem_c7000_enclosure` — HP BladeSystem c7000 Enclosure
+- `rack_hp_hp_bladesystem_s6500_enclosure` — HP BladeSystem s6500 Enclosure
+- `rack_hp_hp_infiniband_fdr_switch` — HP InfiniBand FDR Switch
+- `rack_hp_hp_proliant_bl620c_server_blade` — HP ProLiant BL620c Server Blade
+- `rack_hp_hp_proliant_bl660c_server_blade` — HP ProLiant BL660c Server Blade
+- `rack_hp_hp_proliant_bl685c_server_blade` — HP ProLiant BL685c Server Blade
+- `rack_hp_hp_proliant_dl160_g8` — HP ProLiant DL160 G8
+- `rack_hp_hp_proliant_dl320e_g8` — HP ProLiant DL320e G8
+- `rack_hp_hp_proliant_dl360e_g8` — HP ProLiant DL360e G8
+- `rack_hp_hp_proliant_dl360p_g8` — HP ProLiant DL360p G8
+- `rack_hp_hp_proliant_dl380e_g8` — HP ProLiant DL380e G8
+- `rack_hp_hp_proliant_dl380p_g8` — HP ProLiant DL380p G8
+- `rack_hp_hp_proliant_dl385p_g8` — HP ProLiant DL385p G8
+- `rack_hp_hp_proliant_dl560_g8` — HP ProLiant DL560 G8
+- `rack_hp_hp_proliant_sl230s_g8` — HP ProLiant SL230s G8
+- `rack_hp_hp_proliant_sl250s_g8` — HP ProLiant SL250s G8
+- `rack_hp_hp_virtual_connect_flex_10_10d` — HP Virtual Connect Flex-10-10D
+
+## 机房机架 · HPE 网关（rack_hpe_gateways）— 28 个
+
+- `rack_hpe_gateways_aruba_7010_mobility_controller_front` — Aruba 7010 Mobility Controller front
+- `rack_hpe_gateways_aruba_7010_mobility_controller_rear` — Aruba 7010 Mobility Controller rear
+- `rack_hpe_gateways_aruba_7024_mobility_controller_front` — Aruba 7024 Mobility Controller front
+- `rack_hpe_gateways_aruba_7024_mobility_controller_rear` — Aruba 7024 Mobility Controller rear
+- `rack_hpe_gateways_aruba_7030_mobility_controller_front` — Aruba 7030 Mobility Controller front
+- `rack_hpe_gateways_aruba_7030_mobility_controller_rear` — Aruba 7030 Mobility Controller rear
+- `rack_hpe_gateways_aruba_7205_mobility_controller_front` — Aruba 7205 Mobility Controller front
+- `rack_hpe_gateways_aruba_7205_mobility_controller_rear` — Aruba 7205 Mobility Controller rear
+- `rack_hpe_gateways_aruba_7210_mobility_controller_front` — Aruba 7210 Mobility Controller front
+- `rack_hpe_gateways_aruba_7210_mobility_controller_rear` — Aruba 7210 Mobility Controller rear
+- `rack_hpe_gateways_aruba_7220_mobility_controller_front` — Aruba 7220 Mobility Controller front
+- `rack_hpe_gateways_aruba_7220_mobility_controller_rear` — Aruba 7220 Mobility Controller rear
+- `rack_hpe_gateways_aruba_7240_mobility_controller_front` — Aruba 7240 Mobility Controller front
+- `rack_hpe_gateways_aruba_7240_mobility_controller_rear` — Aruba 7240 Mobility Controller rear
+- `rack_hpe_gateways_aruba_7280_mobility_controller_front` — Aruba 7280 Mobility Controller front
+- `rack_hpe_gateways_aruba_7280_mobility_controller_rear` — Aruba 7280 Mobility Controller rear
+- `rack_hpe_gateways_aruba_9004_4_port_gbe_gateway_back` — Aruba 9004 4 Port GbE Gateway back
+- `rack_hpe_gateways_aruba_9004_4_port_gbe_gateway_front` — Aruba 9004 4 Port GbE Gateway front
+- `rack_hpe_gateways_aruba_9004_dual_rackmount` — Aruba 9004 dual rackmount
+- `rack_hpe_gateways_aruba_9012_10_port_gbe_gateway_back` — Aruba 9012 10 Port GbE Gateway back
+- `rack_hpe_gateways_aruba_9012_10_port_gbe_gateway_front` — Aruba 9012 10 Port GbE Gateway front
+- `rack_hpe_gateways_aruba_clearpass_c1000_front` — Aruba ClearPass C1000 front
+- `rack_hpe_gateways_aruba_mobility_master_10k_front` — Aruba Mobility Master 10k front
+- `rack_hpe_gateways_aruba_mobility_master_10k_rear` — Aruba Mobility Master 10k rear
+- `rack_hpe_gateways_aruba_mobility_master_1k_front` — Aruba Mobility Master 1k front
+- `rack_hpe_gateways_aruba_mobility_master_1k_rear` — Aruba Mobility Master 1k rear
+- `rack_hpe_gateways_aruba_mobility_master_5k_front` — Aruba Mobility Master 5k front
+- `rack_hpe_gateways_aruba_mobility_master_5k_rear` — Aruba Mobility Master 5k rear
+
+## 机房机架 · HPE 安全（rack_hpe_security）— 7 个
+
+- `rack_hpe_security_aruba_clearpass_c1000_front` — Aruba ClearPass C1000 front
+- `rack_hpe_security_aruba_clearpass_c1000_rear` — Aruba ClearPass C1000 rear
+- `rack_hpe_security_aruba_clearpass_c2000_front` — Aruba ClearPass C2000 front
+- `rack_hpe_security_aruba_clearpass_c2000_rear` — Aruba ClearPass C2000 rear
+- `rack_hpe_security_aruba_clearpass_c3000_front` — Aruba ClearPass C3000 front
+- `rack_hpe_security_aruba_clearpass_c3000_rear` — Aruba ClearPass C3000 rear
+- `rack_hpe_security_direct_qsfp` — Direct QSFP
+
+## 机房机架 · HPE 交换机（rack_hpe_switches）— 187 个
+
+- `rack_hpe_switches_direct_qsfp` — Direct QSFP
+- `rack_hpe_switches_direct_sfp` — Direct SFP
+- `rack_hpe_switches_fibre_qsfp` — Fibre QSFP
+- `rack_hpe_switches_j9772a_2530_48g_poeplus_switch` — J9772A 2530 48G PoEplus Switch
+- `rack_hpe_switches_j9773a_2530_24g_poeplus_switch` — J9773A 2530 24G PoEplus Switch
+- `rack_hpe_switches_j9774a_2530_8g_poeplus_front` — J9774A 2530 8G PoEplus front
+- `rack_hpe_switches_j9774a_2530_8g_poeplus_rear` — J9774A 2530 8G PoEplus rear
+- `rack_hpe_switches_j9775a_2530_48g_switch` — J9775A 2530 48G Switch
+- `rack_hpe_switches_j9776a_2530_24g_switch` — J9776A 2530 24G Switch
+- `rack_hpe_switches_j9777a_2530_8g_front` — J9777A 2530 8G front
+- `rack_hpe_switches_j9777a_2530_8g_rear` — J9777A 2530 8G rear
+- `rack_hpe_switches_j9778a_2530_48_poeplus_front` — J9778A 2530 48 PoEplus front
+- `rack_hpe_switches_j9780a_2530_8_poeplus_front` — J9780A 2530 8 PoEplus front
+- `rack_hpe_switches_j9780a_2530_8_poeplus_rear` — J9780A 2530 8 PoEplus rear
+- `rack_hpe_switches_j9781a_2530_48_front` — J9781A 2530 48 front
+- `rack_hpe_switches_j9782a_2530_24_front` — J9782A 2530 24 front
+- `rack_hpe_switches_j9821a_540r_zl2_switch_rear` — J9821A 540R zl2 Switch rear
+- `rack_hpe_switches_j9822a_5412r_zl2_switch` — J9822A 5412R zl2 Switch
+- `rack_hpe_switches_j9822a_5412r_zl2_switch_rear` — J9822A 5412R zl2 Switch rear
+- `rack_hpe_switches_j9827a_5400r_management_module` — J9827A 5400R Management Module
+- `rack_hpe_switches_j9828a_5400r_700w_poeplus_zl2_power_supply` — J9828A 5400R 700W PoEplus zl2 Power Supply
+- `rack_hpe_switches_j9829a_5400r_1100w_poeplus_zl2_power_supply` — J9829A 5400R 1100W PoEplus zl2 Power Supply
+- `rack_hpe_switches_j9830b_5400r_2750w_poeplus_zl2_power_supply` — J9830B 5400R 2750W PoEplus zl2 Power Supply
+- `rack_hpe_switches_j9831a_5406r_zl2_switch_fan_tray` — J9831A 5406R zl2 Switch Fan Tray
+- `rack_hpe_switches_j9832a_5412r_zl2_switch_fan_tray` — J9832A 5412R zl2 Switch Fan Tray
+- `rack_hpe_switches_j9840a_msm_775zl_v2_zl_module` — J9840A MSM 775zl v2 zl Module
+- `rack_hpe_switches_j9850a_5406r_zl2_switch_rear` — J9850A 5406R zl2 Switch rear
+- `rack_hpe_switches_j9850a_540r_zl2_switch` — J9850A 540R zl2 Switch
+- `rack_hpe_switches_j9851a_5412r_zl2_switch` — J9851A 5412R zl2 Switch
+- `rack_hpe_switches_j9851a_5412r_zl2_switch_rear` — J9851A 5412R zl2 Switch rear
+- `rack_hpe_switches_j9853a_2530_48g_poeplus_2sfpplus_switch` — J9853A 2530 48G PoEplus 2SFPplus Switch
+- `rack_hpe_switches_j9854a_2530_24g_poeplus_2sfpplus_switch` — J9854A 2530 24G PoEplus 2SFPplus Switch
+- `rack_hpe_switches_j9855a_2530_48g_2sfpplus_switch` — J9855A 2530 48G 2SFPplus Switch
+- `rack_hpe_switches_j9856a_2530_24g_2sfpplus_switch` — J9856A 2530 24G 2SFPplus Switch
+- `rack_hpe_switches_j9857a_adv_svcs_v2_zl_module` — J9857A Adv Svcs v2 zl Module
+- `rack_hpe_switches_j9858a_adv_svcs_v2_zl_module` — J9858A Adv Svcs v2 zl Module
+- `rack_hpe_switches_j993a_8_port_1g_10gbe_sfpplus_with_macsec_v3_zl2_module` — J993A 8 port 1G 10GbE SFPplus with MACsec v3 zl2 Module
+- `rack_hpe_switches_j9986a_24p_gigt_module` — J9986A 24p GigT Module
+- `rack_hpe_switches_j9987a_24_port_10_100_1000base_t_with_macsec_v3_zl2_module` — J9987A 24 port 10 100 1000BASE T with MACsec v3 zl2 Module
+- `rack_hpe_switches_j9988a_24_port_1gbe_sfp_with_magsec_v3_zl2_module` — J9988A 24 port 1GbE SFP with MAGsec v3 zl2 Module
+- `rack_hpe_switches_j9989a_12_port_10_100_1000base_t_poeplus_and_12_port_1gbe_sfp_with_macsec_v3_zl2_module` — J9989A 12 port 10 100 1000BASE T PoEplus and 12 port 1GbE SFP with MACsec v3 zl2 Module
+- `rack_hpe_switches_j9990a_20p_gigt_4p_sfpplus_module` — J9990A 20p GigT 4p SFPplus Module
+- `rack_hpe_switches_j9991a_20_port_10_100_1000base_t_poeplus_and_4_port_1_2_5_5_10gbase_t_poeplus_with_macsec_v3_zl2_module` — J9991A 20 port 10 100 1000BASE T PoEplus and 4 port 1 2.5 5 10GBASE T PoEplus with MACsec v3 zl2 Module
+- `rack_hpe_switches_j9992a_20_port_10_100_1000base_t_poeplus_and_1_port_40gbe_qsfpplus_withmacsec_v3_zl2_module` — J9992A 20 port 10 100 1000BASE T PoEplus and 1 port 40GbE QSFPplus withMACsec v3 zl2 Module
+- `rack_hpe_switches_j9995a_8p_smart_rate_poeplus_module` — J9995A 8p Smart Rate PoEplus Module
+- `rack_hpe_switches_j9996a_2_port_40gbe_qsfpplus_with_macsec_v3_zl2_module` — J9996A 2 port 40GbE QSFPplus with MACsec v3 zl2 Module
+- `rack_hpe_switches_jl070a_2530_8_poeplus_internal_ps_switch` — JL070A 2530 8 PoEplus Internal PS Switch
+- `rack_hpe_switches_jl071a_hpe_aruba_3810m_24_port_gt_1_slot_switch` — JL071A HPE Aruba 3810M 24 port GT 1 slot Switch
+- `rack_hpe_switches_jl071a_hpe_aruba_3810m_24_port_gt_1_slot_switch_rear` — JL071A HPE Aruba 3810M 24 port GT 1 slot Switch rear
+- `rack_hpe_switches_jl072a_hpe_aruba_3810m_48_port_gt_1_slot_switch` — JL072A HPE Aruba 3810M 48 port GT 1 slot Switch
+- `rack_hpe_switches_jl072a_hpe_aruba_3810m_48_port_gt_1_slot_switch_rear` — JL072A HPE Aruba 3810M 48 port GT 1 slot Switch rear
+- `rack_hpe_switches_jl073a_hpe_aruba_3810m_24_port_gt_poeplus_1_slot_switch` — JL073A HPE Aruba 3810M 24 port GT PoEplus 1 slot Switch
+- `rack_hpe_switches_jl073a_hpe_aruba_3810m_24_port_gt_poeplus_1_slot_switch_rear` — JL073A HPE Aruba 3810M 24 port GT PoEplus 1 slot Switch rear
+- `rack_hpe_switches_jl074a_hpe_aruba_3810m_48_port_gt_poeplus_1_slot_switch` — JL074A HPE Aruba 3810M 48 port GT PoEplus 1 slot Switch
+- `rack_hpe_switches_jl075a_hpe_aruba_3810m_16_port_sfpplus_2_slot_switch` — JL075A HPE Aruba 3810M 16 port SFPplus 2 slot Switch
+- `rack_hpe_switches_jl075a_hpe_aruba_3810m_16_port_sfpplus_2_slot_switch_rear` — JL075A HPE Aruba 3810M 16 port SFPplus 2 slot Switch rear
+- `rack_hpe_switches_jl076a_hpe_aruba_3810m_40_port_gt_poeplus_8_port_1_2_5_5_10gbase_t_poeplus_1_slot_switch` — JL076A HPE Aruba 3810M 40 port GT PoEplus 8 port 1 2 5 5 10GBASE T PoEplus 1 slot Switch
+- `rack_hpe_switches_jl076a_hpe_aruba_3810m_40_port_gt_poeplus_8_port_1_2_5_5_10gbase_t_poeplus_1_slot_switch_rear` — JL076A HPE Aruba 3810M 40 port GT PoEplus 8 port 1 2 5 5 10GBASE T PoEplus 1 slot Switch rear
+- `rack_hpe_switches_jl079a3810m_2930m_2_port_40gbe_qsfpplus_module` — JL079A3810M 2930M 2 port 40GbE QSFPplus Module
+- `rack_hpe_switches_jl081a_3810m_2930m_4_1_2_5_5_10_gbe_hpe_smart_rate_module` — JL081A 3810M 2930M 4 1 2 5 5 10 GbE HPE Smart Rate Module
+- `rack_hpe_switches_jl083a_3810m_2930m_4_port_10gbe_sfpplus_module` — JL083A 3810M 2930M 4 port 10GbE SFPplus Module
+- `rack_hpe_switches_jl084a_3810m_2930m_4_port_stacking_module` — JL084A 3810M 2930M 4 port Stacking Module
+- `rack_hpe_switches_jl085a_aruba_6300m_psu_module` — JL085A Aruba 6300M PSU Module
+- `rack_hpe_switches_jl086a_aruba_6300m_psu_module` — JL086A Aruba 6300M PSU Module
+- `rack_hpe_switches_jl087a_3810m_2930m_1_port_40gbe_qsfpplus_module` — JL087A 3810M 2930M 1 port 40GbE QSFPplus Module
+- `rack_hpe_switches_jl087a_aruba_6300m_psu_module` — JL087A Aruba 6300M PSU Module
+- `rack_hpe_switches_jl253a_aruba_2930f_24g_4sfpplus_switch` — JL253A Aruba 2930F 24G 4SFPplus switch
+- `rack_hpe_switches_jl254a_aruba_2930f_48g_4sfpplus_switch` — JL254A Aruba 2930F 48G 4SFPplus switch
+- `rack_hpe_switches_jl255a_aruba_2930f_24g_poeplus_4sfpplus_switch` — JL255A Aruba 2930F 24G PoEplus 4SFPplus switch
+- `rack_hpe_switches_jl256a_aruba_2930f_48g_poeplus_4sfpplus_switch` — JL256A Aruba 2930F 48G PoEplus 4SFPplus switch
+- `rack_hpe_switches_jl258a_aruba_2930f_8g_poeplus_2sfpplus_rear` — JL258A Aruba 2930F 8G PoEplus 2SFPplus rear
+- `rack_hpe_switches_jl258a_aruba_2930f_8g_poeplus_2sfpplus_switch` — JL258A Aruba 2930F 8G PoEplus 2SFPplus switch
+- `rack_hpe_switches_jl258a_aruba_2930f_8g_poeplus_2sfpplus_switch_rear` — JL258A Aruba 2930F 8G PoEplus 2SFPplus switch rear
+- `rack_hpe_switches_jl259a_aruba_2930f_24g_4sfp_switch` — JL259A Aruba 2930F 24G 4SFP switch
+- `rack_hpe_switches_jl260a_aruba_2930f_48g_4sfp_switch` — JL260A Aruba 2930F 48G 4SFP switch
+- `rack_hpe_switches_jl261a_aruba_2930f_24g_poeplus_4sfp_switch` — JL261A Aruba 2930F 24G PoEplus 4SFP switch
+- `rack_hpe_switches_jl262a_aruba_2930f_48g_poeplus_4sfp_switch` — JL262A Aruba 2930F 48G PoEplus 4SFP switch
+- `rack_hpe_switches_jl263a_aruba_2930f_24g_poeplus_4sfpplus_taa_switch` — JL263A Aruba 2930F 24G PoEplus 4SFPplus TAA Switch
+- `rack_hpe_switches_jl264a_aruba_2930f_48g_poeplus_4sfpplus_taa_switch` — JL264A Aruba 2930F 48G PoEplus 4SFPplus TAA switch
+- `rack_hpe_switches_jl319a_aruba_2930m_24g_1_slot_switch` — JL319A Aruba 2930M 24G 1 slot Switch
+- `rack_hpe_switches_jl319a_aruba_2930m_24g_1_slot_switch_rear` — JL319A Aruba 2930M 24G 1 slot Switch rear
+- `rack_hpe_switches_jl320a_aruba_2930m_24g_poeplus_1_slot_switch` — JL320A Aruba 2930M 24G PoEplus 1 slot Switch
+- `rack_hpe_switches_jl320a_aruba_2930m_24g_poeplus_1_slot_switch_rear` — JL320A Aruba 2930M 24G PoEplus 1 slot Switch rear
+- `rack_hpe_switches_jl321a_aruba_2930m_48g_1_slot_switch` — JL321A Aruba 2930M 48G 1 slot Switch
+- `rack_hpe_switches_jl321a_aruba_2930m_48g_1_slot_switch_rear` — JL321A Aruba 2930M 48G 1 slot Switch rear
+- `rack_hpe_switches_jl322a_aruba_2930m_48g_poeplus_1_slot_switch` — JL322A Aruba 2930M 48G PoEplus 1 slot Switch
+- `rack_hpe_switches_jl322a_aruba_2930m_48g_poeplus_1_slot_switch_rear` — JL322A Aruba 2930M 48G PoEplus 1 slot Switch rear
+- `rack_hpe_switches_jl323a_aruba_2930m_40g_8_smart_rate_poeplus_1_slot_switch` — JL323A Aruba 2930M 40G 8 Smart Rate PoEplus 1 slot Switch
+- `rack_hpe_switches_jl324a_aruba_2930m_24_smart_rate_poeplus_1_slot_switch` — JL324A Aruba 2930M 24 Smart Rate PoEplus 1 slot Switch
+- `rack_hpe_switches_jl325a_2930m_2_port_stacking_module` — JL325A 2930M 2 port Stacking Module
+- `rack_hpe_switches_jl354a_aruba_2540_24g_4sfpplus_switch` — JL354A Aruba 2540 24G 4SFPplus switch
+- `rack_hpe_switches_jl355a_aruba_2540_48g_4sfpplus_switch` — JL355A Aruba 2540 48G 4SFPplus Switch
+- `rack_hpe_switches_jl356a_aruba_2540_24g_poeplus_4sfpplus_switch` — JL356A Aruba 2540 24G PoEplus 4SFPplus Switch
+- `rack_hpe_switches_jl357a_aruba_2540_48g_poeplus_4sfpplus_switch` — JL357A Aruba 2540 48G PoEplus 4SFPplus Switch
+- `rack_hpe_switches_jl363a_32p_sfpplus_adv` — JL363A 32P SFPplus Adv
+- `rack_hpe_switches_jl365a_8p_qsfpplus_adv` — JL365A 8P QSFPplus Adv
+- `rack_hpe_switches_jl366a_6p_qsfp28_adv` — JL366A 6P QSFP28 Adv
+- `rack_hpe_switches_jl368a_aruba_8400_mgmt_mod` — JL368A Aruba 8400 Mgmt Mod
+- `rack_hpe_switches_jl369a_aruba_8400_x731_fan_tray` — JL369A Aruba 8400 X731 Fan tray
+- `rack_hpe_switches_jl370a_aruba_8400_fan_for_x731_fan_tray` — JL370A Aruba 8400 Fan for X731 Fan tray
+- `rack_hpe_switches_jl371a_aruba8400_fan_tray_and_6_fans_bundle` — JL371A Aruba8400 Fan tray and 6 fans bundle
+- `rack_hpe_switches_jl375a_aruba_8400_front` — JL375A Aruba 8400 front
+- `rack_hpe_switches_jl375a_aruba_8400_rear` — JL375A Aruba 8400 rear
+- `rack_hpe_switches_jl375a_aruba_8400_rear_empty` — JL375A Aruba 8400 rear empty
+- `rack_hpe_switches_jl376a_aruba_8400_front` — JL376A Aruba 8400 front
+- `rack_hpe_switches_jl376a_aruba_8400_rear` — JL376A Aruba 8400 rear
+- `rack_hpe_switches_jl376a_aruba_8400_rear_empty` — JL376A Aruba 8400 rear empty
+- `rack_hpe_switches_jl479a_aruba_8320_48p_10g_sfp_sfpplus_and_6p_40g_qsfpplus_5_fan_2_ps_switch_bundle` — JL479A Aruba 8320 48p 10G SFP SFPplus and 6p 40G QSFPplus 5 fan 2 PS Switch Bundle
+- `rack_hpe_switches_jl479a_aruba_8320_48p_10g_sfp_sfpplus_and_6p_40g_qsfpplus_5_fan_2_ps_switch_bundle_rear` — JL479A Aruba 8320 48p 10G SFP SFPplus and 6p 40G QSFPplus 5 fan 2 PS Switch Bundle rear
+- `rack_hpe_switches_jl557a_aruba_2930f_48g_poeplus_4sfp_740w_switch` — JL557A Aruba 2930F 48G PoEplus 4SFP 740W Switch
+- `rack_hpe_switches_jl557a_aruba_2930f_48g_poeplus_4sfp_740w_switch_rear` — JL557A Aruba 2930F 48G PoEplus 4SFP 740W Switch rear
+- `rack_hpe_switches_jl558a_aruba_2930f_48g_poeplus_4sfpplus_740w_switch` — JL558A Aruba 2930F 48G PoEplus 4SFPplus 740W Switch
+- `rack_hpe_switches_jl558a_aruba_2930f_48g_poeplus_4sfpplus_740w_switch_rear` — JL558A Aruba 2930F 48G PoEplus 4SFPplus 740W Switch rear
+- `rack_hpe_switches_jl559a_aruba_2930f_48g_poeplus_4sfpplus_740w_taa_switch` — JL559A Aruba 2930F 48G PoEplus 4SFPplus 740W TAA switch
+- `rack_hpe_switches_jl559a_aruba_2930f_48g_poeplus_4sfpplus_740w_taa_switch_rear` — JL559A Aruba 2930F 48G PoEplus 4SFPplus 740W TAA switch rear
+- `rack_hpe_switches_jl579a_aruba_8320_32p_40g_qsfpplus_5_fans_2_ps_switch_bundle` — JL579A Aruba 8320 32p 40G QSFPplus 5 fans 2 PS Switch Bundle
+- `rack_hpe_switches_jl579a_aruba_8320_32p_40g_qsfpplus_5_fans_2_ps_switch_bundle_rear` — JL579A Aruba 8320 32p 40G QSFPplus 5 fans 2 PS Switch Bundle rear
+- `rack_hpe_switches_jl581a_aruba_8320_48p_1g_10gbase_t_and_6p_40g_qsfpplus_5_fans_2_ps_switch_bundle` — JL581A Aruba 8320 48p 1G 10GBASE T and 6p 40G QSFPplus 5 fans 2 PS Switch Bundle
+- `rack_hpe_switches_jl581a_aruba_8320_48p_1g_10gbase_t_and_6p_40g_qsfpplus_5_fans_2_ps_switch_bundle_rear` — JL581A Aruba 8320 48p 1G 10GBASE T and 6p 40G QSFPplus 5 fans 2 PS Switch Bundle rear
+- `rack_hpe_switches_jl624a_aruba_8325_32y8c_f2b_front` — JL624A Aruba 8325 32Y8C F2B front
+- `rack_hpe_switches_jl624a_aruba_8325_32y8c_f2b_rear` — JL624A Aruba 8325 32Y8C F2B rear
+- `rack_hpe_switches_jl625a_aruba_8325_32y_8c_b2f_front` — JL625A Aruba 8325 32Y 8C B2F front
+- `rack_hpe_switches_jl625a_aruba_8325_32y_8c_b2f_rear` — JL625A Aruba 8325 32Y 8C B2F rear
+- `rack_hpe_switches_jl626a_aruba_8325_32c_f2b_front` — JL626A Aruba 8325 32C F2B front
+- `rack_hpe_switches_jl626a_aruba_8325_32c_f2b_rear` — JL626A Aruba 8325 32C F2B rear
+- `rack_hpe_switches_jl627a_aruba_8325_32c_b2f_front` — JL627A Aruba 8325 32C B2F front
+- `rack_hpe_switches_jl627a_aruba_8325_32c_b2f_rear` — JL627A Aruba 8325 32C B2F rear
+- `rack_hpe_switches_jl658a_aruba_6300m_24_port_sfpplus_and_4_port_sfp56_switch` — JL658A Aruba 6300M 24 port SFPplus and 4 port SFP56 Switch
+- `rack_hpe_switches_jl658a_aruba_6300m_24_port_sfpplus_and_4_port_sfp56_switch_rear` — JL658A Aruba 6300M 24 port SFPplus and 4 port SFP56 Switch rear
+- `rack_hpe_switches_jl659a_aruba_6300m_48_port_hpe_smart_rate_1_2_5_5gbe_class_6_poe_and_4_port_switch` — JL659A Aruba 6300M 48 port HPE Smart Rate 1 2 5 5GbE Class 6 PoE and 4 port Switch
+- `rack_hpe_switches_jl659a_aruba_6300m_48_port_hpe_smart_rate_1_2_5_5gbe_class_6_poe_and_4_port_switch_rear` — JL659A Aruba 6300M 48 port HPE Smart Rate 1 2 5 5GbE Class 6 PoE and 4 port Switch rear
+- `rack_hpe_switches_jl660a_aruba_6300m_24_port_hpe_smart_rate_1_2_5_5_gbe_class_6_poe_and_4_port_switch` — JL660A Aruba 6300M 24 port HPE Smart Rate 1 2 5 5 GbE Class 6 PoE and 4 port switch
+- `rack_hpe_switches_jl660a_aruba_6300m_24_port_hpe_smart_rate_1_2_5_5_gbe_class_6_poe_and_4_port_switch_rear` — JL660A Aruba 6300M 24 port HPE Smart Rate 1 2 5 5 GbE Class 6 PoE and 4 port switch rear
+- `rack_hpe_switches_jl661a_aruba_6300m_48_port_1gbe_class_4_poe_and_4_port_sfp56_switch` — JL661A Aruba 6300M 48 port 1GbE Class 4 PoE and 4 port SFP56 Switch
+- `rack_hpe_switches_jl661a_aruba_6300m_48_port_1gbe_class_4_poe_and_4_port_sfp56_switch_rear` — JL661A Aruba 6300M 48 port 1GbE Class 4 PoE and 4 port SFP56 Switch rear
+- `rack_hpe_switches_jl662a_aruba_6300m_24_port_1gbe_class_4_poe_4_port_sfp56_switch` — JL662A Aruba 6300M 24 port 1GbE Class 4 PoE 4 port SFP56 Switch
+- `rack_hpe_switches_jl662a_aruba_6300m_24_port_1gbe_class_4_poe_4_port_sfp56_switch_rear` — JL662A Aruba 6300M 24 port 1GbE Class 4 PoE 4 port SFP56 Switch rear
+- `rack_hpe_switches_jl663a_aruba_6300m_48_port_1gbe_and_4_port_sfp56_switch` — JL663A Aruba 6300M 48 port 1GbE and 4 port SFP56 Switch
+- `rack_hpe_switches_jl663a_aruba_6300m_48_port_1gbe_and_4_port_sfp56_switch_rear` — JL663A Aruba 6300M 48 port 1GbE and 4 port SFP56 Switch rear
+- `rack_hpe_switches_jl664a_aruba_6300m_24_port_1gbe_and_4_port_sfp56_switch` — JL664A Aruba 6300M 24 port 1GbE and 4 port SFP56 Switch
+- `rack_hpe_switches_jl664a_aruba_6300m_24_port_1gbe_and_4_port_sfp56_switch_rear` — JL664A Aruba 6300M 24 port 1GbE and 4 port SFP56 Switch rear
+- `rack_hpe_switches_jl665a_aruba_6300f_48_port_1gbe_class_4_poe_and_4_port_sfp56_switch` — JL665A Aruba 6300F 48 port 1GbE Class 4 PoE and 4 port SFP56 Switch
+- `rack_hpe_switches_jl665a_aruba_6300f_48_port_1gbe_class_4_poe_and_4_port_sfp56_switch_rear` — JL665A Aruba 6300F 48 port 1GbE Class 4 PoE and 4 port SFP56 Switch rear
+- `rack_hpe_switches_jl666a_aruba_6300f_24_port_1gbe_class_4_poe_and_4_port_sfp56_switch` — JL666A Aruba 6300F 24 port 1GbE Class 4 PoE and 4 port SFP56 Switch
+- `rack_hpe_switches_jl666a_aruba_6300f_24_port_1gbe_class_4_poe_and_4_port_sfp56_switch_rear` — JL666A Aruba 6300F 24 port 1GbE Class 4 PoE and 4 port SFP56 Switch rear
+- `rack_hpe_switches_jl667a_aruba_6300f_48_port_1gbe_and_4_port_sfp56_switch` — JL667A Aruba 6300F 48 port 1GbE and 4 port SFP56 Switch
+- `rack_hpe_switches_jl667a_aruba_6300f_48_port_1gbe_and_4_port_sfp56_switch_rear` — JL667A Aruba 6300F 48 port 1GbE and 4 port SFP56 Switch rear
+- `rack_hpe_switches_jl668a_aruba_6300f_24_port_1gbe_and_4_port_sfp56_rear` — JL668A aruba 6300F 24 port 1GbE and 4 port SFP56 rear
+- `rack_hpe_switches_jl668a_aruba_6300f_24_port_1gbe_and_4_port_sfp56_switch` — JL668A Aruba 6300F 24 port 1GbE and 4 port SFP56 Switch
+- `rack_hpe_switches_jl669_aruba_6300m_fan_module` — JL669 Aruba 6300M Fan Module
+- `rack_hpe_switches_jl670a_aruba_6300m_psu_module` — JL670A Aruba 6300M PSU Module
+- `rack_hpe_switches_jl687a_aruba_8400x_32y_32p_1_10_25g_sfp_sfpplus_sfp28_module` — JL687A Aruba 8400X 32Y 32p 1 10 25G SFP SFPplus SFP28 Module
+- `rack_hpe_switches_jl693a_aruba_12g_poeplus_2g_2sfpplus_switch` — JL693A Aruba 12G PoEplus 2G 2SFPplus Switch
+- `rack_hpe_switches_jl693a_aruba_12g_poeplus_2g_2sfpplus_switch_rear` — JL693A Aruba 12G PoEplus 2G 2SFPplus Switch rear
+- `rack_hpe_switches_jl724a_aruba_6200f_24_port_1gbe_and_4_port_sfpplus_switch` — JL724A Aruba 6200F 24 port 1GbE and 4 port SFPplus switch
+- `rack_hpe_switches_jl724a_aruba_6200f_24_port_1gbe_and_4_port_sfpplus_switch_rear` — JL724A Aruba 6200F 24 port 1GbE and 4 port SFPplus switch rear
+- `rack_hpe_switches_jl725a_aruba_6200f_24_port_1gbe_class_4_poe_and_4_port_sfpplus_370w_switch` — JL725A Aruba 6200F 24 port 1GbE Class 4 PoE and 4 port SFPplus 370W Switch
+- `rack_hpe_switches_jl725a_aruba_6200f_24_port_1gbe_class_4_poe_and_4_port_sfpplus_370w_switch_rear` — JL725A Aruba 6200F 24 port 1GbE Class 4 PoE and 4 port SFPplus 370W Switch rear
+- `rack_hpe_switches_jl726a_aruba_6200f_48_port_1gbe_and_4_port_sfpplus_switch` — JL726A Aruba 6200F 48 port 1GbE and 4 port SFPplus Switch
+- `rack_hpe_switches_jl726a_aruba_6200f_48_port_1gbe_and_4_port_sfpplus_switch_rear` — JL726A Aruba 6200F 48 port 1GbE and 4 port SFPplus Switch rear
+- `rack_hpe_switches_jl727a_aruba_6200f_48_port_1gbe_class_4_poe_and_4_port_sfpplus_370w_switch` — JL727A Aruba 6200F 48 port 1GbE Class 4 PoE and 4 port SFPplus 370W Switch
+- `rack_hpe_switches_jl727a_aruba_6200f_48_port_1gbe_class_4_poe_and_4_port_sfpplus_370w_switch_rear` — JL727A Aruba 6200F 48 port 1GbE Class 4 PoE and 4 port SFPplus 370W Switch rear
+- `rack_hpe_switches_jl728a_aruba_6200f_48_port_1gbe_class_4_poe_and_4_port_sfpplus_740w_switch` — JL728A Aruba 6200F 48 port 1GbE Class 4 PoE and 4 port SFPplus 740W Switch
+- `rack_hpe_switches_jl728a_aruba_6200f_48_port_1gbe_class_4_poe_and_4_port_sfpplus_740w_switch_rear` — JL728A Aruba 6200F 48 port 1GbE Class 4 PoE and 4 port SFPplus 740W Switch rear
+- `rack_hpe_switches_jl9826a_5412r_92g_poeplus_4sfp_zl2_switch` — JL9826A 5412R 92G PoEplus 4SFP zl2 Switch
+- `rack_hpe_switches_lc_sfp` — LC SFP
+- `rack_hpe_switches_r0x26a_aruba_cx_6400_switch` — R0X26A Aruba CX 6400 Switch
+- `rack_hpe_switches_r0x26a_aruba_cx_6405_switch_rear` — R0X26A Aruba CX 6405 Switch rear
+- `rack_hpe_switches_r0x27a_aruba_cx_6410_switch` — R0X27A Aruba CX 6410 Switch
+- `rack_hpe_switches_r0x27a_aruba_cx_6410_switch_rear` — R0X27A Aruba CX 6410 Switch rear
+- `rack_hpe_switches_r0x31a_aruba_6400_management_module` — R0X31A Aruba 6400 Management Module
+- `rack_hpe_switches_r0x35a_aruba_6400_1800w_ps_w_c16` — R0X35A Aruba 6400 1800W PS w C16
+- `rack_hpe_switches_r0x36a_aruba_6400_3000w_ps_w_c20` — R0X36A Aruba 6400 3000W PS w C20
+- `rack_hpe_switches_r0x38a_aruba_6400_48p_1gbe_cls4_poe_module` — R0X38A Aruba 6400 48p 1GbE CLS4 PoE Module
+- `rack_hpe_switches_r0x39a_aruba_6400_48p_1gbe_cls4_poe_4sfp56_module` — R0X39A Aruba 6400 48p 1GbE CLS4 PoE 4SFP56 Module
+- `rack_hpe_switches_r0x40a_aruba_6400_48p_1gbe_cls6_poe_4sfp56_module` — R0X40A Aruba 6400 48p 1GbE CLS6 PoE 4SFP56 Module
+- `rack_hpe_switches_r0x41a_aruba_6400_48p_smart_rate_cls6_poe_4sfp56_module` — R0X41A Aruba 6400 48p Smart Rate CLS6 PoE 4SFP56 Module
+- `rack_hpe_switches_r0x42a_aruba_6400_24p_10gt_4sfp56_module` — R0X42A Aruba 6400 24p 10GT 4SFP56 Module
+- `rack_hpe_switches_r0x43a_aruba_6400_24p_sfp_4sfp56_module` — R0X43A Aruba 6400 24p SFP 4SFP56 Module
+- `rack_hpe_switches_r0x44_aruba_6400_48p_10g_25g_sfp28_module` — R0X44 Aruba 6400 48p 10G 25G SFP28 Module
+- `rack_hpe_switches_r0x45a_aruba_6400_12p_40g_100g_qsfp28_module` — R0X45A Aruba 6400 12p 40G 100G QSFP28 Module
+- `rack_hpe_switches_rj45_sfp` — Rj45 SFP
+- `rack_hpe_switches_rj45_sfp_alt` — Rj45 SFP alt
+- `rack_hpe_switches_rom67a_aruba_2930m_48p_poe_class_6_switch` — ROM67A Aruba 2930M 48p PoE class 6 switch
+- `rack_hpe_switches_rom67a_aruba_2930m_poe_class_6_switch_rear` — ROM67A Aruba 2930M PoE class 6 switch rear
+- `rack_hpe_switches_rom68a_aruba_2930m_24p_poe_class_6_switch` — ROM68A Aruba 2930M 24p PoE class 6 switch
+- `rack_hpe_switches_rom68a_aruba_2930m_24p_poe_class_6_switch_rear` — ROM68A Aruba 2930M 24p PoE class 6 switch rear
+
+## 机房机架 · IBM（rack_ibm）— 21 个
+
+- `rack_ibm_ibm_11000va_ups` — IBM 11000VA UPS
+- `rack_ibm_ibm_1500_2200va_ups` — IBM 1500-2200VA UPS
+- `rack_ibm_ibm_1754_local_console_manager` — IBM 1754 Local Console Manager
+- `rack_ibm_ibm_1u_flat_panel_console_kit` — IBM 1U Flat Panel Console Kit
+- `rack_ibm_ibm_3000va_ups` — IBM 3000VA UPS
+- `rack_ibm_ibm_6000va_ups` — IBM 6000VA UPS
+- `rack_ibm_ibm_dx360` — IBM dx360
+- `rack_ibm_ibm_ups10000` — IBM UPS10000
+- `rack_ibm_ibm_ups5000_hv` — IBM UPS5000 HV
+- `rack_ibm_ibm_ups7500` — IBM UPS7500
+- `rack_ibm_ibm_x3250_m4` — IBM x3250 M4
+- `rack_ibm_ibm_x3530_m4` — IBM x3530 M4
+- `rack_ibm_ibm_x3550_m4` — IBM x3550 M4
+- `rack_ibm_ibm_x3630_m3` — IBM x3630 M3
+- `rack_ibm_ibm_x3630_m4` — IBM x3630 M4
+- `rack_ibm_ibm_x3650_m4` — IBM x3650 M4
+- `rack_ibm_ibm_x3690` — IBM x3690
+- `rack_ibm_ibm_x3750` — IBM x3750
+- `rack_ibm_ibm_x3755_m3` — IBM x3755 M3
+- `rack_ibm_ibm_x3850_x5` — IBM x3850 X5
+- `rack_ibm_ibm_x3950_x5` — IBM x3950 X5
+
+## 机房机架 · Oracle（rack_oracle）— 37 个
+
+- `rack_oracle_netra_blade_x3_2b_server` — Netra Blade X3-2B Server
+- `rack_oracle_netra_cp3260_atca_blade_server` — Netra CP3260 ATCA Blade Server
+- `rack_oracle_netra_cp3270_atca_blade_server` — Netra CP3270 ATCA Blade Server
+- `rack_oracle_netra_ct900_atca_blade_server` — Netra CT900 ATCA Blade Server
+- `rack_oracle_netra_ct9000_server` — Netra CT9000 Server
+- `rack_oracle_netra_server_x3_2` — Netra Server X3-2
+- `rack_oracle_netra_sparc_t4_1_server` — Netra Sparc T4-1 Server
+- `rack_oracle_netra_sparc_t4_1b_server_module` — Netra Sparc T4-1B Server Module
+- `rack_oracle_netra_sparc_t4_2_server` — Netra Sparc T4-2 Server
+- `rack_oracle_netra_x4270_server` — Netra X4270 Server
+- `rack_oracle_netra_x6270_server_module` — Netra X6270 Server Module
+- `rack_oracle_sparc_enterprise_m4000_server` — Sparc Enterprise M4000 Server
+- `rack_oracle_sparc_enterprise_m5000_server` — Sparc Enterprise M5000 Server
+- `rack_oracle_sparc_t4_1_server` — Sparc T4-1 Server
+- `rack_oracle_sparc_t4_1b_server_module` — Sparc T4-1B Server Module
+- `rack_oracle_sparc_t4_2_server` — Sparc T4-2 Server
+- `rack_oracle_sparc_t4_4_server` — Sparc T4-4 Server
+- `rack_oracle_sun_blade_6000_enclosure` — Sun Blade 6000 Enclosure
+- `rack_oracle_sun_blade_6000_ethernet_network_express_module_24p_10_gbe` — Sun Blade 6000 Ethernet Network Express Module 24p 10 GbE
+- `rack_oracle_sun_blade_6000_virtualized_40_gbe_network_express_module` — Sun Blade 6000 Virtualized 40 GbE Network Express Module
+- `rack_oracle_sun_blade_x3_2b_server` — Sun Blade X3-2B Server
+- `rack_oracle_sun_blade_x6270_m2_server_module` — Sun Blade X6270 M2 Server Module
+- `rack_oracle_sun_datacenter_infiniband_switch_36` — Sun DataCenter Infiniband Switch 36
+- `rack_oracle_sun_network_10gbe_switch_72p` — Sun Network 10GbE Switch 72p
+- `rack_oracle_sun_network_qdr_infiniband_gateway_switch` — Sun Network QDR InfiniBand Gateway Switch
+- `rack_oracle_sun_server_x2_4` — Sun Server X2-4
+- `rack_oracle_sun_server_x2_8` — Sun Server X2-8
+- `rack_oracle_sun_server_x3_2` — Sun Server X3-2
+- `rack_oracle_sun_server_x3_2l` — Sun Server X3-2L
+- `rack_oracle_sun_storage_2500_m2_array` — Sun Storage 2500-M2 Array
+- `rack_oracle_sun_zfs_storage_7120` — Sun ZFS Storage 7120
+- `rack_oracle_sun_zfs_storage_7320` — Sun ZFS Storage 7320
+- `rack_oracle_sunfire_t1000` — SunFire T1000
+- `rack_oracle_sunfire_x2100` — SunFire X2100
+- `rack_oracle_sunfire_x4100` — SunFire X4100
+- `rack_oracle_sunfire_x4500` — SunFire X4500
+- `rack_oracle_sunfire_x4600` — SunFire X4600
+
+## Web 原型 · 广告位（mk_advertising）— 17 个
+
+- `mk_advertising_3_1_rec` — 3-1 Rec
+- `mk_advertising_banner_468x60` — Banner 468x60
+- `mk_advertising_button_120x60` — Button 120x60
+- `mk_advertising_button_120x90` — Button 120x90
+- `mk_advertising_half_banner_234x60` — Half Banner 234x60
+- `mk_advertising_half_page_300x600` — Half Page 300x600
+- `mk_advertising_large_rec_336x280` — Large Rec 336x280
+- `mk_advertising_leaderboard_728x90` — Leaderboard 728x90
+- `mk_advertising_medium_rec_300x250` — Medium Rec 300x250
+- `mk_advertising_micro_bar_88x31` — Micro Bar 88x31
+- `mk_advertising_rec_180x150` — Rec 180x150
+- `mk_advertising_sky_120x600` — Sky 120x600
+- `mk_advertising_square_button_125x125` — Square Button 125x125
+- `mk_advertising_square_pop_up_250x250` — Square Pop-up 250x250
+- `mk_advertising_vertical_banner_120x240` — Vertical Banner 120x240
+- `mk_advertising_vertical_rec_240x400` — Vertical Rec 240x400
+- `mk_advertising_wide_sky_160x600` — Wide Sky 160x600
+
+## Web 原型 · 日历（mk_calendars）— 4 个
+
+- `mk_calendars_calendar_1` — Calendar 1
+- `mk_calendars_calendar_2` — Calendar 2
+- `mk_calendars_calendar_2_months_horizontal` — Calendar 2 Months Horizontal
+- `mk_calendars_calendar_2_months_vertical` — Calendar 2 Months Vertical
+
+## Web 原型 · 轮播（mk_carousel）— 12 个
+
+- `mk_carousel_carousel_1` — Carousel 1
+- `mk_carousel_carousel_2` — Carousel 2
+- `mk_carousel_carousel_3` — Carousel 3
+- `mk_carousel_carousel_4` — Carousel 4
+- `mk_carousel_carousel_5` — Carousel 5
+- `mk_carousel_carousel_6` — Carousel 6
+- `mk_carousel_carousel_7` — Carousel 7
+- `mk_carousel_next` — Next
+- `mk_carousel_next_prev` — Next-Prev
+- `mk_carousel_prev` — Prev
+- `mk_carousel_status_display_1` — Status Display 1
+- `mk_carousel_status_display_2` — Status Display 2
+
+## Web 原型 · 图表与表格（mk_charts_tables）— 5 个
+
+- `mk_charts_tables_bar_chart` — Bar Chart
+- `mk_charts_tables_bar_graph` — Bar Graph
+- `mk_charts_tables_graph` — Graph
+- `mk_charts_tables_piechart` — Piechart
+- `mk_charts_tables_table` — Table
+
+## Web 原型 · 控件（mk_controls）— 12 个
+
+- `mk_controls_horizontal_interval_bar_1` — Horizontal Interval Bar 1
+- `mk_controls_horizontal_interval_bar_2` — Horizontal Interval Bar 2
+- `mk_controls_horizontal_slidebar` — Horizontal Slidebar
+- `mk_controls_knob_1` — Knob 1
+- `mk_controls_knob_2` — Knob 2
+- `mk_controls_on_off_button_1` — On-Off Button 1
+- `mk_controls_on_off_button_2` — On-Off Button 2
+- `mk_controls_on_off_button_3` — On-Off Button 3
+- `mk_controls_on_off_button_4` — On-Off Button 4
+- `mk_controls_vertical_interval_bar_1` — Vertical Interval Bar 1
+- `mk_controls_vertical_interval_bar_2` — Vertical Interval Bar 2
+- `mk_controls_vertical_slidebar` — Vertical Slidebar
+
+## Web 原型 · 表单元素（mk_form_elements）— 11 个
+
+- `mk_form_elements_alert_textbox` — Alert Textbox
+- `mk_form_elements_checkbox_off` — Checkbox Off
+- `mk_form_elements_checkbox_on` — Checkbox On
+- `mk_form_elements_city_state_postal_code` — City State Postal Code
+- `mk_form_elements_combo_box` — Combo Box
+- `mk_form_elements_date` — Date
+- `mk_form_elements_multi_select` — Multi-select
+- `mk_form_elements_radio_button_off` — Radio Button Off
+- `mk_form_elements_radio_button_on` — Radio Button On
+- `mk_form_elements_select_field` — Select Field
+- `mk_form_elements_spinner` — Spinner
+
+## Web 原型 · 菜单与按钮（mk_menus_buttons）— 15 个
+
+- `mk_menus_buttons_close` — Close
+- `mk_menus_buttons_color_picker` — Color Picker
+- `mk_menus_buttons_delete` — Delete
+- `mk_menus_buttons_drop_down_menu` — Drop Down Menu
+- `mk_menus_buttons_edit` — Edit
+- `mk_menus_buttons_font_selector` — Font Selector
+- `mk_menus_buttons_font_style_selector_1` — Font Style Selector 1
+- `mk_menus_buttons_font_style_selector_2` — Font Style Selector 2
+- `mk_menus_buttons_font_style_selector_3` — Font Style Selector 3
+- `mk_menus_buttons_line_width_selector` — Line Width Selector
+- `mk_menus_buttons_new` — New
+- `mk_menus_buttons_open` — Open
+- `mk_menus_buttons_primary_and_secondary_1` — Primary and Secondary 1
+- `mk_menus_buttons_primary_and_secondary_2` — Primary and Secondary 2
+- `mk_menus_buttons_view` — View
+
+## Web 原型 · 其他（mk_misc）— 22 个
+
+- `mk_misc_critical_icon` — Critical Icon
+- `mk_misc_cursor_arrow` — Cursor Arrow
+- `mk_misc_cursor_hand` — Cursor Hand
+- `mk_misc_gear` — Gear
+- `mk_misc_help_icon` — Help Icon
+- `mk_misc_horizontal_splitter` — Horizontal Splitter
+- `mk_misc_image_placeholder` — Image Placeholder
+- `mk_misc_information_icon` — Information Icon
+- `mk_misc_loading_bar_1` — Loading Bar 1
+- `mk_misc_loading_bar_2` — Loading Bar 2
+- `mk_misc_loading_circle_1` — Loading Circle 1
+- `mk_misc_loading_circle_2` — Loading Circle 2
+- `mk_misc_mail` — Mail
+- `mk_misc_map` — Map
+- `mk_misc_search_box` — Search Box
+- `mk_misc_security` — Security
+- `mk_misc_sign_in` — Sign In
+- `mk_misc_sign_up` — Sign Up
+- `mk_misc_star_rating` — Star Rating
+- `mk_misc_vertical_splitter` — Vertical Splitter
+- `mk_misc_video` — Video
+- `mk_misc_warning_icon` — Warning Icon
+
+## Web 原型 · 标签页（mk_tabs）— 6 个
+
+- `mk_tabs_horizontal_tabs_1` — Horizontal Tabs 1
+- `mk_tabs_horizontal_tabs_2` — Horizontal Tabs 2
+- `mk_tabs_vertical_tabs_1` — Vertical Tabs 1
+- `mk_tabs_vertical_tabs_2` — Vertical Tabs 2
+- `mk_tabs_vertical_tabs_3` — Vertical Tabs 3
+- `mk_tabs_vertical_tabs_4` — Vertical Tabs 4
+
+## 通用素材 · 动物（signs_animals）— 15 个
+
+- `signs_animals_bear_1` — Bear 1
+- `signs_animals_bear_2` — Bear 2
+- `signs_animals_deer_1` — Deer 1
+- `signs_animals_deer_2` — Deer 2
+- `signs_animals_dog_on_leash` — Dog On Leash
+- `signs_animals_duck` — Duck
+- `signs_animals_fish_hatchery` — Fish Hatchery
+- `signs_animals_kennel` — Kennel
+- `signs_animals_moose` — Moose
+- `signs_animals_no_dogs` — No Dogs
+- `signs_animals_seal` — Seal
+- `signs_animals_sloth` — Sloth
+- `signs_animals_snake` — Snake
+- `signs_animals_stable` — Stable
+- `signs_animals_teddy_bear` — Teddy Bear
+
+## 通用素材 · 食物（signs_food）— 10 个
+
+- `signs_food_bar` — Bar
+- `signs_food_cans_and_bottles` — Cans and Bottles
+- `signs_food_coffee` — Coffee
+- `signs_food_drinking_water_1` — Drinking Water 1
+- `signs_food_drinking_water_2` — Drinking Water 2
+- `signs_food_fast_food` — Fast Food
+- `signs_food_food_truck` — Food Truck
+- `signs_food_knife` — Knife
+- `signs_food_restaurant_1` — Restaurant 1
+- `signs_food_restaurant_2` — Restaurant 2
+
+## 通用素材 · 医疗（signs_healthcare）— 50 个
+
+- `signs_healthcare_alternative_medicine` — Alternative Medicine
+- `signs_healthcare_anesthesia` — Anesthesia
+- `signs_healthcare_assistive_listening_system` — Assistive Listening System
+- `signs_healthcare_brain` — Brain
+- `signs_healthcare_cardiology` — Cardiology
+- `signs_healthcare_care_staff_area` — Care Staff Area
+- `signs_healthcare_cath_lab` — Cath Lab
+- `signs_healthcare_chapel` — Chapel
+- `signs_healthcare_deaf` — Deaf
+- `signs_healthcare_dermatology` — Dermatology
+- `signs_healthcare_diabetes` — Diabetes
+- `signs_healthcare_eye` — Eye
+- `signs_healthcare_eye_wash` — Eye Wash
+- `signs_healthcare_family_practice` — Family Practice
+- `signs_healthcare_first_aid` — First Aid
+- `signs_healthcare_genetics` — Genetics
+- `signs_healthcare_health_education` — Health Education
+- `signs_healthcare_heart_1` — Heart 1
+- `signs_healthcare_heart_2` — Heart 2
+- `signs_healthcare_hospital_1` — Hospital 1
+- `signs_healthcare_hospital_2` — Hospital 2
+- `signs_healthcare_immunizations` — Immunizations
+- `signs_healthcare_infectious_disease` — Infectious Disease
+- `signs_healthcare_inpatient` — Inpatient
+- `signs_healthcare_intensive_care` — Intensive Care
+- `signs_healthcare_internal_medicine` — Internal Medicine
+- `signs_healthcare_kidney` — Kidney
+- `signs_healthcare_lungs` — Lungs
+- `signs_healthcare_mammogram` — Mammogram
+- `signs_healthcare_medical_interpreter` — Medical Interpreter
+- `signs_healthcare_medical_library` — Medical Library
+- `signs_healthcare_medical_records` — Medical Records
+- `signs_healthcare_mental_health` — Mental Health
+- `signs_healthcare_mri` — MRI
+- `signs_healthcare_neurology` — Neurology
+- `signs_healthcare_nutrition` — Nutrition
+- `signs_healthcare_oncology` — Oncology
+- `signs_healthcare_out_patient` — Out Patient
+- `signs_healthcare_pharmacy` — Pharmacy
+- `signs_healthcare_physical_therapy` — Physical Therapy
+- `signs_healthcare_registration` — Registration
+- `signs_healthcare_sign_language` — Sign Language
+- `signs_healthcare_social_services` — Social Services
+- `signs_healthcare_surgery` — Surgery
+- `signs_healthcare_tdd` — TDD
+- `signs_healthcare_tooth` — Tooth
+- `signs_healthcare_ultrasound` — Ultrasound
+- `signs_healthcare_wheelchair_accessible_1` — Wheelchair Accessible 1
+- `signs_healthcare_wheelchair_accessible_2` — Wheelchair Accessible 2
+- `signs_healthcare_wheelchair_accessible_3` — Wheelchair Accessible 3
+
+## 通用素材 · 自然（signs_nature）— 17 个
+
+- `signs_nature_earth` — Earth
+- `signs_nature_jupiter` — Jupiter
+- `signs_nature_maple_leaf` — Maple Leaf
+- `signs_nature_mars` — Mars
+- `signs_nature_mercury` — Mercury
+- `signs_nature_moon` — Moon
+- `signs_nature_neptune` — Neptune
+- `signs_nature_pluto` — Pluto
+- `signs_nature_saturn` — Saturn
+- `signs_nature_snowflake` — Snowflake
+- `signs_nature_sun_1` — Sun 1
+- `signs_nature_sun_2` — Sun 2
+- `signs_nature_sun_3` — Sun 3
+- `signs_nature_sun_4` — Sun 4
+- `signs_nature_tsunami` — Tsunami
+- `signs_nature_uranus` — Uranus
+- `signs_nature_venus` — Venus
+
+## 通用素材 · 人物（signs_people）— 19 个
+
+- `signs_people_baby_1` — Baby 1
+- `signs_people_baby_2` — Baby 2
+- `signs_people_changing_station` — Changing Station
+- `signs_people_construction` — Construction
+- `signs_people_female` — Female
+- `signs_people_male` — Male
+- `signs_people_man_1` — Man 1
+- `signs_people_man_2` — Man 2
+- `signs_people_mummy` — Mummy
+- `signs_people_pedestrian` — Pedestrian
+- `signs_people_shower_1` — Shower 1
+- `signs_people_shower_2` — Shower 2
+- `signs_people_stroller` — Stroller
+- `signs_people_unisex` — Unisex
+- `signs_people_waiting_room_1` — Waiting Room 1
+- `signs_people_waiting_room_2` — Waiting Room 2
+- `signs_people_walking` — Walking
+- `signs_people_woman_1` — Woman 1
+- `signs_people_woman_2` — Woman 2
+
+## 通用素材 · 安全（signs_safety）— 20 个
+
+- `signs_safety_biohazard` — Biohazard
+- `signs_safety_caution` — Caution
+- `signs_safety_chemical_weapon` — Chemical Weapon
+- `signs_safety_falling_rocks` — Falling Rocks
+- `signs_safety_fallout_shelter` — Fallout Shelter
+- `signs_safety_fragile` — Fragile
+- `signs_safety_handle_with_care` — Handle With Care
+- `signs_safety_high_voltage_1` — High Voltage 1
+- `signs_safety_high_voltage_2` — High Voltage 2
+- `signs_safety_high_voltage_3` — High Voltage 3
+- `signs_safety_keep_dry` — Keep Dry
+- `signs_safety_no` — No
+- `signs_safety_no_entry` — No Entry
+- `signs_safety_no_smoking` — No Smoking
+- `signs_safety_non_ionizing_radiation` — Non-Ionizing Radiation
+- `signs_safety_pedestrian_crossing` — Pedestrian Crossing
+- `signs_safety_radiation` — Radiation
+- `signs_safety_slip_hazard` — Slip Hazard
+- `signs_safety_store_right_up_1` — Store Right Up 1
+- `signs_safety_store_right_up_2` — Store Right Up 2
+
+## 通用素材 · 科学（signs_science）— 6 个
+
+- `signs_science_laboratory` — Laboratory
+- `signs_science_magnet` — Magnet
+- `signs_science_microscope` — Microscope
+- `signs_science_nuclear_1` — Nuclear 1
+- `signs_science_nuclear_2` — Nuclear 2
+- `signs_science_windmill` — Windmill
+
+## 通用素材 · 运动（signs_sports）— 80 个
+
+- `signs_sports_amphiteater` — Amphiteater
+- `signs_sports_archery` — Archery
+- `signs_sports_baseball` — Baseball
+- `signs_sports_binoculars` — Binoculars
+- `signs_sports_boardwalk` — Boardwalk
+- `signs_sports_boat_launch` — Boat Launch
+- `signs_sports_camper_1` — Camper 1
+- `signs_sports_camper_2` — Camper 2
+- `signs_sports_campfire` — Campfire
+- `signs_sports_campground` — Campground
+- `signs_sports_canoe_1` — Canoe 1
+- `signs_sports_canoe_2` — Canoe 2
+- `signs_sports_chair_lift` — Chair Lift
+- `signs_sports_climbing` — Climbing
+- `signs_sports_cross_country_skiing_1` — Cross Country Skiing 1
+- `signs_sports_cross_country_skiing_2` — Cross Country Skiing 2
+- `signs_sports_cycling` — Cycling
+- `signs_sports_dirt_bike` — Dirt Bike
+- `signs_sports_diving` — Diving
+- `signs_sports_downhill_skiing_1` — Downhill Skiing 1
+- `signs_sports_downhill_skiing_2` — Downhill Skiing 2
+- `signs_sports_exercise` — Exercise
+- `signs_sports_firewood` — Firewood
+- `signs_sports_fish_cleaning` — Fish Cleaning
+- `signs_sports_fishing_1` — Fishing 1
+- `signs_sports_fishing_2` — Fishing 2
+- `signs_sports_fishing_pier` — Fishing Pier
+- `signs_sports_golf` — Golf
+- `signs_sports_golfing` — Golfing
+- `signs_sports_gondola` — Gondola
+- `signs_sports_hang_gliding` — Hang Gliding
+- `signs_sports_hiker` — Hiker
+- `signs_sports_hiking` — Hiking
+- `signs_sports_horseback_trail` — Horseback Trail
+- `signs_sports_ice_fishing` — Ice Fishing
+- `signs_sports_ice_skating` — Ice Skating
+- `signs_sports_indoor_swimming` — Indoor Swimming
+- `signs_sports_jet_ski` — Jet Ski
+- `signs_sports_kayak` — Kayak
+- `signs_sports_life_jacket` — Life Jacket
+- `signs_sports_motorboat_1` — Motorboat 1
+- `signs_sports_motorboat_2` — Motorboat 2
+- `signs_sports_picnic_shelter` — Picnic Shelter
+- `signs_sports_picnic_table_1` — Picnic Table 1
+- `signs_sports_picnic_table_2` — Picnic Table 2
+- `signs_sports_ranger_station_1` — Ranger Station 1
+- `signs_sports_ranger_station_2` — Ranger Station 2
+- `signs_sports_rock_climbing` — Rock Climbing
+- `signs_sports_rock_collection` — Rock Collection
+- `signs_sports_rollerblading` — Rollerblading
+- `signs_sports_rowboat` — Rowboat
+- `signs_sports_running` — Running
+- `signs_sports_rv` — RV
+- `signs_sports_sail_boat` — Sail Boat
+- `signs_sports_sanitary_disposal_station` — Sanitary Disposal Station
+- `signs_sports_scenic_viewpoint` — Scenic Viewpoint
+- `signs_sports_scuba_diving` — Scuba Diving
+- `signs_sports_seesaw` — Seesaw
+- `signs_sports_self_guiding_trail` — Self Guiding Trail
+- `signs_sports_shelter` — Shelter
+- `signs_sports_skateboarding` — Skateboarding
+- `signs_sports_ski_jump` — Ski Jump
+- `signs_sports_sledding` — Sledding
+- `signs_sports_sleeping_shelter` — Sleeping Shelter
+- `signs_sports_small_boat_launch` — Small Boat Launch
+- `signs_sports_snow_shoeing` — Snow Shoeing
+- `signs_sports_snowboarder` — Snowboarder
+- `signs_sports_snowmobile` — Snowmobile
+- `signs_sports_surfing` — Surfing
+- `signs_sports_swimming_1` — Swimming 1
+- `signs_sports_swimming_2` — Swimming 2
+- `signs_sports_swing` — Swing
+- `signs_sports_tennis` — Tennis
+- `signs_sports_trail` — Trail
+- `signs_sports_view` — View
+- `signs_sports_wading` — Wading
+- `signs_sports_waterskiing` — Waterskiing
+- `signs_sports_whale_viewing` — Whale Viewing
+- `signs_sports_windsurfing` — Windsurfing
+- `signs_sports_wood_gathering` — Wood Gathering
+
+## 通用素材 · 科技（signs_tech）— 28 个
+
+- `signs_tech_at_1` — At 1
+- `signs_tech_at_2` — At 2
+- `signs_tech_camera_1` — Camera 1
+- `signs_tech_camera_2` — Camera 2
+- `signs_tech_cell_phone` — Cell Phone
+- `signs_tech_command` — Command
+- `signs_tech_computer` — Computer
+- `signs_tech_crop` — Crop
+- `signs_tech_cut` — Cut
+- `signs_tech_eject` — Eject
+- `signs_tech_ethernet` — Ethernet
+- `signs_tech_firewire` — Firewire
+- `signs_tech_fullscreen` — Fullscreen
+- `signs_tech_fullscreen_exit` — Fullscreen Exit
+- `signs_tech_mail` — Mail
+- `signs_tech_next` — Next
+- `signs_tech_power` — Power
+- `signs_tech_previous` — Previous
+- `signs_tech_radio` — Radio
+- `signs_tech_rss` — RSS
+- `signs_tech_telephone_1` — Telephone 1
+- `signs_tech_telephone_2` — Telephone 2
+- `signs_tech_telephone_3` — Telephone 3
+- `signs_tech_telephone_4` — Telephone 4
+- `signs_tech_telephone_5` — Telephone 5
+- `signs_tech_usb` — USB
+- `signs_tech_video_camera` — Video Camera
+- `signs_tech_washing_machine` — Washing Machine
+
+## 通用素材 · 交通（signs_transportation）— 75 个
+
+- `signs_transportation_4_wheeler` — 4 Wheeler
+- `signs_transportation_airbag` — Airbag
+- `signs_transportation_airplane_1` — Airplane 1
+- `signs_transportation_airplane_2` — Airplane 2
+- `signs_transportation_airplane_3` — Airplane 3
+- `signs_transportation_airplane_4` — Airplane 4
+- `signs_transportation_airplane_5` — Airplane 5
+- `signs_transportation_airplane_6` — Airplane 6
+- `signs_transportation_airplane_7` — Airplane 7
+- `signs_transportation_ambulance` — Ambulance
+- `signs_transportation_anchor_1` — Anchor 1
+- `signs_transportation_anchor_2` — Anchor 2
+- `signs_transportation_anchor_3` — Anchor 3
+- `signs_transportation_anchor_4` — Anchor 4
+- `signs_transportation_bicycle_1` — Bicycle 1
+- `signs_transportation_bicycle_2` — Bicycle 2
+- `signs_transportation_bicycle_3` — Bicycle 3
+- `signs_transportation_bicycle_4` — Bicycle 4
+- `signs_transportation_bicycle_5` — Bicycle 5
+- `signs_transportation_bicycler` — Bicycler
+- `signs_transportation_bus_1` — Bus 1
+- `signs_transportation_bus_2` — Bus 2
+- `signs_transportation_bus_3` — Bus 3
+- `signs_transportation_bus_4` — Bus 4
+- `signs_transportation_car_1` — Car 1
+- `signs_transportation_car_2` — Car 2
+- `signs_transportation_car_3` — Car 3
+- `signs_transportation_car_4` — Car 4
+- `signs_transportation_car_lock` — Car Lock
+- `signs_transportation_divided_highway` — Divided Highway
+- `signs_transportation_ferry` — Ferry
+- `signs_transportation_firetruck` — Firetruck
+- `signs_transportation_forklift` — Forklift
+- `signs_transportation_gas_1` — Gas 1
+- `signs_transportation_gas_2` — Gas 2
+- `signs_transportation_gas_3` — Gas 3
+- `signs_transportation_gas_4` — Gas 4
+- `signs_transportation_ground_transportation` — Ground Transportation
+- `signs_transportation_harbor` — Harbor
+- `signs_transportation_helicopter` — Helicopter
+- `signs_transportation_highway` — Highway
+- `signs_transportation_jeep_1` — Jeep 1
+- `signs_transportation_jeep_2` — Jeep 2
+- `signs_transportation_lighthouse_1` — Lighthouse 1
+- `signs_transportation_lighthouse_2` — Lighthouse 2
+- `signs_transportation_moped_1` — Moped 1
+- `signs_transportation_moped_2` — Moped 2
+- `signs_transportation_motorcycle` — Motorcycle
+- `signs_transportation_partially_submerged_wreck` — Partially Submerged Wreck
+- `signs_transportation_radiator_water` — Radiator Water
+- `signs_transportation_scooter` — Scooter
+- `signs_transportation_sea_plane` — Sea Plane
+- `signs_transportation_seat_belt` — Seat Belt
+- `signs_transportation_ship_1` — Ship 1
+- `signs_transportation_ship_2` — Ship 2
+- `signs_transportation_tank` — Tank
+- `signs_transportation_taxi` — Taxi
+- `signs_transportation_tow_away` — Tow Away
+- `signs_transportation_tractor_1` — Tractor 1
+- `signs_transportation_tractor_2` — Tractor 2
+- `signs_transportation_train_1` — Train 1
+- `signs_transportation_train_2` — Train 2
+- `signs_transportation_train_3` — Train 3
+- `signs_transportation_train_station` — Train Station
+- `signs_transportation_tram_1` — Tram 1
+- `signs_transportation_tram_2` — Tram 2
+- `signs_transportation_truck_1` — Truck 1
+- `signs_transportation_truck_2` — Truck 2
+- `signs_transportation_truck_3` — Truck 3
+- `signs_transportation_truck_4` — Truck 4
+- `signs_transportation_truck_5` — Truck 5
+- `signs_transportation_truck_6` — Truck 6
+- `signs_transportation_truck_7` — Truck 7
+- `signs_transportation_uneven_road` — Uneven Road
+- `signs_transportation_vehicle_ferry` — Vehicle Ferry
+
+## 通用素材 · 旅行（signs_travel）— 49 个
+
+- `signs_travel_arriving_flights` — Arriving Flights
+- `signs_travel_arrow_east` — Arrow East
+- `signs_travel_arrow_ne` — Arrow NE
+- `signs_travel_arrow_north` — Arrow North
+- `signs_travel_arrow_nw` — Arrow NW
+- `signs_travel_arrow_se` — Arrow SE
+- `signs_travel_arrow_south` — Arrow South
+- `signs_travel_arrow_sw` — Arrow SW
+- `signs_travel_arrow_west` — Arrow West
+- `signs_travel_baggage` — Baggage
+- `signs_travel_bank` — Bank
+- `signs_travel_barber_shop` — Barber Shop
+- `signs_travel_beauty_salon` — Beauty Salon
+- `signs_travel_book_and_souvenir_shop` — Book And Souvenir Shop
+- `signs_travel_car_rental` — Car Rental
+- `signs_travel_cashier` — Cashier
+- `signs_travel_coat_check` — Coat Check
+- `signs_travel_currency_exchange` — Currency Exchange
+- `signs_travel_customs` — Customs
+- `signs_travel_downstairs` — Downstairs
+- `signs_travel_drinking_fountain` — Drinking Fountain
+- `signs_travel_driving_tour` — Driving Tour
+- `signs_travel_elevator` — Elevator
+- `signs_travel_escalator` — Escalator
+- `signs_travel_escalator_down` — Escalator Down
+- `signs_travel_escalator_up` — Escalator Up
+- `signs_travel_euro` — Euro
+- `signs_travel_exit` — Exit
+- `signs_travel_haircut` — Haircut
+- `signs_travel_hotel` — Hotel
+- `signs_travel_hotel_information` — Hotel Information
+- `signs_travel_immigration` — Immigration
+- `signs_travel_information_1` — Information 1
+- `signs_travel_information_2` — Information 2
+- `signs_travel_locker` — Locker
+- `signs_travel_lost_and_found` — Lost And Found
+- `signs_travel_museum` — Museum
+- `signs_travel_no_parking` — No Parking
+- `signs_travel_parking_1` — Parking 1
+- `signs_travel_parking_2` — Parking 2
+- `signs_travel_point_of_interest` — Point Of Interest
+- `signs_travel_pound` — Pound
+- `signs_travel_present` — Present
+- `signs_travel_shops` — Shops
+- `signs_travel_stairs` — Stairs
+- `signs_travel_ticket_machine` — Ticket Machine
+- `signs_travel_ticket_purchase` — Ticket Purchase
+- `signs_travel_tunnel` — Tunnel
+- `signs_travel_upstairs` — Upstairs

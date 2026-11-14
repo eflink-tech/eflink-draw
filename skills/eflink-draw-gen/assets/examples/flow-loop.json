@@ -1,0 +1,21 @@
+{
+  "title": "循环结构流程图",
+  "width": 580,
+  "height": 790,
+  "nodes": [
+    { "id": "start", "name": "terminator", "text": "开始", "x": 148, "y": 28, "w": 120, "h": 55, "fill": "240,128,105", "textColor": "255,255,255", "bold": true },
+    { "id": "init", "name": "process", "text": "赋初值", "x": 152, "y": 190, "w": 112, "h": 55, "fill": "247,243,180" },
+    { "id": "cond", "name": "decision", "text": "表达式1", "x": 135, "y": 345, "w": 145, "h": 90, "fill": "242,167,159" },
+    { "id": "body", "name": "process", "text": "代码块", "x": 152, "y": 500, "w": 112, "h": 55, "fill": "247,243,180" },
+    { "id": "step", "name": "process", "text": "表达式2", "x": 388, "y": 500, "w": 147, "h": 55, "fill": "247,243,180" },
+    { "id": "end", "name": "terminator", "text": "结束", "x": 148, "y": 688, "w": 120, "h": 55, "fill": "240,128,105", "textColor": "255,255,255", "bold": true }
+  ],
+  "links": [
+    { "from": "start", "to": "init", "fromSide": "bottom", "toSide": "top" },
+    { "from": "init", "to": "cond", "fromSide": "bottom", "toSide": "top" },
+    { "from": "cond", "to": "body", "text": "真", "fromSide": "bottom", "toSide": "top" },
+    { "from": "body", "to": "step", "fromSide": "right", "toSide": "left" },
+    { "from": "step", "to": "cond", "fromSide": "right", "toSide": "right" },
+    { "from": "cond", "to": "end", "text": "假", "fromSide": "left", "toSide": "left" }
+  ]
+}
