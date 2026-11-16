@@ -205,6 +205,15 @@ function labelInkTopOffset(text: string, fontCSS: string, fontSize: number): num
   return v
 }
 
+/** 多行文字块的顶部偏移：单行按墨迹中心对齐锚点，多行整体垂直居中 */
+function labelBlockTopOffset(text: string, fontCSS: string, fontSize: number): number {
+  const lineCount = Math.max(1, text.split('\n').length)
+  return (
+    labelInkTopOffset(text, fontCSS, fontSize) -
+    ((lineCount - 1) * fontSize * TEXT_LINE_HEIGHT) / 2
+  )
+}
+
 /** 连线文字标签（整线文字 / 分段文字通用；白底居中） */
 function LinkerLabel({
   linker,
@@ -342,7 +351,7 @@ function LinkerLabel({
       <Text
         ref={textRef}
         x={-box.w / 2}
-        y={labelInkTopOffset(linker.text, fontFamilyCSS(font.fontFamily), font.size ?? 13)}
+        y={labelBlockTopOffset(text, fontFamilyCSS(font.fontFamily), font.size ?? 13)}
         text={text}
         fontSize={font.size}
         fontFamily={fontFamilyCSS(font.fontFamily)}
